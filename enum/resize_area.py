@@ -2,7 +2,7 @@
 from enum import Enum
 
 
-class ResizeRegion(Enum):
+class ResizeArea(Enum):
     """..."""
     NONE = 'NONE'
     TOP = 'TOP'

@@ -1,0 +1,17 @@
+{
+    "quickCommandButtons.activeSet": null,
+    "quickCommandButtons.buttons": [
+        {
+            "command": "SDL_VIDEODRIVER=x11 SDL_RENDERER_DRIVER=vulkan /home/user/Dev/github/venvs/gen/bin/python -O /home/user/Dev/github/genframe.py",
+            "insertOnly": false,
+            "name": "$(terminal) X11",
+            "useVsCodeApi": false
+        },
+        {
+            "command": "SDL_RENDERER_DRIVER=vulkan /home/user/Dev/github/venvs/gen/bin/python -O /home/user/Dev/github/genframe.py",
+            "insertOnly": false,
+            "name": "$(terminal-powershell) Way",
+            "useVsCodeApi": false
+        }
+    ]
+}
