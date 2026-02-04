@@ -181,10 +181,17 @@ class Frame(object):
             self.__draw.rect(
                 1, 1, w.value - 2, h.value - 2, (20, 20, 20, 255), 8)  # 30
 
+            # btnx, btny = w.value - (w.value // 2) - 50, h.value - (h.value // 2) - 16
+            # btnw, btnh = 100, 32
+            # self.__draw.rect(
+            #     btnx, btny, btnw, btnh, (100, 100, 100, 255), 3)
+            # self.__draw.rect(
+            #     btnx + 1, btny +1, btnw - 2, btnh - 2, (50, 50, 50, 255), 3)
+
             sdl3.SDL_RenderPresent(self.__renderer)
             sdl3.SDL_Delay(10)
-    
-    def __frame_start_drag(self) -> None:        
+
+    def __frame_start_drag(self) -> None:
         if hasattr(sdl3, 'SDL_StartWindowMove'):
             sdl3.SDL_StartWindowMove(self.__frame)
         else:
@@ -196,7 +203,7 @@ class Frame(object):
             new_y = int(my.value - self.__drag_offset_y)
 
             sdl3.SDL_SetWindowPosition(self.__frame, new_x, new_y)
-    
+
     def __frame_start_resize(self) -> None:
         if not self.__resizing:
             return
