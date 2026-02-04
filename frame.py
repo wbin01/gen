@@ -11,6 +11,8 @@ from .flag import ResizeArea
 class Frame(object):
     """..."""
     def __init__(self) -> None:
+        sdl3.SDL_SetHint(
+            sdl3.SDL_HINT_X11_WINDOW_TYPE, b'_NET_WM_WINDOW_TYPE_NORMAL')
         # Init
         if sdl3.SDL_Init(sdl3.SDL_INIT_VIDEO) < 0: # X SDL_INIT_EVERYTHING
             print('SDL3 init error:', sdl3.SDL_GetError())
@@ -18,8 +20,12 @@ class Frame(object):
 
         # Frame
         self.__frame = sdl3.SDL_CreateWindow(
-            b'Transparente Frame - SDL3 + PySDL3', 640, 480,
-            (sdl3.SDL_WINDOW_BORDERLESS | sdl3.SDL_WINDOW_TRANSPARENT))
+            b'Transparente Frame - SDL3 + PySDL3', 640, 480, (
+                sdl3.SDL_WINDOW_BORDERLESS | sdl3.SDL_WINDOW_TRANSPARENT |
+                sdl3.SDL_WINDOW_RESIZABLE))
+        # SDL_WINDOW_UTILITY
+        # SDL_WINDOW_TOOLTIP
+        # SDL_WINDOW_POPUP
 
         if not self.__frame:
             print('Frame creation error:', sdl3.SDL_GetError())
