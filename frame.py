@@ -5,7 +5,7 @@ from ctypes import c_float, c_int
 import sdl3
 
 from .core import Draw
-from .enum import ResizeArea
+from .flag import ResizeArea
 
 
 class Frame(object):
@@ -136,11 +136,11 @@ class Frame(object):
             event = sdl3.SDL_Event()
 
             while sdl3.SDL_PollEvent(event):
+                resize_area = self.__cursor_find_resize_area()
 
-                resize_region = self.__cursor_find_resize_area()
-                if resize_region.value != self.__last_resize_cursor_on_hover:
-                    self.__cursor_update_shape(resize_region.value)
-                    self.__last_resize_cursor_on_hover = resize_region.value
+                if resize_area.value != self.__last_resize_cursor_on_hover:
+                    self.__cursor_update_shape(resize_area.value)
+                    self.__last_resize_cursor_on_hover = resize_area.value
 
                 if event.type == sdl3.SDL_EVENT_QUIT:
                     self.__running = False
@@ -177,15 +177,15 @@ class Frame(object):
             w = c_int()
             h = c_int()
             sdl3.SDL_GetWindowSize(self.__frame, w, h)
-            self.__draw.rect(0, 0, w.value, h.value, (40, 40, 40, 200), 8)
+            self.__draw.rect(0, 0, w.value, h.value, (55, 55, 55, 255), 8) # 40
             self.__draw.rect(
-                1, 1, w.value - 2, h.value - 2, (30, 30, 30, 255), 8)
+                1, 1, w.value - 2, h.value - 2, (20, 20, 20, 255), 8)  # 30
 
             sdl3.SDL_RenderPresent(self.__renderer)
             sdl3.SDL_Delay(10)
     
     def __frame_start_drag(self) -> None:        
-        if hasattr(sdl3, "SDL_StartWindowMove"):
+        if hasattr(sdl3, 'SDL_StartWindowMove'):
             sdl3.SDL_StartWindowMove(self.__frame)
         else:
             mx = c_float()
