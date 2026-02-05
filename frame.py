@@ -191,8 +191,11 @@ class Frame(object):
             self.__draw.rect(
                 1, 1, w.value - 2, h.value - 2, (20, 20, 20, 255), 8)  # 30
 
-            AbsButton(self.__draw, 100, 50)
-            self.__draw.text(110, 55, 'Olá texto')
+            w = c_int()
+            h = c_int()
+            sdl3.SDL_GetWindowSize(self.__frame, w, h)
+
+            AbsButton(self.__draw, 'Button', 0, 50, w.value)
 
             sdl3.SDL_RenderPresent(self.__renderer)
             sdl3.SDL_Delay(10)

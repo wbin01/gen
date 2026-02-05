@@ -7,6 +7,10 @@ from PIL import Image, ImageDraw, ImageFont
 import sdl3
 
 
+class Text:
+    pass
+
+
 class Draw(object):
     """..."""
     def __init__(self, renderer) -> None:
@@ -61,56 +65,12 @@ class Draw(object):
             sdl3.SDL_RenderLine(
                 self.__renderer, cx - dx, cy + dy, cx + dx, cy + dy)
 
-    def text(self, x: int, y: int, text: str) -> None:
-        text_bytes, w, h = self.__text_to_raster_bytes_font(text)
+    def text(self, x: int, y: int, text: Text) -> None:
         surface = sdl3.SDL_CreateSurfaceFrom(
-            w, h, sdl3.SDL_PIXELFORMAT_RGBA32, text_bytes, w * 4)
+            text.width, text._height,
+            sdl3.SDL_PIXELFORMAT_RGBA32, text._bytes, text.width * 4)
         texture = sdl3.SDL_CreateTextureFromSurface(self.__renderer, surface)
         sdl3.SDL_DestroySurface(surface)
 
-        dst = sdl3.SDL_FRect(x, y, w, h)
+        dst = sdl3.SDL_FRect(x, y, text.width, text._height)
         sdl3.SDL_RenderTexture(self.__renderer, texture, None, dst)
-    
-    def __text_to_raster_bytes_font(
-            self,
-            text: str,
-            color: tuple = (200, 200, 200, 255),
-            font: str = 'DejaVuSans.ttf',
-            size: int = 12) -> None:
-        
-        font = ImageFont.truetype(font, size)
-
-        bbox = font.getbbox(text)
-        w = bbox[2] - bbox[0]
-        h = bbox[3] - bbox[1]
-
-        raster = Image.new('RGBA', (w, h), (0, 0, 0, 0))
-        draw = ImageDraw.Draw(raster)
-        draw.text((-bbox[0], -bbox[1]), text, font=font, fill=color)
-
-        pixels = raster.tobytes()
-        w, h = raster.size
-        return pixels, w, h
-
-    def text_old(
-            self, x: int, y: int, text: str, color: tuple = None,
-            font: str = None, size: int = 12) -> None:
-        """..."""
-        if font:
-            self.__font = self.__ttf.TTF_OpenFont(b'DejaVuSans.ttf', size)
-        
-        if color:
-            self.__font_color = sdl3.SDL_Color(
-                color[0], color[1], color[2], color[3])
-        
-        if text:
-            self.__font_surface = self.__ttf.TTF_RenderUTF8_Blended(
-                self.__font, str.encode('Hello world!'), self.__font_color)
-
-        texture = sdl3.SDL_CreateTextureFromSurface(
-            self.__renderer, cast(self.__font_surface, c_void_p))
-
-        dst = sdl3.SDL_FRect(
-            x, y, self.__font_surface.w, self.__font_surface.h)
-        sdl3.SDL_RenderTexture(self.__renderer, texture, None, dst)
-
