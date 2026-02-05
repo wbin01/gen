@@ -39,7 +39,7 @@ class Frame(object):
 
         sdl3.SDL_SetWindowOpacity(self.__frame, 1.0)
 
-        # Renderer Draw
+        # Renderer Draw Style
         self.__renderer = sdl3.SDL_CreateRenderer(self.__frame, None)
         if not self.__renderer:
             print('Renderer creation error:', sdl3.SDL_GetError())
@@ -49,8 +49,8 @@ class Frame(object):
         
         sdl3.SDL_SetRenderVSync(self.__renderer, 1)  # Opt 1=on 0=off -1=adapt
 
-        # Draw
         self.__draw = Draw(self.__renderer)
+        self.__style = self._Frame__theme
 
         # Control Frame
         self.__running = True
@@ -223,9 +223,12 @@ class Frame(object):
             
             self.btn._AbsButton__style['NORMAL']['background'] = (50, 100, 50, 255)
             self.btn._AbsButton__render()
+
+            btn2 = AbsButton(self.__draw, 'Olá', x=100, y=240, name='green')
+            btn2._AbsButton__render()
             
             if win_w.value < 300 < 350:
-                self._Frame__theme.button['NORMAL']['background'] = (150, 50, 50, 255)
+                self.__style.button['NORMAL']['background'] = (150, 50, 50, 255)
 
             sdl3.SDL_RenderPresent(self.__renderer)
             sdl3.SDL_Delay(10)

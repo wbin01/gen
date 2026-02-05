@@ -6,8 +6,7 @@ from .style import Theme
 
 
 class AbsButton(object):
-    __theme = Theme.button
-    
+    """..."""
     def __init__(
             self, draw, text: str = '',
             x: int = 0, y: int = 0, w: int = 100, h: int = 32,
@@ -21,11 +20,14 @@ class AbsButton(object):
         self.__h = h
         self.__elided = elided
         self.__name = name
-
+        
         if self.__name:
-            self.__style = copy.deepcopy(AbsButton.__theme)
+            if self.__name not in Theme.classes:
+                Theme.classes[self.__name] = copy.deepcopy(Theme.button)
+            self.__style = Theme.classes[self.__name]
         else:
-            self.__style = AbsButton.__theme
+            self.__style = Theme.button
+
     
     def __render(self):
         pad = self.__style['NORMAL']['padding'] * 2
