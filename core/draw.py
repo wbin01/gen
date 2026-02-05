@@ -7,7 +7,7 @@ from PIL import Image, ImageDraw, ImageFont
 import sdl3
 
 
-class Text:
+class FontRender:
     pass
 
 
@@ -65,12 +65,13 @@ class Draw(object):
             sdl3.SDL_RenderLine(
                 self.__renderer, cx - dx, cy + dy, cx + dx, cy + dy)
 
-    def text(self, x: int, y: int, text: Text) -> None:
+    def text(self, x: int, y: int, text: FontRender) -> None:
         surface = sdl3.SDL_CreateSurfaceFrom(
-            text.width, text._height,
-            sdl3.SDL_PIXELFORMAT_RGBA32, text._bytes, text.width * 4)
+            text.width, text.height, sdl3.SDL_PIXELFORMAT_RGBA32,
+            text._bytes, text.width * 4)
+        
         texture = sdl3.SDL_CreateTextureFromSurface(self.__renderer, surface)
         sdl3.SDL_DestroySurface(surface)
 
-        dst = sdl3.SDL_FRect(x, y, text.width, text._height)
+        dst = sdl3.SDL_FRect(x, y, text.width, text.height)
         sdl3.SDL_RenderTexture(self.__renderer, texture, None, dst)

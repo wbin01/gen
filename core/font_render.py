@@ -3,20 +3,28 @@ from PIL import Image, ImageDraw, ImageFont
 # python3 -m pip install --upgrade Pillow
 
 
-class Text(object):
+class FontRender(object):
     """..."""
     def __init__(
-            self, text: str,
-            width_to_elided: int = 0, padding: int = 20) -> None:
+            self,
+            text: str,
+            color: tuple = (200, 200, 200, 255),
+            font: str = 'DejaVuSans.ttf',
+            size: int = 12,
+            width_to_elided: int = 0,
+            padding: int = 20) -> None:
         """..."""
         self.__text = text
+        self.__color = color
+        self.__font = font
+        self.__size = size
         self.__width_to_elided = width_to_elided
         self.__pad = padding
 
         self.__bytes = None
         self.__width = None
         self.__height = None
-        self.__text_to_bytes(text)
+        self.__text_to_bytes()
     
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}({self.__text!r})'
@@ -32,7 +40,15 @@ class Text(object):
     @text.setter
     def text(self, text: str) -> None:
         self.__text = text
-        self.__text_to_bytes(text)
+    
+    @property
+    def height(self) -> int:
+        """..."""
+        return self.__height
+    
+    @height.setter
+    def height(self, height: int) -> None:
+        self.__height = height
     
     @property
     def width(self) -> int:
@@ -46,9 +62,9 @@ class Text(object):
     def _bytes(self) -> bytes:
         return self.__bytes
     
-    @property
-    def _height(self) -> int:
-        return self.__height
+    def update(self) -> None:
+        """..."""
+        self.__text_to_bytes()
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}()'
@@ -56,16 +72,11 @@ class Text(object):
     def __str__(self) -> str:
         return self.__class__.__name__
     
-    def __text_to_bytes(
-            self,
-            text: str,
-            color: tuple = (200, 200, 200, 255),
-            font: str = 'DejaVuSans.ttf',
-            size: int = 12) -> None:
+    def __text_to_bytes(self) -> None:
         
-        font = ImageFont.truetype(font, size)
+        font = ImageFont.truetype(self.__font, self.__size)
 
-        bbox = font.getbbox(text)
+        bbox = font.getbbox(self.__text)
         w = bbox[2] - bbox[0]
         h = bbox[3] - bbox[1]
 
@@ -74,7 +85,8 @@ class Text(object):
 
         raster = Image.new('RGBA', (w, h), (0, 0, 0, 0))
         draw = ImageDraw.Draw(raster)
-        draw.text((-bbox[0], -bbox[1]), text, font=font, fill=color)
+        draw.text(
+            (-bbox[0], -bbox[1]), self.__text, font=font, fill=self.__color)
 
         self.__bytes = raster.tobytes()
         self.__width, self.__height = raster.size

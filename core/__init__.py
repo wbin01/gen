@@ -1,3 +1,3 @@
 #!/usr/bin/env python3
 from .draw import Draw
-from .text import Text
+from .font_render import FontRender

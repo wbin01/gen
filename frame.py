@@ -196,8 +196,24 @@ class Frame(object):
             sdl3.SDL_GetWindowSize(self.__frame, win_w, win_h)
 
             AbsButton(
-                self.__draw, 'Button açlsdkçsd sadasd',
-                100, 50, elided=False)
+                draw=self.__draw,
+                text='Button Button Button Button',
+                x=10, y=10, w=win_w.value - 20, elided=True)
+            
+            AbsButton(
+                draw=self.__draw,
+                text='Button Button Button Button',
+                x=10, y=50, w=win_w.value - 20, elided=False)
+
+            AbsButton(
+                draw=self.__draw,
+                text='Button Button Button Button',
+                x=100, y=90, w=100, h=100, elided=False)
+            
+            AbsButton(
+                draw=self.__draw,
+                text='Button Button Button Button',
+                x=100, y=200, elided=True)
 
             sdl3.SDL_RenderPresent(self.__renderer)
             sdl3.SDL_Delay(10)

@@ -1,31 +1,15 @@
 #!/usr/bin/env python3
-from .core import Draw, Text
+from .core import Draw, FontRender
+from .style import Theme
 
 
 class AbsButton(object):
+    __theme = Theme.button
+    
     def __init__(
             self, draw, text: str = '',
             x: int = 0, y: int = 0, w: int = 100, h: int = 32,
-            style: dict = {
-                'NORMAL': {
-                    'text': (200, 200, 200, 255),
-                    'background': (40, 40, 40, 255),
-                    'border': (80, 80, 80, 255),
-                    'radius': 4,
-                    'font-size': 12,
-                    'padding': 10
-                    },
-                'HOVER': {
-                    'text': (200, 200, 200, 255),
-                    'background': (40, 40, 40, 255),
-                    'border': (80, 80, 80, 255),
-                    },
-                'CLICKED': {
-                    'text': (200, 200, 200, 255),
-                    'background': (40, 40, 40, 255),
-                    'border': (80, 80, 80, 255),
-                    },
-                }, elided: bool = False) -> None:
+            style: dict = None, elided: bool = False) -> None:
         """..."""
         self.__draw = draw
         self.__text = text
@@ -33,7 +17,7 @@ class AbsButton(object):
         self.__y = y
         self.__w = w
         self.__h = h
-        self.__style = style
+        self.__style = style or AbsButton.__theme
         self.__elided = elided
 
         self.__icon = None
@@ -41,12 +25,18 @@ class AbsButton(object):
         pad = self.__style['NORMAL']['padding'] * 2
 
         if self.__text:
-            txt = Text(text, self.__w if self.__elided else None, pad)
-            if self.__w < txt.width + pad: self.__w = txt.width + pad
-            if self.__h < txt._height + pad: self.__h = txt._height + pad
+            text = FontRender(
+                self.__text,
+                self.__style['NORMAL']['text'],
+                self.__style['NORMAL']['font'],
+                self.__style['NORMAL']['font-size'],
+                self.__w if self.__elided else None,
+                pad)
+            if self.__w < text.width + pad: self.__w = text.width + pad
+            if self.__h < text.height + pad: self.__h = text.height + pad
 
-            tx = self.__x + (self.__w // 2) - (txt.width // 2)
-            ty = self.__y + (self.__h // 2) - (txt._height // 2)
+            tx = self.__x + (self.__w // 2) - (text.width // 2)
+            ty = self.__y + (self.__h // 2) - (text.height // 2)
 
             if self.__icon:
                 tx -= 18
@@ -62,4 +52,4 @@ class AbsButton(object):
             self.__style['NORMAL']['radius'] - 1)
         
         if self.__text:
-            self.__draw.text(tx, ty, txt)
+            self.__draw.text(tx, ty, text)
