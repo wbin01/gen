@@ -9,10 +9,12 @@ import sdl3
 from .core import Draw
 from .flag import ResizeArea
 from .abs_button import AbsButton
-
+from .style import Theme
 
 class Frame(object):
     """..."""
+    __theme = Theme
+
     def __init__(self) -> None:
         sdl3.SDL_SetHint(
             sdl3.SDL_HINT_X11_WINDOW_TYPE, b'_NET_WM_WINDOW_TYPE_NORMAL')
@@ -39,7 +41,6 @@ class Frame(object):
 
         # Renderer Draw
         self.__renderer = sdl3.SDL_CreateRenderer(self.__frame, None)
-
         if not self.__renderer:
             print('Renderer creation error:', sdl3.SDL_GetError())
             sdl3.SDL_DestroyWindow(self.__frame)
@@ -47,6 +48,8 @@ class Frame(object):
             sys.exit(1)
         
         sdl3.SDL_SetRenderVSync(self.__renderer, 1)  # Opt 1=on 0=off -1=adapt
+
+        # Draw
         self.__draw = Draw(self.__renderer)
 
         # Control Frame
@@ -195,25 +198,34 @@ class Frame(object):
             win_h = c_int()
             sdl3.SDL_GetWindowSize(self.__frame, win_w, win_h)
 
-            AbsButton(
+            btn = AbsButton(
                 draw=self.__draw,
                 text='Button Button Button Button',
                 x=10, y=10, w=win_w.value - 20, elided=True)
+            btn._AbsButton__render()
             
-            AbsButton(
+            btn = AbsButton(
                 draw=self.__draw,
                 text='Button Button Button Button',
                 x=10, y=50, w=win_w.value - 20, elided=False)
+            btn._AbsButton__render()
 
-            AbsButton(
+            btn = AbsButton(
                 draw=self.__draw,
                 text='Button Button Button Button',
                 x=100, y=90, w=100, h=100, elided=False)
+            btn._AbsButton__render()
             
-            AbsButton(
+            self.btn = AbsButton(
                 draw=self.__draw,
                 text='Button Button Button Button',
-                x=100, y=200, elided=True)
+                x=100, y=200, elided=True, name='green')
+            
+            self.btn._AbsButton__style['NORMAL']['background'] = (50, 100, 50, 255)
+            self.btn._AbsButton__render()
+            
+            if win_w.value < 300 < 350:
+                self._Frame__theme.button['NORMAL']['background'] = (150, 50, 50, 255)
 
             sdl3.SDL_RenderPresent(self.__renderer)
             sdl3.SDL_Delay(10)

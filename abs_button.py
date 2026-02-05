@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+import copy
+
 from .core import Draw, FontRender
 from .style import Theme
 
@@ -9,7 +11,7 @@ class AbsButton(object):
     def __init__(
             self, draw, text: str = '',
             x: int = 0, y: int = 0, w: int = 100, h: int = 32,
-            style: dict = None, elided: bool = False) -> None:
+            elided: bool = False, name: str = None) -> None:
         """..."""
         self.__draw = draw
         self.__text = text
@@ -17,11 +19,15 @@ class AbsButton(object):
         self.__y = y
         self.__w = w
         self.__h = h
-        self.__style = style or AbsButton.__theme
         self.__elided = elided
+        self.__name = name
 
-        self.__icon = None
-
+        if self.__name:
+            self.__style = copy.deepcopy(AbsButton.__theme)
+        else:
+            self.__style = AbsButton.__theme
+    
+    def __render(self):
         pad = self.__style['NORMAL']['padding'] * 2
 
         if self.__text:
@@ -37,9 +43,6 @@ class AbsButton(object):
 
             tx = self.__x + (self.__w // 2) - (text.width // 2)
             ty = self.__y + (self.__h // 2) - (text.height // 2)
-
-            if self.__icon:
-                tx -= 18
         
         self.__draw.rect(
             self.__x, self.__y, self.__w, self.__h,
