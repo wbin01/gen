@@ -7,23 +7,25 @@ class AbsButton(object):
             self, draw, text: str = '',
             x: int = 0, y: int = 0, w: int = 100, h: int = 32,
             style: dict = {
-                'ACTIVE': {
+                'NORMAL': {
                     'text': (200, 200, 200, 255),
-                    'background': (50, 50, 50, 255),
-                    'border': (100, 100, 100, 255),
-                    'radius': 4
+                    'background': (40, 40, 40, 255),
+                    'border': (80, 80, 80, 255),
+                    'radius': 4,
+                    'font-size': 12,
+                    'padding': 10
                     },
                 'HOVER': {
                     'text': (200, 200, 200, 255),
-                    'background': (50, 50, 50, 255),
-                    'border': (100, 100, 100, 255),
+                    'background': (40, 40, 40, 255),
+                    'border': (80, 80, 80, 255),
                     },
                 'CLICKED': {
                     'text': (200, 200, 200, 255),
-                    'background': (50, 50, 50, 255),
-                    'border': (100, 100, 100, 255),
+                    'background': (40, 40, 40, 255),
+                    'border': (80, 80, 80, 255),
                     },
-                }) -> None:
+                }, elided: bool = False) -> None:
         """..."""
         self.__draw = draw
         self.__text = text
@@ -32,13 +34,16 @@ class AbsButton(object):
         self.__w = w
         self.__h = h
         self.__style = style
+        self.__elided = elided
 
         self.__icon = None
 
+        pad = self.__style['NORMAL']['padding'] * 2
+
         if self.__text:
-            txt = Text(text)
-            if self.__w < txt.width + 20: self.__w = txt.width + 20
-            if self.__h < txt._height + 20: self.__h = txt._height + 20
+            txt = Text(text, self.__w if self.__elided else None, pad)
+            if self.__w < txt.width + pad: self.__w = txt.width + pad
+            if self.__h < txt._height + pad: self.__h = txt._height + pad
 
             tx = self.__x + (self.__w // 2) - (txt.width // 2)
             ty = self.__y + (self.__h // 2) - (txt._height // 2)
@@ -48,13 +53,13 @@ class AbsButton(object):
         
         self.__draw.rect(
             self.__x, self.__y, self.__w, self.__h,
-            self.__style['ACTIVE']['border'],
-            self.__style['ACTIVE']['radius'])
+            self.__style['NORMAL']['border'],
+            self.__style['NORMAL']['radius'])
         
         self.__draw.rect(
             self.__x + 1, self.__y +1, self.__w - 2,self.__h - 2,
-            self.__style['ACTIVE']['background'],
-            self.__style['ACTIVE']['radius'] - 1)
+            self.__style['NORMAL']['background'],
+            self.__style['NORMAL']['radius'] - 1)
         
         if self.__text:
             self.__draw.text(tx, ty, txt)

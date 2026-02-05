@@ -5,13 +5,24 @@ from PIL import Image, ImageDraw, ImageFont
 
 class Text(object):
     """..."""
-    def __init__(self, text: str) -> None:
+    def __init__(
+            self, text: str,
+            width_to_elided: int = 0, padding: int = 20) -> None:
         """..."""
         self.__text = text
+        self.__width_to_elided = width_to_elided
+        self.__pad = padding
+
         self.__bytes = None
         self.__width = None
         self.__height = None
         self.__text_to_bytes(text)
+    
+    def __repr__(self) -> str:
+        return f'{self.__class__.__name__}({self.__text!r})'
+
+    def __str__(self) -> str:
+        return self.__text
     
     @property
     def text(self) -> str:
@@ -57,6 +68,9 @@ class Text(object):
         bbox = font.getbbox(text)
         w = bbox[2] - bbox[0]
         h = bbox[3] - bbox[1]
+
+        if self.__width_to_elided and w + self.__pad > self.__width_to_elided:
+            w = self.__width_to_elided - self.__pad
 
         raster = Image.new('RGBA', (w, h), (0, 0, 0, 0))
         draw = ImageDraw.Draw(raster)

@@ -23,7 +23,7 @@ class Frame(object):
 
         # Frame
         self.__frame = sdl3.SDL_CreateWindow(
-            b'Transparente Frame - SDL3 + PySDL3', 640, 480, (
+            b'Transparente Frame - SDL3 + PySDL3', 400, 300, (
                 sdl3.SDL_WINDOW_BORDERLESS | sdl3.SDL_WINDOW_TRANSPARENT |
                 sdl3.SDL_WINDOW_RESIZABLE))
         # SDL_WINDOW_UTILITY
@@ -191,11 +191,13 @@ class Frame(object):
             self.__draw.rect(
                 1, 1, w.value - 2, h.value - 2, (20, 20, 20, 255), 8)  # 30
 
-            w = c_int()
-            h = c_int()
-            sdl3.SDL_GetWindowSize(self.__frame, w, h)
+            win_w = c_int()
+            win_h = c_int()
+            sdl3.SDL_GetWindowSize(self.__frame, win_w, win_h)
 
-            AbsButton(self.__draw, 'Button', 0, 50, w.value)
+            AbsButton(
+                self.__draw, 'Button açlsdkçsd sadasd',
+                100, 50, elided=False)
 
             sdl3.SDL_RenderPresent(self.__renderer)
             sdl3.SDL_Delay(10)
