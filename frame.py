@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
+
 import sys
 from ctypes import c_float, c_int
 
 import sdl3
+# import sdl3.sdlttf as ttf
 
 from .core import Draw
 from .flag import ResizeArea
+from .abs_button import AbsButton
 
 
 class Frame(object):
@@ -32,7 +35,7 @@ class Frame(object):
             sdl3.SDL_Quit()
             sys.exit(1)
 
-        sdl3.SDL_SetWindowOpacity(self.__frame, 0.80)
+        sdl3.SDL_SetWindowOpacity(self.__frame, 1.0)
 
         # Renderer Draw
         self.__renderer = sdl3.SDL_CreateRenderer(self.__frame, None)
@@ -42,7 +45,7 @@ class Frame(object):
             sdl3.SDL_DestroyWindow(self.__frame)
             sdl3.SDL_Quit()
             sys.exit(1)
-
+        
         sdl3.SDL_SetRenderVSync(self.__renderer, 1)  # Opt 1=on 0=off -1=adapt
         self.__draw = Draw(self.__renderer)
 
@@ -135,6 +138,7 @@ class Frame(object):
 
         sdl3.SDL_DestroyRenderer(self.__renderer)
         sdl3.SDL_DestroyWindow(self.__frame)
+        # sdl3.SDL_DestroySurface(self.__font_surface)
         sdl3.SDL_Quit()
 
     def __event_loop(self) -> None:
@@ -187,12 +191,8 @@ class Frame(object):
             self.__draw.rect(
                 1, 1, w.value - 2, h.value - 2, (20, 20, 20, 255), 8)  # 30
 
-            # btnx, btny = w.value - (w.value // 2) - 50, h.value - (h.value // 2) - 16
-            # btnw, btnh = 100, 32
-            # self.__draw.rect(
-            #     btnx, btny, btnw, btnh, (100, 100, 100, 255), 3)
-            # self.__draw.rect(
-            #     btnx + 1, btny +1, btnw - 2, btnh - 2, (50, 50, 50, 255), 3)
+            AbsButton(self.__draw, 100, 50)
+            self.__draw.text(110, 55, 'Olá texto')
 
             sdl3.SDL_RenderPresent(self.__renderer)
             sdl3.SDL_Delay(10)
