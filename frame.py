@@ -54,6 +54,8 @@ class Frame(object):
 
         # Control Frame
         self.__running = True
+        self.__render_update = True
+        self.__render_update_count = 0
 
         # Control Frame - Drag 
         self.__dragging = False
@@ -183,55 +185,34 @@ class Frame(object):
                     elif self.__dragging:
                         self.__frame_start_drag()
 
-            # Draw background Frame
-            sdl3.SDL_SetRenderDrawColor(self.__renderer, 0, 0, 0, 0)
-            sdl3.SDL_RenderClear(self.__renderer)
+            if self.__render_update:
+                self.__render_update_count += 1
+                
+                self.__draw_background()
 
-            w = c_int()
-            h = c_int()
-            sdl3.SDL_GetWindowSize(self.__frame, w, h)
-            self.__draw.rect(0, 0, w.value, h.value, (55, 55, 55, 255), 8) # 40
-            self.__draw.rect(
-                1, 1, w.value - 2, h.value - 2, (20, 20, 20, 255), 8)  # 30
+                self.__render()
+                self.__render_update = False
+                print('Render update:', self.__render_update_count)
 
-            win_w = c_int()
-            win_h = c_int()
-            sdl3.SDL_GetWindowSize(self.__frame, win_w, win_h)
+    def __render(self) -> None:
+        sdl3.SDL_RenderPresent(self.__renderer)
+        sdl3.SDL_Delay(10)
+    
+    def __draw_background(self) -> None:
+        sdl3.SDL_SetRenderDrawColor(self.__renderer, 0, 0, 0, 0)
+        sdl3.SDL_RenderClear(self.__renderer)
 
-            btn = AbsButton(
-                draw=self.__draw,
-                text='Button Button Button Button',
-                x=10, y=10, w=win_w.value - 20, elided=True)
-            btn._AbsButton__render()
-            
-            btn = AbsButton(
-                draw=self.__draw,
-                text='Button Button Button Button',
-                x=10, y=50, w=win_w.value - 20, elided=False)
-            btn._AbsButton__render()
+        w = c_int()
+        h = c_int()
+        sdl3.SDL_GetWindowSize(self.__frame, w, h)
 
-            btn = AbsButton(
-                draw=self.__draw,
-                text='Button Button Button Button',
-                x=100, y=90, w=100, h=100, elided=False)
-            btn._AbsButton__render()
-            
-            self.btn = AbsButton(
-                draw=self.__draw,
-                text='Button Button Button Button',
-                x=100, y=200, elided=True, name='green')
-            
-            self.btn._AbsButton__style['NORMAL']['background'] = (50, 100, 50, 255)
-            self.btn._AbsButton__render()
-
-            btn2 = AbsButton(self.__draw, 'Olá', x=100, y=240, name='green')
-            btn2._AbsButton__render()
-            
-            if win_w.value < 300 < 350:
-                self.__style.button['NORMAL']['background'] = (150, 50, 50, 255)
-
-            sdl3.SDL_RenderPresent(self.__renderer)
-            sdl3.SDL_Delay(10)
+        self.__draw.rect(
+            x=0, y=0, w=w.value, h=h.value,
+            color=self.__style.frame['NORMAL']['border'], r=8)
+        
+        self.__draw.rect(
+            x=1, y=1, w=w.value - 2, h=h.value - 2,
+            color=self.__style.frame['NORMAL']['background'], r=8)
 
     def __frame_start_drag(self) -> None:
         if hasattr(sdl3, 'SDL_StartWindowMove'):
@@ -245,6 +226,8 @@ class Frame(object):
             new_y = int(my.value - self.__drag_offset_y)
 
             sdl3.SDL_SetWindowPosition(self.__frame, new_x, new_y)
+        
+        self.__render_update = True
 
     def __frame_start_resize(self) -> None:
         if not self.__resizing:
@@ -280,15 +263,18 @@ class Frame(object):
 
         sdl3.SDL_SetWindowPosition(self.__frame, int(x), int(y))
         sdl3.SDL_SetWindowSize(self.__frame, w, h)
+        self.__render_update = True
     
     def __frame_stop_drag(self) -> None:
         self.__dragging = False
         self.__cursor_update_shape('NONE')
+        self.__render_update = True
     
     def __frame_stop_resize(self) -> None:
         self.__resizing = False
         self.__resize_area = ResizeArea.NONE
         self.__cursor_update_shape('NONE')
+        self.__render_update = True
     
     def __frame_update_drag_settings(self) -> None:
         self.__dragging = True
