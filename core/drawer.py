@@ -11,7 +11,7 @@ class FontRender:
     pass
 
 
-class Draw(object):
+class Drawer(object):
     """..."""
     def __init__(self, renderer) -> None:
         self.__renderer = renderer

@@ -6,7 +6,7 @@ from ctypes import c_float, c_int
 import sdl3
 # import sdl3.sdlttf as ttf
 
-from .core import Draw
+from .core import Drawer
 from .flag import ResizeArea
 from .abs_button import AbsButton
 from .style import Theme
@@ -39,7 +39,7 @@ class Frame(object):
 
         sdl3.SDL_SetWindowOpacity(self.__frame, 1.0)
 
-        # Renderer Draw Style
+        # Renderer Drawer Style
         self.__renderer = sdl3.SDL_CreateRenderer(self.__frame, None)
         if not self.__renderer:
             print('Renderer creation error:', sdl3.SDL_GetError())
@@ -49,12 +49,12 @@ class Frame(object):
         
         sdl3.SDL_SetRenderVSync(self.__renderer, 1)  # Opt 1=on 0=off -1=adapt
 
-        self.__draw = Draw(self.__renderer)
+        self.__drawer = Drawer(self.__renderer)
         self.__style = self._Frame__theme
 
         # Control Frame
         self.__running = True
-        self.__render_update = True
+        self.__render_update = 0
         self.__render_update_count = 0
 
         # Control Frame - Drag 
@@ -185,13 +185,28 @@ class Frame(object):
                     elif self.__dragging:
                         self.__frame_start_drag()
 
-            if self.__render_update:
+            if self.__render_update < 2:
+                self.__render_update += 1
                 self.__render_update_count += 1
                 
                 self.__draw_background()
 
+                btn = AbsButton(self.__drawer, 'Button', 100, 10)
+                btn._AbsButton__style['NORMAL']['background'] = (100, 50, 50, 255)
+                btn._AbsButton__draw()
+
+                btn = AbsButton(
+                    self.__drawer, 'Button', 100, 50, style_class='green')
+                btn._AbsButton__style['NORMAL']['background'] = (50, 100, 50, 255)
+                btn._AbsButton__draw()
+
+                btn = AbsButton(self.__drawer, 'Button', 100, 90)
+                btn._AbsButton__draw()
+
+                btn = AbsButton(self.__drawer, 'Button', 100, 130)
+                btn._AbsButton__draw()
+
                 self.__render()
-                self.__render_update = False
                 print('Render update:', self.__render_update_count)
 
     def __render(self) -> None:
@@ -206,11 +221,11 @@ class Frame(object):
         h = c_int()
         sdl3.SDL_GetWindowSize(self.__frame, w, h)
 
-        self.__draw.rect(
+        self.__drawer.rect(
             x=0, y=0, w=w.value, h=h.value,
             color=self.__style.frame['NORMAL']['border'], r=8)
         
-        self.__draw.rect(
+        self.__drawer.rect(
             x=1, y=1, w=w.value - 2, h=h.value - 2,
             color=self.__style.frame['NORMAL']['background'], r=8)
 
@@ -227,7 +242,7 @@ class Frame(object):
 
             sdl3.SDL_SetWindowPosition(self.__frame, new_x, new_y)
         
-        self.__render_update = True
+        self.__render_update = 0
 
     def __frame_start_resize(self) -> None:
         if not self.__resizing:
@@ -263,18 +278,18 @@ class Frame(object):
 
         sdl3.SDL_SetWindowPosition(self.__frame, int(x), int(y))
         sdl3.SDL_SetWindowSize(self.__frame, w, h)
-        self.__render_update = True
+        self.__render_update = 0
     
     def __frame_stop_drag(self) -> None:
         self.__dragging = False
         self.__cursor_update_shape('NONE')
-        self.__render_update = True
+        self.__render_update = 0
     
     def __frame_stop_resize(self) -> None:
         self.__resizing = False
         self.__resize_area = ResizeArea.NONE
         self.__cursor_update_shape('NONE')
-        self.__render_update = True
+        self.__render_update = 0
     
     def __frame_update_drag_settings(self) -> None:
         self.__dragging = True

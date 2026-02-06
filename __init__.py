@@ -1,4 +1,4 @@
 #!/usr/bin/env python3
-from .core import Draw
+from .core import Drawer
 from .flag import ResizeArea
 from .frame import Frame
