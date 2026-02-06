@@ -1,17 +1,19 @@
 #!/usr/bin/env python3
 import copy
 
-from .core import FontRender
-from .style import Theme
+from .cell import Cell
+from ..core import FontRender
+from ..style import Theme
 
 
-class AbsButton(object):
+class AbsButton(Cell):
     """..."""
     def __init__(
             self, drawer, text: str = '',
             x: int = 0, y: int = 0, w: int = 100, h: int = 32,
             elided: bool = False, style_class: str = None) -> None:
         """..."""
+        super().__init__()
         self.__drawer = drawer
         self.__text = text
         self.__x = x

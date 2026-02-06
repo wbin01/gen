@@ -8,8 +8,9 @@ import sdl3
 
 from .core import Drawer
 from .flag import ResizeArea
-from .abs_button import AbsButton
+from .cell import AbsButton
 from .style import Theme
+from .layout import Layout
 
 class Frame(object):
     """..."""
@@ -54,8 +55,12 @@ class Frame(object):
 
         # Control Frame
         self.__running = True
-        self.__render_update = 0
+        self.__render_update = True
         self.__render_update_count = 0
+
+        self.__layout = Layout()
+        self.__layout.add(AbsButton(self.__drawer, 'Button 1'))
+        self.__layout.add(AbsButton(self.__drawer, 'Button 2'))
 
         # Control Frame - Drag 
         self.__dragging = False
@@ -185,30 +190,19 @@ class Frame(object):
                     elif self.__dragging:
                         self.__frame_start_drag()
 
-            if self.__render_update < 2:
-                self.__render_update += 1
-                self.__render_update_count += 1
-                
+            if self.__render_update:
                 self.__draw_background()
 
-                btn = AbsButton(self.__drawer, 'Button', 100, 10)
-                btn._AbsButton__style['NORMAL']['background'] = (100, 50, 50, 255)
-                btn._AbsButton__draw()
-
-                btn = AbsButton(
-                    self.__drawer, 'Button', 100, 50, style_class='green')
-                btn._AbsButton__style['NORMAL']['background'] = (50, 100, 50, 255)
-                btn._AbsButton__draw()
-
-                btn = AbsButton(self.__drawer, 'Button', 100, 90)
-                btn._AbsButton__draw()
-
-                btn = AbsButton(self.__drawer, 'Button', 100, 130)
-                btn._AbsButton__draw()
-
+                if self.__layout._Layout__dirty:
+                    self.__layout._Layout__update()
+                    self.__layout._Layout__redraw()
+                    
                 self.__render()
+                self.__render_update = False
+                
+                self.__render_update_count += 1
                 print('Render update:', self.__render_update_count)
-
+    
     def __render(self) -> None:
         sdl3.SDL_RenderPresent(self.__renderer)
         sdl3.SDL_Delay(10)
@@ -242,7 +236,8 @@ class Frame(object):
 
             sdl3.SDL_SetWindowPosition(self.__frame, new_x, new_y)
         
-        self.__render_update = 0
+        self.__render_update = True
+        self.__layout._Layout__invalidate()
 
     def __frame_start_resize(self) -> None:
         if not self.__resizing:
@@ -278,18 +273,21 @@ class Frame(object):
 
         sdl3.SDL_SetWindowPosition(self.__frame, int(x), int(y))
         sdl3.SDL_SetWindowSize(self.__frame, w, h)
-        self.__render_update = 0
+        self.__render_update = True
+        self.__layout._Layout__invalidate()
     
     def __frame_stop_drag(self) -> None:
         self.__dragging = False
         self.__cursor_update_shape('NONE')
-        self.__render_update = 0
+        self.__render_update = True
+        self.__layout._Layout__invalidate()
     
     def __frame_stop_resize(self) -> None:
         self.__resizing = False
         self.__resize_area = ResizeArea.NONE
         self.__cursor_update_shape('NONE')
-        self.__render_update = 0
+        self.__render_update = True
+        self.__layout._Layout__invalidate()
     
     def __frame_update_drag_settings(self) -> None:
         self.__dragging = True
