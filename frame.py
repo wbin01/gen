@@ -17,11 +17,13 @@ class Frame(object):
     __theme = Theme
 
     def __init__(self) -> None:
+        self.__logging = True
+
         sdl3.SDL_SetHint(
             sdl3.SDL_HINT_X11_WINDOW_TYPE, b'_NET_WM_WINDOW_TYPE_NORMAL')
         # Init
         if sdl3.SDL_Init(sdl3.SDL_INIT_VIDEO) < 0: # X SDL_INIT_EVERYTHING
-            print('SDL3 init error:', sdl3.SDL_GetError())
+            if self.__logging: print('SDL3 init error:', sdl3.SDL_GetError())
             sys.exit(1) # X SDL_SetHint(sdl3.SDL_HINT_RENDER_DRIVER, b'vulkan')
 
         # Frame
@@ -34,7 +36,7 @@ class Frame(object):
         # SDL_WINDOW_POPUP
 
         if not self.__frame:
-            print('Frame creation error:', sdl3.SDL_GetError())
+            if self.__logging: print('Frame error:', sdl3.SDL_GetError())
             sdl3.SDL_Quit()
             sys.exit(1)
 
@@ -43,7 +45,7 @@ class Frame(object):
         # Renderer Drawer Style
         self.__renderer = sdl3.SDL_CreateRenderer(self.__frame, None)
         if not self.__renderer:
-            print('Renderer creation error:', sdl3.SDL_GetError())
+            if self.__logging: print('Renderer error:', sdl3.SDL_GetError())
             sdl3.SDL_DestroyWindow(self.__frame)
             sdl3.SDL_Quit()
             sys.exit(1)
@@ -53,20 +55,21 @@ class Frame(object):
         self.__drawer = Drawer(self.__renderer)
         self.__style = self._Frame__theme
 
+        # Layout test
+        self.__layout = Layout()
+
+        btn = self.__layout.add(AbsButton(self.__drawer, 'Button 1'))
+        btn._AbsButton__style['NORMAL']['background'] = (100, 50, 50, 255)
+        self.__layout.add(AbsButton(self.__drawer, 'Button 2'))
+        self.__layout.add(AbsButton(self.__drawer, 'Button 3'))
+        self.__layout.add(AbsButton(self.__drawer, 'Button 4'))
+
         # Control Frame
         self.__running = True
         self.__render_needs_updating = True
         self.__render_update_count = 0
         
         self.__draw_background()
-        self.__layout = Layout()
-        
-        # Layout test
-        btn = self.__layout.add(AbsButton(self.__drawer, 'Button 1'))
-        btn._AbsButton__style['NORMAL']['background'] = (100, 50, 50, 255)
-        self.__layout.add(AbsButton(self.__drawer, 'Button 2'))
-        self.__layout.add(AbsButton(self.__drawer, 'Button 3'))
-        self.__layout.add(AbsButton(self.__drawer, 'Button 4'))
 
         # Control Frame - Drag 
         self.__dragging = False
@@ -76,6 +79,7 @@ class Frame(object):
         # Control Frame - resize
         self.__resizing = False
         self.__resizing_end = 3
+        self.__resizing_first = True
         self.__resize_area = ResizeArea.NONE
         self.__resize_border = 8
 
@@ -209,34 +213,16 @@ class Frame(object):
             self.__layout._Layout__invalidate()
             self.__draw_background()
 
-            if not self.__resizing:  # Tmp Resizing reinforcement: 3 times more
-                if self.__resizing_end > 0:
+            # Tmp Resizing reinforcement: 3 times more
+            if not self.__resizing and not self.__resizing_first:
+                if self.__resizing_end > 1:
                     self.__resizing_end -= 1
                     self.__render_needs_updating = True
                 
-                if self.__resizing_end < 0:
+                if self.__resizing_end < 1:
                     self.__resizing_end = 3
-        # -------
-        # w = c_int()
-        # sdl3.SDL_GetWindowSize(self.__frame, w, c_int())
-
-        # btn = AbsButton(self.__drawer, 'Button Button Button Button',
-        #     x=10, y=30, w=w.value - 20, style_class='red', elided=True)
-        # btn._AbsButton__style['NORMAL']['background'] = (100, 50, 50, 255)
-        # btn._AbsButton__draw()
-
-        # btn = AbsButton(self.__drawer, 'Button',
-        #     x=100, y=70)
-        # btn._AbsButton__draw()
-
-        # btn = AbsButton(self.__drawer, 'Button',
-        #     x=100, y=110, style_class='red')
-        # btn._AbsButton__draw()
-
-        # btn = AbsButton(self.__drawer, 'Button',
-        #     x=100, y=150)
-        # btn._AbsButton__draw()
-        # -----
+            
+            if self.__resizing_first: self.__resizing_first = False
 
         if self.__layout._Layout__dirty:
             self.__layout._Layout__update()
@@ -247,7 +233,7 @@ class Frame(object):
 
         # Tmp log
         self.__render_update_count += 1
-        print('Render update:', self.__render_update_count)
+        if self.__logging: print('Frame update:', self.__render_update_count)
     
     def __draw_background(self) -> None:
         sdl3.SDL_SetRenderDrawColor(self.__renderer, 0, 0, 0, 0)
