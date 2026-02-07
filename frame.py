@@ -59,8 +59,10 @@ class Frame(object):
         self.__render_update_count = 0
 
         self.__layout = Layout()
-        self.__layout.add(AbsButton(self.__drawer, 'Button 1'))
-        self.__layout.add(AbsButton(self.__drawer, 'Button 2'))
+        # self.__layout.add(AbsButton(self.__drawer, 'Button 1'))
+        # self.__layout.add(AbsButton(self.__drawer, 'Button 2'))
+        # self.__layout.add(AbsButton(self.__drawer, 'Button 3'))
+        # self.__layout.add(AbsButton(self.__drawer, 'Button 4'))
 
         # Control Frame - Drag 
         self.__dragging = False
@@ -181,8 +183,10 @@ class Frame(object):
 
                 elif event.type == sdl3.SDL_EVENT_MOUSE_BUTTON_UP:
                     if event.button.button == sdl3.SDL_BUTTON_LEFT:
-                        self.__frame_stop_resize()
-                        self.__frame_stop_drag()
+                        if self.__dragging:
+                            self.__frame_stop_drag()
+                        else:
+                            self.__frame_stop_resize()
 
                 elif event.type == sdl3.SDL_EVENT_MOUSE_MOTION:
                     if self.__resize_area != ResizeArea.NONE:
@@ -192,6 +196,26 @@ class Frame(object):
 
             if self.__render_update:
                 self.__draw_background()
+                
+                w = c_int()
+                sdl3.SDL_GetWindowSize(self.__frame, w, c_int())
+
+                btn = AbsButton(self.__drawer, 'Button Button Button Button',
+                    x=10, y=30, w=w.value - 20, style_class='red', elided=True)
+                btn._AbsButton__style['NORMAL']['background'] = (100, 50, 50, 255)
+                btn._AbsButton__draw()
+
+                btn = AbsButton(self.__drawer, 'Button',
+                    x=100, y=70)
+                btn._AbsButton__draw()
+
+                btn = AbsButton(self.__drawer, 'Button',
+                    x=100, y=110, style_class='red')
+                btn._AbsButton__draw()
+
+                btn = AbsButton(self.__drawer, 'Button',
+                    x=100, y=150)
+                btn._AbsButton__draw()
 
                 if self.__layout._Layout__dirty:
                     self.__layout._Layout__update()
@@ -235,9 +259,6 @@ class Frame(object):
             new_y = int(my.value - self.__drag_offset_y)
 
             sdl3.SDL_SetWindowPosition(self.__frame, new_x, new_y)
-        
-        self.__render_update = True
-        self.__layout._Layout__invalidate()
 
     def __frame_start_resize(self) -> None:
         if not self.__resizing:
@@ -279,8 +300,6 @@ class Frame(object):
     def __frame_stop_drag(self) -> None:
         self.__dragging = False
         self.__cursor_update_shape('NONE')
-        self.__render_update = True
-        self.__layout._Layout__invalidate()
     
     def __frame_stop_resize(self) -> None:
         self.__resizing = False
