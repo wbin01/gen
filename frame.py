@@ -55,14 +55,18 @@ class Frame(object):
 
         # Control Frame
         self.__running = True
-        self.__render_update = True
+        self.__render_needs_updating = True
         self.__render_update_count = 0
-
+        
+        self.__draw_background()
         self.__layout = Layout()
-        # self.__layout.add(AbsButton(self.__drawer, 'Button 1'))
-        # self.__layout.add(AbsButton(self.__drawer, 'Button 2'))
-        # self.__layout.add(AbsButton(self.__drawer, 'Button 3'))
-        # self.__layout.add(AbsButton(self.__drawer, 'Button 4'))
+        
+        # Layout test
+        btn = self.__layout.add(AbsButton(self.__drawer, 'Button 1'))
+        btn._AbsButton__style['NORMAL']['background'] = (100, 50, 50, 255)
+        self.__layout.add(AbsButton(self.__drawer, 'Button 2'))
+        self.__layout.add(AbsButton(self.__drawer, 'Button 3'))
+        self.__layout.add(AbsButton(self.__drawer, 'Button 4'))
 
         # Control Frame - Drag 
         self.__dragging = False
@@ -71,6 +75,7 @@ class Frame(object):
 
         # Control Frame - resize
         self.__resizing = False
+        self.__resizing_end = 3
         self.__resize_area = ResizeArea.NONE
         self.__resize_border = 8
 
@@ -194,42 +199,55 @@ class Frame(object):
                     elif self.__dragging:
                         self.__frame_start_drag()
 
-            if self.__render_update:
-                self.__draw_background()
-                
-                w = c_int()
-                sdl3.SDL_GetWindowSize(self.__frame, w, c_int())
-
-                btn = AbsButton(self.__drawer, 'Button Button Button Button',
-                    x=10, y=30, w=w.value - 20, style_class='red', elided=True)
-                btn._AbsButton__style['NORMAL']['background'] = (100, 50, 50, 255)
-                btn._AbsButton__draw()
-
-                btn = AbsButton(self.__drawer, 'Button',
-                    x=100, y=70)
-                btn._AbsButton__draw()
-
-                btn = AbsButton(self.__drawer, 'Button',
-                    x=100, y=110, style_class='red')
-                btn._AbsButton__draw()
-
-                btn = AbsButton(self.__drawer, 'Button',
-                    x=100, y=150)
-                btn._AbsButton__draw()
-
-                if self.__layout._Layout__dirty:
-                    self.__layout._Layout__update()
-                    self.__layout._Layout__redraw()
-                    
+            if self.__render_needs_updating:
                 self.__render()
-                self.__render_update = False
-                
-                self.__render_update_count += 1
-                print('Render update:', self.__render_update_count)
     
     def __render(self) -> None:
+        self.__render_needs_updating = False
+
+        if self.__resizing or self.__resizing_end <= 3:
+            self.__layout._Layout__invalidate()
+            self.__draw_background()
+
+            if not self.__resizing:  # Tmp Resizing reinforcement: 3 times more
+                if self.__resizing_end > 0:
+                    self.__resizing_end -= 1
+                    self.__render_needs_updating = True
+                
+                if self.__resizing_end < 0:
+                    self.__resizing_end = 3
+        # -------
+        # w = c_int()
+        # sdl3.SDL_GetWindowSize(self.__frame, w, c_int())
+
+        # btn = AbsButton(self.__drawer, 'Button Button Button Button',
+        #     x=10, y=30, w=w.value - 20, style_class='red', elided=True)
+        # btn._AbsButton__style['NORMAL']['background'] = (100, 50, 50, 255)
+        # btn._AbsButton__draw()
+
+        # btn = AbsButton(self.__drawer, 'Button',
+        #     x=100, y=70)
+        # btn._AbsButton__draw()
+
+        # btn = AbsButton(self.__drawer, 'Button',
+        #     x=100, y=110, style_class='red')
+        # btn._AbsButton__draw()
+
+        # btn = AbsButton(self.__drawer, 'Button',
+        #     x=100, y=150)
+        # btn._AbsButton__draw()
+        # -----
+
+        if self.__layout._Layout__dirty:
+            self.__layout._Layout__update()
+            self.__layout._Layout__redraw()
+            
         sdl3.SDL_RenderPresent(self.__renderer)
         sdl3.SDL_Delay(10)
+
+        # Tmp log
+        self.__render_update_count += 1
+        print('Render update:', self.__render_update_count)
     
     def __draw_background(self) -> None:
         sdl3.SDL_SetRenderDrawColor(self.__renderer, 0, 0, 0, 0)
@@ -238,7 +256,6 @@ class Frame(object):
         w = c_int()
         h = c_int()
         sdl3.SDL_GetWindowSize(self.__frame, w, h)
-
         self.__drawer.rect(
             x=0, y=0, w=w.value, h=h.value,
             color=self.__style.frame['NORMAL']['border'], r=8)
@@ -294,19 +311,18 @@ class Frame(object):
 
         sdl3.SDL_SetWindowPosition(self.__frame, int(x), int(y))
         sdl3.SDL_SetWindowSize(self.__frame, w, h)
-        self.__render_update = True
-        self.__layout._Layout__invalidate()
+        self.__render_needs_updating = True
     
     def __frame_stop_drag(self) -> None:
         self.__dragging = False
         self.__cursor_update_shape('NONE')
     
     def __frame_stop_resize(self) -> None:
-        self.__resizing = False
         self.__resize_area = ResizeArea.NONE
         self.__cursor_update_shape('NONE')
-        self.__render_update = True
-        self.__layout._Layout__invalidate()
+        self.__resizing = False
+        self.__resizing_end = 3
+        self.__render_needs_updating = True
     
     def __frame_update_drag_settings(self) -> None:
         self.__dragging = True

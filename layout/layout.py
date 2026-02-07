@@ -15,10 +15,12 @@ class Layout(object):
         self.__y = 10
         self.__spacing = 10
 
-    def add(self, cell: Cell) -> None:
+    def add(self, cell: Cell) -> Cell:
         """..."""
         self.__cells.append(cell)
         cell.parent = self
+
+        return cell
     
     def __invalidate(self) -> None:
         for cell in self.__cells:
@@ -29,12 +31,12 @@ class Layout(object):
     def __update(self) -> None:
         """..."""
         for cell in self.__cells:
-            name = f'_{cell.__class__.__name__}__'
-            setattr(cell, name + 'x', self.__x)
+            name = f'_{cell.__class__.__name__}'
+            setattr(cell, name + '__x', self.__x)
 
-            name = f'_{cell.__class__.__name__}__'
-            setattr(cell, name + 'y', self.__y)
-            self.__y += getattr(cell, name + 'h') + self.__spacing
+            name = f'_{cell.__class__.__name__}'
+            setattr(cell, name + '__y', self.__y)
+            self.__y += getattr(cell, name + '__h') + self.__spacing
         
         self.__x = 100
         self.__y = 10
@@ -43,8 +45,9 @@ class Layout(object):
         """..."""
         for cell in self.__cells:
             if cell._Cell__dirty:
-                name = f'_{cell.__class__.__name__}__'
-                getattr(cell, name + 'draw')()
+                name = f'_{cell.__class__.__name__}'
+                getattr(cell, name + '__draw')()
                 cell._Cell__dirty = False
+                # print('Render', name)
 
         self.__dirty = False
