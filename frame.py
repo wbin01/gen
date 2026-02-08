@@ -56,25 +56,7 @@ class Frame(object):
         self.__style = self._Frame__theme
 
         # Layout test
-        self.__layout = AbsLayout(self.__frame, padding=10, fill=True)
-
-        w = c_int()
-        sdl3.SDL_GetWindowSize(self.__frame, w, c_int())
-
-        btn1 = self.__layout.add(
-            AbsButton(
-                self.__drawer, 'Button1 Button1 Button1 Button1',
-                elided=True, style_class='red'))
-        btn1._AbsButton__style['NORMAL']['background'] = (100, 50, 50, 255)
-
-        btn2 = self.__layout.add(
-            AbsButton(
-                self.__drawer, 'Button2 Button2 Button2 Button2',
-                elided=False))
-        btn3 = self.__layout.add(AbsButton(self.__drawer, 'Button3'))
-        # btn3._AbsButton__style['NORMAL']['background'] = (50, 100, 50, 255)
-
-        btn4 = self.__layout.add(AbsButton(self.__drawer, 'Button4', style_class='red'))
+        self.__layout = AbsLayout(self.__frame, fill=True)
 
         # Control Frame
         self.__running = True
@@ -109,6 +91,11 @@ class Frame(object):
             'DRAG': sdl3.SDL_CreateSystemCursor(9),
         }
         self.__last_resize_cursor_on_hover = 'NONE'
+    
+    def add(self, cell: Cell | AbsLayout) -> Cell | AbsLayout:
+        name = f'_{cell.__class__.__name__}'
+        setattr(cell, name + '__drawer', self.__drawer)
+        return self.__layout.add(cell)
         
     def run(self) -> int:
         self.__event_loop()

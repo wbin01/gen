@@ -9,12 +9,12 @@ from ..style import Theme
 class AbsButton(Cell):
     """..."""
     def __init__(
-            self, drawer, text: str = '',
+            self, text: str = '',
             x: int = 0, y: int = 0, w: int = 100, h: int = 32,
             elided: bool = False, style_class: str = None) -> None:
         """..."""
         super().__init__()
-        self.__drawer = drawer
+        self.__drawer = None
         self.__text = text
         self.__x = x
         self.__y = y
@@ -29,6 +29,13 @@ class AbsButton(Cell):
             self.__style = Theme.classes[self.__style_class]
         else:
             self.__style = Theme.button
+    @property
+    def style(self) -> dict:
+        return self.__style
+    
+    @style.setter
+    def style(self, style: dict) -> None:
+        self.__style = style
 
     def __draw(self):
         pad = self.__style['NORMAL']['padding'] * 2
