@@ -1,18 +1,28 @@
 #!/usr/bin/env python3
+import sdl3
+
+from ctypes import c_int
 
 
 class Cell:
     pass
 
 
-class Layout(object):
+class AbsLayout(object):
     """..."""
-    def __init__(self) -> None:
+    def __init__(self, parent, padding=10, fill=False) -> None:
         """..."""
+        self.__parent = parent
+        self.__pad = padding
+        self.__fill = fill
+
         self.__dirty = True
         self.__cells = []
-        self.__x = 100
+        self.__x = 0 + self.__pad
         self.__y = 10
+        self.__w = c_int()
+        self.__h = c_int()
+
         self.__spacing = 10
 
     def add(self, cell: Cell) -> Cell:
@@ -30,15 +40,18 @@ class Layout(object):
     
     def __update(self) -> None:
         """..."""
+        sdl3.SDL_GetWindowSize(self.__parent, self.__w, self.__h)
+
         for cell in self.__cells:
             name = f'_{cell.__class__.__name__}'
             setattr(cell, name + '__x', self.__x)
-
-            name = f'_{cell.__class__.__name__}'
             setattr(cell, name + '__y', self.__y)
+            if self.__fill:
+                setattr(cell, name + '__w', self.__w.value - (self.__pad * 2))
+            # setattr(cell, name + '__h', self.__h.value)
             self.__y += getattr(cell, name + '__h') + self.__spacing
         
-        self.__x = 100
+        self.__x = 0 + self.__pad
         self.__y = 10
 
     def __redraw(self) -> None:

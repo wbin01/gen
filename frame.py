@@ -10,7 +10,7 @@ from .core import Drawer
 from .flag import ResizeArea
 from .cell import AbsButton
 from .style import Theme
-from .layout import Layout
+from .layout import AbsLayout
 
 class Frame(object):
     """..."""
@@ -56,13 +56,25 @@ class Frame(object):
         self.__style = self._Frame__theme
 
         # Layout test
-        self.__layout = Layout()
+        self.__layout = AbsLayout(self.__frame, padding=10, fill=True)
 
-        btn = self.__layout.add(AbsButton(self.__drawer, 'Button 1'))
-        btn._AbsButton__style['NORMAL']['background'] = (100, 50, 50, 255)
-        self.__layout.add(AbsButton(self.__drawer, 'Button 2'))
-        self.__layout.add(AbsButton(self.__drawer, 'Button 3'))
-        self.__layout.add(AbsButton(self.__drawer, 'Button 4'))
+        w = c_int()
+        sdl3.SDL_GetWindowSize(self.__frame, w, c_int())
+
+        btn1 = self.__layout.add(
+            AbsButton(
+                self.__drawer, 'Button1 Button1 Button1 Button1',
+                elided=True, style_class='red'))
+        btn1._AbsButton__style['NORMAL']['background'] = (100, 50, 50, 255)
+
+        btn2 = self.__layout.add(
+            AbsButton(
+                self.__drawer, 'Button2 Button2 Button2 Button2',
+                elided=False))
+        btn3 = self.__layout.add(AbsButton(self.__drawer, 'Button3'))
+        # btn3._AbsButton__style['NORMAL']['background'] = (50, 100, 50, 255)
+
+        btn4 = self.__layout.add(AbsButton(self.__drawer, 'Button4', style_class='red'))
 
         # Control Frame
         self.__running = True
@@ -210,23 +222,23 @@ class Frame(object):
         self.__render_needs_updating = False
 
         if self.__resizing or self.__resizing_end <= 3:
-            self.__layout._Layout__invalidate()
+            self.__layout._AbsLayout__invalidate()
             self.__draw_background()
 
             # Tmp Resizing reinforcement: 3 times more
             if not self.__resizing and not self.__resizing_first:
-                if self.__resizing_end > 1:
+                if self.__resizing_end > 2:
                     self.__resizing_end -= 1
                     self.__render_needs_updating = True
                 
-                if self.__resizing_end < 1:
+                if self.__resizing_end < 2:
                     self.__resizing_end = 3
             
             if self.__resizing_first: self.__resizing_first = False
 
-        if self.__layout._Layout__dirty:
-            self.__layout._Layout__update()
-            self.__layout._Layout__redraw()
+        if self.__layout._AbsLayout__dirty:
+            self.__layout._AbsLayout__update()
+            self.__layout._AbsLayout__redraw()
             
         sdl3.SDL_RenderPresent(self.__renderer)
         sdl3.SDL_Delay(10)
