@@ -25,11 +25,13 @@ class AbsLayout(object):
 
         self.__spacing = 10
 
-    def add(self, cell: Cell) -> Cell:
+    def add(self, cell: Cell, fill=None) -> Cell:
         """..."""
         self.__cells.append(cell)
         cell.parent = self
 
+        if fill is not None:
+            self.__fill = fill
         return cell
     
     def __invalidate(self) -> None:

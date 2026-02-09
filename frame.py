@@ -12,6 +12,7 @@ from .cell import AbsButton
 from .style import Theme
 from .layout import AbsLayout
 
+
 class Frame(object):
     """..."""
     __theme = Theme
@@ -56,7 +57,7 @@ class Frame(object):
         self.__style = self._Frame__theme
 
         # Layout test
-        self.__layout = AbsLayout(self.__frame, fill=True)
+        self.__layout = AbsLayout(self.__frame, fill=False)
 
         # Control Frame
         self.__running = True
@@ -92,10 +93,11 @@ class Frame(object):
         }
         self.__last_resize_cursor_on_hover = 'NONE'
     
-    def add(self, cell: Cell | AbsLayout) -> Cell | AbsLayout:
+    def add(self, cell: Cell | AbsLayout, fill=None) -> Cell | AbsLayout:
         name = f'_{cell.__class__.__name__}'
         setattr(cell, name + '__drawer', self.__drawer)
-        return self.__layout.add(cell)
+
+        return self.__layout.add(cell, fill=fill)
         
     def run(self) -> int:
         self.__event_loop()
@@ -212,7 +214,7 @@ class Frame(object):
             self.__layout._AbsLayout__invalidate()
             self.__draw_background()
 
-            # Tmp Resizing reinforcement: 3 times more
+            # Resizing: last redraw
             if not self.__resizing and not self.__resizing_first:
                 if self.__resizing_end > 2:
                     self.__resizing_end -= 1
