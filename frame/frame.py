@@ -8,7 +8,6 @@ import sdl3
 
 from ..ui import UI, Drawer
 from ..flag import ResizeArea
-from ..cell import AbsButton
 from ..style import Theme
 from ..layout import Layout
 

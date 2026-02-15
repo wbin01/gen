@@ -1,3 +1,3 @@
 #!/usr/bin/env python3
-from .abs_button import AbsButton
+from .button import Button
 from .cell import Cell

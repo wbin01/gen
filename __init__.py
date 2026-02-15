@@ -2,4 +2,4 @@
 from .flag import ResizeArea
 from .frame import Frame
 from .layout import Layout
-from .cell import AbsButton
+from .cell import Button

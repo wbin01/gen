@@ -6,7 +6,7 @@ from ..style import Theme
 from ..ui import FontRender
 
 
-class AbsButton(Cell):
+class Button(Cell):
     """..."""
     def __init__(
             self, text: str = '',
