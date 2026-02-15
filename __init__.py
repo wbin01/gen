@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
 from .flag import ResizeArea
 from .frame import Frame
-from .layout import AbsLayout
+from .layout import Layout
 from .cell import AbsButton

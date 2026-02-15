@@ -6,7 +6,7 @@ import sdl3
 from ..ui import UI
 
 
-class AbsLayout(UI):
+class Layout(UI):
     """..."""
     def __init__(self, parent, padding=10, fill=False) -> None:
         """..."""
