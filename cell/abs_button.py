@@ -2,8 +2,8 @@
 import copy
 
 from .cell import Cell
-from ..core import FontRender
 from ..style import Theme
+from ..ui import FontRender
 
 
 class AbsButton(Cell):

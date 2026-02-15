@@ -6,11 +6,11 @@ from ctypes import c_float, c_int
 import sdl3
 # import sdl3.sdlttf as ttf
 
-from .core import Drawer
-from .flag import ResizeArea
-from .cell import AbsButton
-from .style import Theme
-from .layout import AbsLayout
+from ..ui import Drawer
+from ..flag import ResizeArea
+from ..cell import AbsButton
+from ..style import Theme
+from ..layout import AbsLayout
 
 
 class Frame(object):

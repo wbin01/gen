@@ -28,7 +28,7 @@ class AbsLayout(object):
     def add(self, cell: Cell, fill=None) -> Cell:
         """..."""
         self.__cells.append(cell)
-        cell.parent = self
+        cell._Cell__parent = self
 
         if fill is not None:
             self.__fill = fill
