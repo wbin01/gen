@@ -17,6 +17,8 @@ class Frame(UI):
     __theme = Theme
 
     def __init__(self) -> None:
+        """..."""
+        super().__init__()
         self.__logging = True
 
         sdl3.SDL_SetHint(
@@ -56,7 +58,8 @@ class Frame(UI):
         self.__style = self._Frame__theme
 
         # Layout test
-        self.__layout = Layout(self.__frame, fill=False)
+        self.__layout = Layout()
+        self.__layout._UI__parent = self.__frame
 
         # Control Frame
         self.__running = True
@@ -102,7 +105,7 @@ class Frame(UI):
         name = f'_{cell.__class__.__name__}'
         setattr(cell, name + '__drawer', self.__drawer)
 
-        return self.__layout.add(cell, fill=fill)
+        return self.__layout.add(cell)
         
     def run(self) -> int:
         self.__event_loop()
@@ -274,6 +277,9 @@ class Frame(UI):
 
         sdl3.SDL_SetWindowPosition(self.__frame, int(x), int(y))
         sdl3.SDL_SetWindowSize(self.__frame, w, h)
+        self.width = w
+        self.height = h
+
         self.__render_needs_updating = True
     
     def __frame_stop_drag(self) -> None:
@@ -334,7 +340,7 @@ class Frame(UI):
             
             if self.__resizing_first: self.__resizing_first = False
 
-        if self.__layout._Layout__dirty:
+        if self.__layout._UI__dirty:
             self.__layout._Layout__update()
             self.__layout._Layout__redraw()
             

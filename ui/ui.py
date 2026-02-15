@@ -5,8 +5,12 @@ class UI(object):
     """..."""
     def __init__(self) -> None:
         """..."""
+        self.__parent = None
+        self.__dirty = True
+
         self.__x = 0
         self.__y = 0
+
         self.__width = 100
         self.__height = 30
     
@@ -45,3 +49,13 @@ class UI(object):
     @height.setter
     def height(self, height: int) -> None:
         self.__height = height
+    
+    @property
+    def _parent(self) -> UI:
+        return self.__parent
+    
+    def __invalidate(self) -> None:
+        self.__dirty = True
+
+        name = f'_{self._parent.__class__.__name__}'
+        setattr(self._parent, name + '__dirty', True)
