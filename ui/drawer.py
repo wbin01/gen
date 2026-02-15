@@ -27,6 +27,7 @@ class Drawer(object):
         pass
 
     def rect(self, x, y, w, h, color, r):
+        """..."""
         tl = tr = br = bl = r
         rmax = min(w // 2, h // 2)
         tl = min(tl, rmax)

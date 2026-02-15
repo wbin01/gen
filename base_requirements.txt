@@ -1,0 +1,3 @@
+# python -m pip install --upgrade
+PySDL3
+Pillow

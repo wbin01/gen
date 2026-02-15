@@ -64,7 +64,7 @@ class Frame(object):
         self.__render_needs_updating = True
         self.__render_update_count = 0
         
-        self.__draw_background()
+        self.__draw()
 
         # Control Frame - Drag 
         self.__dragging = False
@@ -92,6 +92,12 @@ class Frame(object):
             'DRAG': sdl3.SDL_CreateSystemCursor(9),
         }
         self.__last_resize_cursor_on_hover = 'NONE'
+    
+    def __repr__(self) -> str:
+        return f'{self.__class__.__name__}()'
+
+    def __str__(self) -> str:
+        return self.__class__.__name__
     
     def add(self, cell: Cell | AbsLayout, fill=None) -> Cell | AbsLayout:
         name = f'_{cell.__class__.__name__}'
@@ -162,6 +168,21 @@ class Frame(object):
         sdl3.SDL_DestroyWindow(self.__frame)
         # sdl3.SDL_DestroySurface(self.__font_surface)
         sdl3.SDL_Quit()
+    
+    def __draw(self) -> None:
+        sdl3.SDL_SetRenderDrawColor(self.__renderer, 0, 0, 0, 0)
+        sdl3.SDL_RenderClear(self.__renderer)
+
+        w = c_int()
+        h = c_int()
+        sdl3.SDL_GetWindowSize(self.__frame, w, h)
+        self.__drawer.rect(
+            x=0, y=0, w=w.value, h=h.value,
+            color=self.__style.frame['NORMAL']['border'], r=8)
+        
+        self.__drawer.rect(
+            x=1, y=1, w=w.value - 2, h=h.value - 2,
+            color=self.__style.frame['NORMAL']['background'], r=8)
 
     def __event_loop(self) -> None:
         while self.__running:
@@ -207,50 +228,6 @@ class Frame(object):
             if self.__render_needs_updating:
                 self.__render()
     
-    def __render(self) -> None:
-        self.__render_needs_updating = False
-
-        if self.__resizing or self.__resizing_end <= 3:
-            self.__layout._AbsLayout__invalidate()
-            self.__draw_background()
-
-            # Resizing: last redraw
-            if not self.__resizing and not self.__resizing_first:
-                if self.__resizing_end > 2:
-                    self.__resizing_end -= 1
-                    self.__render_needs_updating = True
-                
-                if self.__resizing_end < 2:
-                    self.__resizing_end = 3
-            
-            if self.__resizing_first: self.__resizing_first = False
-
-        if self.__layout._AbsLayout__dirty:
-            self.__layout._AbsLayout__update()
-            self.__layout._AbsLayout__redraw()
-            
-        sdl3.SDL_RenderPresent(self.__renderer)
-        sdl3.SDL_Delay(10)
-
-        # Tmp log
-        self.__render_update_count += 1
-        if self.__logging: print('Frame update:', self.__render_update_count)
-    
-    def __draw_background(self) -> None:
-        sdl3.SDL_SetRenderDrawColor(self.__renderer, 0, 0, 0, 0)
-        sdl3.SDL_RenderClear(self.__renderer)
-
-        w = c_int()
-        h = c_int()
-        sdl3.SDL_GetWindowSize(self.__frame, w, h)
-        self.__drawer.rect(
-            x=0, y=0, w=w.value, h=h.value,
-            color=self.__style.frame['NORMAL']['border'], r=8)
-        
-        self.__drawer.rect(
-            x=1, y=1, w=w.value - 2, h=h.value - 2,
-            color=self.__style.frame['NORMAL']['background'], r=8)
-
     def __frame_start_drag(self) -> None:
         if hasattr(sdl3, 'SDL_StartWindowMove'):
             sdl3.SDL_StartWindowMove(self.__frame)
@@ -339,6 +316,35 @@ class Frame(object):
         self.__start_w = c_int()
         self.__start_h = c_int()
         sdl3.SDL_GetWindowSize(self.__frame, self.__start_w, self.__start_h)
+    
+    def __render(self) -> None:
+        self.__render_needs_updating = False
+
+        if self.__resizing or self.__resizing_end <= 3:
+            self.__layout._AbsLayout__invalidate()
+            self.__draw()
+
+            # Resizing: last redraw
+            if not self.__resizing and not self.__resizing_first:
+                if self.__resizing_end > 2:
+                    self.__resizing_end -= 1
+                    self.__render_needs_updating = True
+                
+                if self.__resizing_end < 2:
+                    self.__resizing_end = 3
+            
+            if self.__resizing_first: self.__resizing_first = False
+
+        if self.__layout._AbsLayout__dirty:
+            self.__layout._AbsLayout__update()
+            self.__layout._AbsLayout__redraw()
+            
+        sdl3.SDL_RenderPresent(self.__renderer)
+        sdl3.SDL_Delay(10)
+
+        # Tmp log
+        self.__render_update_count += 1
+        if self.__logging: print('Frame update:', self.__render_update_count)
 
 
 if __name__ == "__main__":
