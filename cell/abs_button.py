@@ -10,16 +10,16 @@ class AbsButton(Cell):
     """..."""
     def __init__(
             self, text: str = '',
-            x: int = 0, y: int = 0, w: int = 100, h: int = 32,
+            x: int = 0, y: int = 0, width: int = 100, height: int = 32,
             elided: bool = False, style_class: str = None) -> None:
         """..."""
         super().__init__()
         self.__drawer = None
         self.__text = text
-        self.__x = x
-        self.__y = y
-        self.__w = w
-        self.__h = h
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
         self.__elided = elided
         self.__style_class = style_class
         
@@ -46,21 +46,21 @@ class AbsButton(Cell):
                 self.__style['NORMAL']['text'],
                 self.__style['NORMAL']['font'],
                 self.__style['NORMAL']['font-size'],
-                self.__w if self.__elided else None,
+                self.width if self.__elided else None,
                 pad)
-            if self.__w < text.width + pad: self.__w = text.width + pad
-            if self.__h < text.height + pad: self.__h = text.height + pad
+            if self.width < text.width + pad: self.width = text.width + pad
+            if self.height < text.height + pad: self.height = text.height + pad
 
-            tx = self.__x + (self.__w // 2) - (text.width // 2)
-            ty = self.__y + (self.__h // 2) - (text.height // 2)
+            tx = self.x + (self.width // 2) - (text.width // 2)
+            ty = self.y + (self.height // 2) - (text.height // 2)
         
         self.__drawer.rect(
-            self.__x, self.__y, self.__w, self.__h,
+            self.x, self.y, self.width, self.height,
             self.__style['NORMAL']['border'],
             self.__style['NORMAL']['radius'])
         
         self.__drawer.rect(
-            self.__x + 1, self.__y +1, self.__w - 2,self.__h - 2,
+            self.x + 1, self.y +1, self.width - 2,self.height - 2,
             self.__style['NORMAL']['background'],
             self.__style['NORMAL']['radius'] - 1)
         
