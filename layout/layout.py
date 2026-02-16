@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 from ctypes import c_int
+import random
 
 import sdl3
 
@@ -15,6 +16,7 @@ class Layout(Margin, UI):
         """..."""
         super().__init__()
         self.__first = False
+        self.__drawer = None
         self.width = 0
         self.height = 0
         self.__spacing = 6
@@ -50,6 +52,8 @@ class Layout(Margin, UI):
 
         if isinstance(ui, Cell):
             ui._Cell__drawer = self._app._Frame__drawer
+        elif isinstance(ui, Layout):
+            ui._Layout__drawer = self._app._Frame__drawer
         return ui
     
     def __invalidate(self) -> None:
@@ -112,6 +116,7 @@ class Layout(Margin, UI):
 
     def __redraw(self) -> None:
         """..."""
+        self.__draw()
         for ui in self.__uis:
             if not ui._UI__dirty:
                 continue
@@ -124,4 +129,15 @@ class Layout(Margin, UI):
             getattr(ui, f'_{ui.__class__.__name__}__draw')()
             ui._UI__dirty = False
 
+        
         self._UI__dirty = False
+    
+    def __draw(self) -> None:
+        self._Layout__drawer.rect(
+            self.x, self.y, self.width, self.height,
+            (
+                random.randint(50, 150),
+                random.randint(50, 150),
+                random.randint(50, 150),
+                255
+            ), 2)
