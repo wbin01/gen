@@ -47,11 +47,13 @@ class Layout(Margin, Padding, UI):
         ui._UI__parent = self
         ui._Cell__drawer = self.__drawer
 
-        if ui.height > self.height:
-            self.height = ui.height
+        height = ui.padding * 2 + ui.height
+        if height > self.height:
+            self.height = height
         
-        if ui.width > self.width:
-            self.width= ui.width
+        width = ui.padding * 2 + ui.width
+        if width > self.width:
+            self.width = width
 
         return ui
     
@@ -78,14 +80,13 @@ class Layout(Margin, Padding, UI):
                 if first:
                     ui.x = tmp_x + self.padding
                     ui.y = tmp_y + self.padding
-                    tmp_y += ui.height + self.__spacing + self.padding
-                    
-                    self.width = ui.height + self.padding
+                    tmp_y += (ui.padding * 2 + ui.height
+                        ) + self.__spacing + self.padding
                     first = False
                 else:
                     ui.x = tmp_x + self.padding
                     ui.y = tmp_y
-                    tmp_y += ui.height + self.__spacing
+                    tmp_y += (ui.padding * 2 + ui.height) + self.__spacing
                 
                 self.height += tmp_y
                 
@@ -93,21 +94,18 @@ class Layout(Margin, Padding, UI):
                 if first:
                     ui.x = tmp_x + self.padding
                     ui.y = tmp_y + self.padding
-                    tmp_x += ui.width + self.__spacing + self.padding
-
-                    self.height = ui.height + self.padding
+                    tmp_x += (ui.padding * 2 + ui.width
+                        ) + self.__spacing + self.padding
                     first = False
                 else:
                     ui.x = tmp_x
                     ui.y = tmp_y + self.padding
-                    tmp_x += ui.width + self.__spacing
+                    tmp_x += (ui.padding * 2 + ui.width) + self.__spacing
                 
                 self.width += tmp_x
             
             if isinstance(ui, Layout):
                 ui._Layout__update()
-                # continue
-            
 
     def __redraw(self) -> None:
         """..."""
@@ -116,7 +114,6 @@ class Layout(Margin, Padding, UI):
                 continue
 
             if isinstance(ui, Layout):
-                print(ui)
                 ui._Layout__redraw()
                 continue
 

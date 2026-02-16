@@ -103,15 +103,6 @@ class Frame(UI):
         return self.__class__.__name__
     
     @property
-    def padding(self) -> int:
-        """..."""
-        return self.__padding
-    
-    @padding.setter
-    def padding(self, padding: int) -> None:
-        self.__layout.padding = padding
-    
-    @property
     def spacing(self) -> int:
         """..."""
         return self.__spacing
