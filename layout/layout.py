@@ -19,7 +19,7 @@ class Layout(Margin, UI):
         self.__drawer = None
         self.width = 0
         self.height = 0
-        self.__spacing = 6
+        self.__spacing = 0
         self.__orientation = Orientation.VERTICAL
 
         self.__drawer = None
@@ -116,7 +116,8 @@ class Layout(Margin, UI):
 
     def __redraw(self) -> None:
         """..."""
-        self.__draw()
+        if self._app and self._app._Frame__debug: self.__draw()
+
         for ui in self.__uis:
             if not ui._UI__dirty:
                 continue
@@ -129,15 +130,15 @@ class Layout(Margin, UI):
             getattr(ui, f'_{ui.__class__.__name__}__draw')()
             ui._UI__dirty = False
 
-        
         self._UI__dirty = False
     
     def __draw(self) -> None:
+        red = random.randint(50, 100)
+        green = random.randint(50, 100)
+        blue = random.randint(50, 100)
+
         self._Layout__drawer.rect(
-            self.x, self.y, self.width, self.height,
-            (
-                random.randint(50, 150),
-                random.randint(50, 150),
-                random.randint(50, 150),
-                255
-            ), 2)
+            self.x - self.margin[3], self.y - self.margin[0],
+            self.width + self.margin[3] + self.margin[1],
+            self.height + self.margin[0] + self.margin[2],
+            (red, green, blue, 255), 2)

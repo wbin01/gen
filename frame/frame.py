@@ -63,6 +63,7 @@ class Frame(UI):
         self.__layout._UI__parent = self
         self.__layout._UI__app = self
         self.__layout._Layout__drawer = self.__drawer
+        self.__debug = False
 
         # Control Frame
         self.__running = True
@@ -103,6 +104,15 @@ class Frame(UI):
 
     def __str__(self) -> str:
         return self.__class__.__name__
+    
+    @property
+    def debug(self) -> bool:
+        """..."""
+        return self.__debug
+    
+    @debug.setter
+    def debug(self, debug: bool) -> None:
+        self.__debug = debug
     
     @property
     def spacing(self) -> int:
