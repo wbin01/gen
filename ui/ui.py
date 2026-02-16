@@ -5,6 +5,7 @@ class UI(object):
     """..."""
     def __init__(self) -> None:
         """..."""
+        self.__app = None
         self.__parent = None
         self.__dirty = True
 
@@ -49,6 +50,10 @@ class UI(object):
     @height.setter
     def height(self, height: int) -> None:
         self.__height = height
+    
+    @property
+    def _app(self) -> UI:
+        return self.__app
     
     @property
     def _parent(self) -> UI:

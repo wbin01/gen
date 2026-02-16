@@ -60,6 +60,7 @@ class Frame(UI):
         # Layout test
         self.__layout = Layout()
         self.__layout._UI__parent = self
+        self.__layout._UI__app = self
         self.__layout._Layout__drawer = self.__drawer
 
         # Control Frame

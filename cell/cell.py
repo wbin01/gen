@@ -3,7 +3,7 @@ from ..mix import Margin, Padding
 from ..ui import UI
 
 
-class Cell(Margin, Padding, UI):
+class Cell(Margin, UI):
     """..."""
     def __init__(self) -> None:
         """..."""

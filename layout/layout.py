@@ -5,17 +5,19 @@ import sdl3
 
 from ..cell import Cell
 from ..flag import Orientation
-from ..mix import Margin, Padding
+from ..mix import Margin
 from ..ui import UI
 
 
-class Layout(Margin, Padding, UI):
+class Layout(Margin, UI):
     """..."""
     def __init__(self) -> None:
         """..."""
         super().__init__()
-        self.height = self.padding * 2
-        self.width = self.padding * 2
+        # self.x += self.margin[3]
+        # self.y += self.margin[0]
+        self.width = 0
+        self.height = 0
         self.__spacing = 6
         self.__orientation = Orientation.VERTICAL
 
@@ -45,15 +47,23 @@ class Layout(Margin, Padding, UI):
         """..."""
         self.__uis.append(ui)
         ui._UI__parent = self
-        ui._Cell__drawer = self.__drawer
+        ui._UI__app = self._app
+        ui._Cell__drawer = self._app._Frame__drawer # self.__drawer
 
-        height = ui.padding * 2 + ui.height
-        if height > self.height:
-            self.height = height
+        if self.orientation.value == 'VERTICAL':
+            height = ui.height + ui.margin[0] + ui.margin[2] + self.spacing
+            self.height += height
         
-        width = ui.padding * 2 + ui.width
-        if width > self.width:
-            self.width = width
+            width = ui.width + ui.margin[1] + ui.margin[3]
+            if width > self.width:
+                self.width = width
+        else:
+            height = ui.height + ui.margin[0] + ui.margin[2]
+            if height > self.height:
+                self.height = height
+        
+            width = ui.width + ui.margin[1] + ui.margin[3] + self.spacing
+            self.width += width
 
         return ui
     
@@ -69,40 +79,19 @@ class Layout(Margin, Padding, UI):
     
     def __update(self) -> None:
         """..."""
-        tmp_x, tmp_y = self.x, self.y
+        ui_x, ui_y = self.x, self.y
 
-        first = True
         for ui in self.__uis:
             if not ui._UI__dirty:
                 continue
+            
+            ui.x = ui_x + ui.margin[3]
+            ui.y = ui_y + ui.margin[0]
 
             if self.__orientation == Orientation.VERTICAL:
-                if first:
-                    ui.x = tmp_x + self.padding
-                    ui.y = tmp_y + self.padding
-                    tmp_y += (ui.padding * 2 + ui.height
-                        ) + self.__spacing + self.padding
-                    first = False
-                else:
-                    ui.x = tmp_x + self.padding
-                    ui.y = tmp_y
-                    tmp_y += (ui.padding * 2 + ui.height) + self.__spacing
-                
-                self.height += tmp_y
-                
+                ui_y += ui.margin[0] + ui.height + ui.margin[2] + self.__spacing
             else:
-                if first:
-                    ui.x = tmp_x + self.padding
-                    ui.y = tmp_y + self.padding
-                    tmp_x += (ui.padding * 2 + ui.width
-                        ) + self.__spacing + self.padding
-                    first = False
-                else:
-                    ui.x = tmp_x
-                    ui.y = tmp_y + self.padding
-                    tmp_x += (ui.padding * 2 + ui.width) + self.__spacing
-                
-                self.width += tmp_x
+                ui_x += ui.margin[1] + ui.width + ui.margin[3] + self.__spacing
             
             if isinstance(ui, Layout):
                 ui._Layout__update()
@@ -118,6 +107,10 @@ class Layout(Margin, Padding, UI):
                 continue
 
             # if isinstance(ui, Cell):  # mro = str(type(ui).__mro__)
+            print(
+                ui,
+                hasattr(ui, f'_{ui.__class__.__name__}__draw'),
+                ui._Cell__drawer)
             getattr(ui, f'_{ui.__class__.__name__}__draw')()
             ui._UI__dirty = False
 
