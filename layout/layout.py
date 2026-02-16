@@ -14,8 +14,7 @@ class Layout(Margin, UI):
     def __init__(self) -> None:
         """..."""
         super().__init__()
-        # self.x += self.margin[3]
-        # self.y += self.margin[0]
+        self.__first = False
         self.width = 0
         self.height = 0
         self.__spacing = 6
@@ -48,23 +47,9 @@ class Layout(Margin, UI):
         self.__uis.append(ui)
         ui._UI__parent = self
         ui._UI__app = self._app
-        ui._Cell__drawer = self._app._Frame__drawer # self.__drawer
 
-        if self.orientation.value == 'VERTICAL':
-            height = ui.height + ui.margin[0] + ui.margin[2] + self.spacing
-            self.height += height
-        
-            width = ui.width + ui.margin[1] + ui.margin[3]
-            if width > self.width:
-                self.width = width
-        else:
-            height = ui.height + ui.margin[0] + ui.margin[2]
-            if height > self.height:
-                self.height = height
-        
-            width = ui.width + ui.margin[1] + ui.margin[3] + self.spacing
-            self.width += width
-
+        if isinstance(ui, Cell):
+            ui._Cell__drawer = self._app._Frame__drawer
         return ui
     
     def __invalidate(self) -> None:
@@ -79,9 +64,12 @@ class Layout(Margin, UI):
     
     def __update(self) -> None:
         """..."""
+        if self._Layout__first:
+            self.__expand_layouts_size(self)
+        
         ui_x, ui_y = self.x, self.y
-
         for ui in self.__uis:
+
             if not ui._UI__dirty:
                 continue
             
@@ -95,6 +83,32 @@ class Layout(Margin, UI):
             
             if isinstance(ui, Layout):
                 ui._Layout__update()
+    
+    def __expand_layouts_size(self, layout) -> None:
+        layout.height = 0
+        layout.width = 0
+
+        for ui in layout._Layout__uis:
+            if not ui._UI__dirty:
+                continue
+            
+            if isinstance(ui, Layout):
+                self.__expand_layouts_size(ui)
+
+            if layout.orientation.value == 'VERTICAL':
+                h = ui.height + ui.margin[0] + ui.margin[2] + layout.spacing
+                layout.height += h
+            
+                w = ui.width + ui.margin[1] + ui.margin[3]
+                if w > layout.width:
+                    layout.width = w
+            else:
+                h = ui.height + ui.margin[0] + ui.margin[2]
+                if h > layout.height:
+                    layout.height = h
+            
+                w = ui.width + ui.margin[1] + ui.margin[3] + layout.spacing
+                layout.width += w
 
     def __redraw(self) -> None:
         """..."""
@@ -107,10 +121,6 @@ class Layout(Margin, UI):
                 continue
 
             # if isinstance(ui, Cell):  # mro = str(type(ui).__mro__)
-            print(
-                ui,
-                hasattr(ui, f'_{ui.__class__.__name__}__draw'),
-                ui._Cell__drawer)
             getattr(ui, f'_{ui.__class__.__name__}__draw')()
             ui._UI__dirty = False
 
