@@ -242,6 +242,8 @@ class Frame(UI):
             new_y = int(my.value - self.__drag_offset_y)
 
             sdl3.SDL_SetWindowPosition(self.__frame, new_x, new_y)
+            self.x = new_x
+            self.y = new_y
 
     def __frame_start_resize(self) -> None:
         if not self.__resizing:
