@@ -14,7 +14,6 @@ class Button(Cell):
             elided: bool = False, style_class: str = None) -> None:
         """..."""
         super().__init__()
-        self.__drawer = None
         self.__text = text
         self.x = x
         self.y = y
@@ -29,6 +28,10 @@ class Button(Cell):
             self.__style = Theme.classes[self.__style_class]
         else:
             self.__style = Theme.button
+    
+    def __str__(self) -> str:
+        return f'Button({self.__text})'
+    
     @property
     def style(self) -> dict:
         return self.__style
@@ -54,15 +57,15 @@ class Button(Cell):
             tx = self.x + (self.width // 2) - (text.width // 2)
             ty = self.y + (self.height // 2) - (text.height // 2)
         
-        self.__drawer.rect(
+        self._Cell__drawer.rect(
             self.x, self.y, self.width, self.height,
             self.__style['NORMAL']['border'],
             self.__style['NORMAL']['radius'])
         
-        self.__drawer.rect(
+        self._Cell__drawer.rect(
             self.x + 1, self.y +1, self.width - 2,self.height - 2,
             self.__style['NORMAL']['background'],
             self.__style['NORMAL']['radius'] - 1)
         
         if self.__text:
-            self.__drawer.text(tx, ty, text)
+            self._Cell__drawer.text(tx, ty, text)

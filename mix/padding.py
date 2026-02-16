@@ -5,7 +5,7 @@ class Padding(object):
     """..."""
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
-        self.__padding = 10
+        self.__padding = 0
     
     def __repr__(self) -> str:
         return self.__class__.__name__

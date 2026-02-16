@@ -59,7 +59,8 @@ class Frame(UI):
 
         # Layout test
         self.__layout = Layout()
-        self.__layout._UI__parent = self.__frame
+        self.__layout._UI__parent = self
+        self.__layout._Layout__drawer = self.__drawer
 
         # Control Frame
         self.__running = True
@@ -100,6 +101,24 @@ class Frame(UI):
 
     def __str__(self) -> str:
         return self.__class__.__name__
+    
+    @property
+    def padding(self) -> int:
+        """..."""
+        return self.__padding
+    
+    @padding.setter
+    def padding(self, padding: int) -> None:
+        self.__layout.padding = padding
+    
+    @property
+    def spacing(self) -> int:
+        """..."""
+        return self.__spacing
+    
+    @spacing.setter
+    def spacing(self, spacing: int) -> None:
+        self.__layout.spacing = spacing
     
     def add(self, cell: Cell | Layout, fill=None) -> Cell | Layout:
         name = f'_{cell.__class__.__name__}'

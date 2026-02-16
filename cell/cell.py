@@ -7,8 +7,7 @@ class Cell(UI):
     def __init__(self) -> None:
         """..."""
         super().__init__()
-        self.__padding = 10
-        self.__margin = 0
+        self.__drawer = None
 
     def __draw(self) -> None:
         pass

@@ -14,8 +14,12 @@ class Layout(Margin, Padding, UI):
     def __init__(self) -> None:
         """..."""
         super().__init__()
-        self.__spacing = 10
+        self.height = self.padding * 2
+        self.width = self.padding * 2
+        self.__spacing = 6
         self.__orientation = Orientation.VERTICAL
+
+        self.__drawer = None
 
         self._UI__dirty = True
         self.__uis = []
@@ -27,17 +31,38 @@ class Layout(Margin, Padding, UI):
     @orientation.setter
     def orientation(self, orientation: Orientation) -> None:
         self.__orientation = orientation
+    
+    @property
+    def spacing(self) -> int:
+        """..."""
+        return self.__spacing
+    
+    @spacing.setter
+    def spacing(self, spacing: int) -> None:
+        self.__spacing = spacing
 
     def add(self, ui: UI) -> UI:
         """..."""
         self.__uis.append(ui)
         ui._UI__parent = self
+        ui._Cell__drawer = self.__drawer
+
+        if ui.height > self.height:
+            self.height = ui.height
+        
+        if ui.width > self.width:
+            self.width= ui.width
+
         return ui
     
     def __invalidate(self) -> None:
         for ui in self.__uis:
-            ui._UI__dirty = True
+            if isinstance(ui, Layout):
+                ui._Layout__invalidate()
+                continue
 
+            ui._UI__dirty = True
+        
         self._UI__dirty = True
     
     def __update(self) -> None:
@@ -46,40 +71,57 @@ class Layout(Margin, Padding, UI):
 
         first = True
         for ui in self.__uis:
-            # if isinstance(ui, Layout):
-            #     ui._Layout__update()
-            #     continue
+            if not ui._UI__dirty:
+                continue
 
             if self.__orientation == Orientation.VERTICAL:
                 if first:
                     ui.x = tmp_x + self.padding
                     ui.y = tmp_y + self.padding
                     tmp_y += ui.height + self.__spacing + self.padding
+                    
+                    self.width = ui.height + self.padding
                     first = False
                 else:
                     ui.x = tmp_x + self.padding
                     ui.y = tmp_y
                     tmp_y += ui.height + self.__spacing
+                
+                self.height += tmp_y
+                
             else:
                 if first:
                     ui.x = tmp_x + self.padding
                     ui.y = tmp_y + self.padding
                     tmp_x += ui.width + self.__spacing + self.padding
+
+                    self.height = ui.height + self.padding
                     first = False
                 else:
                     ui.x = tmp_x
                     ui.y = tmp_y + self.padding
                     tmp_x += ui.width + self.__spacing
+                
+                self.width += tmp_x
+            
+            if isinstance(ui, Layout):
+                ui._Layout__update()
+                # continue
+            
 
     def __redraw(self) -> None:
         """..."""
         for ui in self.__uis:
-            if ui._UI__dirty:
-                if isinstance(ui, Cell):  # mro = str(type(ui).__mro__)
-                    getattr(ui, f'_{ui.__class__.__name__}__draw')()
-                    ui._UI__dirty = False
-                # else:
-                #     ui._Layout__redraw()
-                #     ui._UI__dirty = False
+            if not ui._UI__dirty:
+                continue
+
+            if isinstance(ui, Layout):
+                print(ui)
+                ui._Layout__redraw()
+                continue
+
+            # if isinstance(ui, Cell):  # mro = str(type(ui).__mro__)
+            getattr(ui, f'_{ui.__class__.__name__}__draw')()
+            ui._UI__dirty = False
 
         self._UI__dirty = False
