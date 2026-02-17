@@ -17,16 +17,13 @@ class Frame(UI):
     __theme = Theme
 
     def __init__(
-            self, title: str,
-            width: int = 500, height: int = 300,
-            logging: bool = True
-            ) -> None:
+            self, title: str, width: int = 500, height: int = 300) -> None:
         """..."""
         super().__init__()
         self.__title = title
         self.__width = width
         self.__height = height
-        self.__logging = logging
+        self.__logging = True
 
         sdl3.SDL_SetHint(
             sdl3.SDL_HINT_X11_WINDOW_TYPE, b'_NET_WM_WINDOW_TYPE_NORMAL')

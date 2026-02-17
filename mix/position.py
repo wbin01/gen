@@ -7,6 +7,8 @@ class Position(object):
         super().__init__(*args, **kwargs)
         self.__x = 0
         self.__y = 0
+        self.__x_ = 0
+        self.__y_ = 0
     
     def __repr__(self) -> str:
         return self.__class__.__name__

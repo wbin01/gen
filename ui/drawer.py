@@ -26,7 +26,10 @@ class Drawer(object):
         """..."""
         pass
 
-    def rect(self, x, y, w, h, color, r):
+    def rect(
+            self, x, y, w, h, color, r: int = 0,
+            top_left: int = None, top_right: int = None,
+            bottom_right: int = None, bottom_left: int = None):
         """..."""
         tl = tr = br = bl = r
         rmax = min(w // 2, h // 2)

@@ -5,7 +5,7 @@ import random
 import sdl3
 
 from ..cell import Cell
-from ..flag import Orientation
+from ..flag import Align
 from ..mix import Margin, Position, Size
 from ..ui import UI
 
@@ -20,7 +20,7 @@ class Layout(Margin, Position, Size, UI):
         self.width = 0
         self.height = 0
         self.__spacing = 0
-        self.__orientation = Orientation.VERTICAL
+        self.__align = Align.VERTICAL
 
         self.__drawer = None
 
@@ -28,12 +28,12 @@ class Layout(Margin, Position, Size, UI):
         self.__uis = []
     
     @property
-    def orientation(self) -> Orientation:
-        return self.__orientation
+    def align(self) -> Align:
+        return self.__align
     
-    @orientation.setter
-    def orientation(self, orientation: Orientation) -> None:
-        self.__orientation = orientation
+    @align.setter
+    def align(self, align: Align) -> None:
+        self.__align = align
     
     @property
     def spacing(self) -> int:
@@ -80,7 +80,7 @@ class Layout(Margin, Position, Size, UI):
             ui.x = ui_x + ui.margin[3]
             ui.y = ui_y + ui.margin[0]
 
-            if self.__orientation == Orientation.VERTICAL:
+            if self.__align == Align.VERTICAL:
                 ui_y += ui.margin[0] + ui.height + ui.margin[2] + self.__spacing
             else:
                 ui_x += ui.margin[1] + ui.width + ui.margin[3] + self.__spacing
@@ -99,7 +99,7 @@ class Layout(Margin, Position, Size, UI):
             if isinstance(ui, Layout):
                 self.__expand_layouts_size(ui)
 
-            if layout.orientation.value == 'VERTICAL':
+            if layout.align.value == 'VERTICAL':
                 h = ui.height + ui.margin[0] + ui.margin[2] + layout.spacing
                 layout.height += h
             
@@ -137,8 +137,9 @@ class Layout(Margin, Position, Size, UI):
         green = random.randint(50, 100)
         blue = random.randint(50, 100)
 
-        self._Layout__drawer.rect(
-            self.x - self.margin[3], self.y - self.margin[0],
-            self.width + self.margin[3] + self.margin[1],
-            self.height + self.margin[0] + self.margin[2],
-            (red, green, blue, 255), 2)
+        if not self._Layout__first:
+            self._Layout__drawer.rect(
+                self.x - self.margin[3], self.y - self.margin[0],
+                self.width + self.margin[3] + self.margin[1],
+                self.height + self.margin[0] + self.margin[2],
+                (red, green, blue, 255), 0)

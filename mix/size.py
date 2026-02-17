@@ -7,7 +7,9 @@ class Size(object):
         super().__init__(*args, **kwargs)
         self.__width = 100
         self.__height = 30
-    
+        self.__width_ = 100
+        self.__height_ = 30
+
     def __repr__(self) -> str:
         return self.__class__.__name__
     
