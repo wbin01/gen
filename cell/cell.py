@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-from ..mix import Margin, Padding
+from ..mix import Margin, Position, Size
 from ..ui import UI
 
 
-class Cell(Margin, UI):
+class Cell(Margin, Position, Size, UI):
     """..."""
     def __init__(self) -> None:
         """..."""

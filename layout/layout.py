@@ -6,11 +6,11 @@ import sdl3
 
 from ..cell import Cell
 from ..flag import Orientation
-from ..mix import Margin
+from ..mix import Margin, Position, Size
 from ..ui import UI
 
 
-class Layout(Margin, UI):
+class Layout(Margin, Position, Size, UI):
     """..."""
     def __init__(self) -> None:
         """..."""

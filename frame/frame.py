@@ -6,20 +6,27 @@ from ctypes import c_float, c_int
 import sdl3
 # import sdl3.sdlttf as ttf
 
-from ..ui import UI, Drawer
 from ..flag import ResizeArea
-from ..style import Theme
 from ..layout import Layout
+from ..style import Theme
+from ..ui import UI, Drawer
 
 
 class Frame(UI):
     """..."""
     __theme = Theme
 
-    def __init__(self) -> None:
+    def __init__(
+            self, title: str,
+            width: int = 500, height: int = 300,
+            logging: bool = True
+            ) -> None:
         """..."""
         super().__init__()
-        self.__logging = True
+        self.__title = title
+        self.__width = width
+        self.__height = height
+        self.__logging = logging
 
         sdl3.SDL_SetHint(
             sdl3.SDL_HINT_X11_WINDOW_TYPE, b'_NET_WM_WINDOW_TYPE_NORMAL')
@@ -30,12 +37,10 @@ class Frame(UI):
 
         # Frame
         self.__frame = sdl3.SDL_CreateWindow(
-            b'Transparente Frame - SDL3 + PySDL3', 400, 300, (
-                sdl3.SDL_WINDOW_BORDERLESS | sdl3.SDL_WINDOW_TRANSPARENT |
-                sdl3.SDL_WINDOW_RESIZABLE))
-        # SDL_WINDOW_UTILITY
-        # SDL_WINDOW_TOOLTIP
-        # SDL_WINDOW_POPUP
+            self.__title.encode('utf-8'), self.__width, self.__height, (
+                sdl3.SDL_WINDOW_BORDERLESS |   # SDL_WINDOW_TOOLTIP
+                sdl3.SDL_WINDOW_TRANSPARENT |  # SDL_WINDOW_POPUP
+                sdl3.SDL_WINDOW_RESIZABLE))    # SDL_WINDOW_UTILITY
 
         if not self.__frame:
             if self.__logging: print('Frame error:', sdl3.SDL_GetError())
@@ -44,7 +49,7 @@ class Frame(UI):
 
         sdl3.SDL_SetWindowOpacity(self.__frame, 1.0)
 
-        # Renderer Drawer Style
+        # Style
         self.__renderer = sdl3.SDL_CreateRenderer(self.__frame, None)
         if not self.__renderer:
             if self.__logging: print('Renderer error:', sdl3.SDL_GetError())
@@ -57,7 +62,7 @@ class Frame(UI):
         self.__drawer = Drawer(self.__renderer)
         self.__style = self._Frame__theme
 
-        # Layout test
+        # Layout
         self.__layout = Layout()
         self.__layout._Layout__first = True
         self.__layout._UI__parent = self
@@ -115,6 +120,16 @@ class Frame(UI):
         self.__debug = debug
     
     @property
+    def height(self) -> int:
+        """..."""
+        return self.__height
+    
+    @height.setter
+    def height(self, height: int) -> None:
+        self.__height = height
+        sdl3.SDL_SetWindowSize(self.__frame, self.__width, self.__height)
+    
+    @property
     def spacing(self) -> int:
         """..."""
         return self.__spacing
@@ -122,6 +137,16 @@ class Frame(UI):
     @spacing.setter
     def spacing(self, spacing: int) -> None:
         self.__layout.spacing = spacing
+    
+    @property
+    def width(self) -> int:
+        """..."""
+        return self.__width
+    
+    @width.setter
+    def width(self, width: int) -> None:
+        self.__width = width
+        sdl3.SDL_SetWindowSize(self.__frame, self.__width, self.__height)
     
     def add(self, cell: Cell | Layout, fill=None) -> Cell | Layout:
         name = f'_{cell.__class__.__name__}'
