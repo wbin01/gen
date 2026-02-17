@@ -5,9 +5,9 @@ from .layout import Layout
 
 class Row(Layout):
     """..."""
-    def __init__(self) -> None:
+    def __init__(self, *args, **kwargs) -> None:
         """..."""
-        super().__init__()
+        super().__init__(*args, **kwargs)
         self.align = Align.HORIZONTAL
     
     def __repr__(self) -> str:

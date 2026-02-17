@@ -8,6 +8,9 @@ class Margin(object):
         self.__margin = (0, 0, 0, 0)
     
     def __repr__(self) -> str:
+        return f'{self.__class__.__name__}()'
+
+    def __str__(self) -> str:
         return self.__class__.__name__
     
     @property

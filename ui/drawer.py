@@ -13,7 +13,7 @@ class FontRender:
 
 class Drawer(object):
     """..."""
-    def __init__(self, renderer) -> None:
+    def __init__(self, renderer, *args, **kwargs) -> None:
         self.__renderer = renderer
         
     def __repr__(self) -> str:

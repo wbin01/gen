@@ -11,9 +11,10 @@ class Button(Cell):
     def __init__(
             self, text: str = '',
             x: int = 0, y: int = 0, width: int = 100, height: int = 32,
-            elided: bool = False, style_class: str = None) -> None:
+            elided: bool = False, style_class: str = None,
+            *args, **kwargs) -> None:
         """..."""
-        super().__init__()
+        super().__init__(*args, **kwargs)
         self.__text = text
         self.x = x
         self.y = y
@@ -29,8 +30,11 @@ class Button(Cell):
         else:
             self.__style = Theme.button
     
+    def __repr__(self) -> str:
+        return f'{self.__class__.__name__}({self.__text})'
+    
     def __str__(self) -> str:
-        return f'Button({self.__text})'
+        return f'{self.__class__.__name__}({self.__text})'
     
     @property
     def style(self) -> dict:

@@ -3,11 +3,17 @@
 
 class UI(object):
     """..."""
-    def __init__(self) -> None:
+    def __init__(self, *args, **kwargs) -> None:
         """..."""
         self.__app = None
         self.__parent = None
         self.__dirty = True
+    
+    def __repr__(self) -> str:
+        return f'{self.__class__.__name__}()'
+
+    def __str__(self) -> str:
+        return self.__class__.__name__
     
     @property
     def _app(self) -> UI:

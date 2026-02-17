@@ -2,11 +2,12 @@
 from enum import Enum
 
 
-class Align(Enum):
+class Fill(Enum):
     """..."""
-    VERTICAL = 'VERTICAL'
-    HORIZONTAL = 'HORIZONTAL'
-    FILL = 'FILL'
+    X = 'X'
+    Y = 'Y'
+    ALL = 'ALL'
+    NONE = 'NONE'
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}()'

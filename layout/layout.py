@@ -5,35 +5,52 @@ import random
 import sdl3
 
 from ..cell import Cell
-from ..flag import Align
+from ..flag import Align, Fill
 from ..mix import Margin, Position, Size
 from ..ui import UI
 
 
 class Layout(Margin, Position, Size, UI):
     """..."""
-    def __init__(self) -> None:
+    def __init__(self, *args, **kwargs) -> None:
         """..."""
-        super().__init__()
+        super().__init__(*args, **kwargs)
         self.__first = False
         self.__drawer = None
         self.width = 0
         self.height = 0
         self.__spacing = 0
         self.__align = Align.VERTICAL
+        self.__fill = Fill.NONE
 
         self.__drawer = None
 
         self._UI__dirty = True
         self.__uis = []
     
+    def __repr__(self) -> str:
+        return f'{self.__class__.__name__}()'
+
+    def __str__(self) -> str:
+        return self.__class__.__name__
+    
     @property
     def align(self) -> Align:
+        """..."""
         return self.__align
     
     @align.setter
     def align(self, align: Align) -> None:
         self.__align = align
+    
+    @property
+    def fill(self) -> Fill:
+        """..."""
+        return self.__fill
+    
+    @fill.setter
+    def fill(self, fill: Fill) -> None:
+        self.__fill = fill
     
     @property
     def spacing(self) -> int:

@@ -12,7 +12,8 @@ class FontRender(object):
             font: str = 'DejaVuSans.ttf',
             size: int = 12,
             width_to_elided: int = 0,
-            padding: int = 20) -> None:
+            padding: int = 20,
+            *args, **kwargs) -> None:
         """..."""
         self.__text = text
         self.__color = color

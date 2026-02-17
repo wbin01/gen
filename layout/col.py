@@ -4,9 +4,9 @@ from .layout import Layout
 
 class Col(Layout):
     """..."""
-    def __init__(self) -> None:
+    def __init__(self, *args, **kwargs) -> None:
         """..."""
-        super().__init__()
+        super().__init__(*args, **kwargs)
     
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}()'

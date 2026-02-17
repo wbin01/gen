@@ -11,6 +11,9 @@ class Size(object):
         self.__height_ = 30
 
     def __repr__(self) -> str:
+        return f'{self.__class__.__name__}()'
+
+    def __str__(self) -> str:
         return self.__class__.__name__
     
     @property

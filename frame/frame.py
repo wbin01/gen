@@ -17,9 +17,10 @@ class Frame(UI):
     __theme = Theme
 
     def __init__(
-            self, title: str, width: int = 500, height: int = 300) -> None:
+            self, title: str, width: int = 500, height: int = 300,
+            *args, **kwargs) -> None:
         """..."""
-        super().__init__()
+        super().__init__(*args, **kwargs)
         self.__title = title
         self.__width = width
         self.__height = height

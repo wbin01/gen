@@ -4,9 +4,9 @@ from ..frame import Frame
 
 class Application(Position, Size):
     """..."""
-    def __init__(self, frame) -> None:
+    def __init__(self, frame, *args, **kwargs) -> None:
         """..."""
-        super().__init__()
+        super().__init__(*args, **kwargs)
         self.__frame = frame
         self.__app = None
         self.__name = 'Genesis'
@@ -14,6 +14,9 @@ class Application(Position, Size):
         self.__size = 500, 400
     
     def __repr__(self) -> str:
+        return f'{self.__class__.__name__}()'
+
+    def __str__(self) -> str:
         return self.__class__.__name__
     
     @property
