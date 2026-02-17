@@ -17,11 +17,14 @@ class Frame(UI):
     __theme = Theme
 
     def __init__(
-            self, title: str, width: int = 500, height: int = 300,
+            self, title: str,
+            x: int = 0, y: int = 0, width: int = 500, height: int = 300,
             *args, **kwargs) -> None:
         """..."""
         super().__init__(*args, **kwargs)
         self.__title = title
+        self.__x = x
+        self.__y = y
         self.__width = width
         self.__height = height
         self.__logging = True
@@ -145,6 +148,26 @@ class Frame(UI):
     def width(self, width: int) -> None:
         self.__width = width
         sdl3.SDL_SetWindowSize(self.__frame, self.__width, self.__height)
+    
+    @property
+    def x(self) -> int:
+        """..."""
+        return self.__x
+    
+    @x.setter
+    def x(self, x: int) -> None:
+        self.__x = int(x)
+        sdl3.SDL_SetWindowPosition(self.__frame, self.__x, self.__y)
+    
+    @property
+    def y(self) -> int:
+        """..."""
+        return self.__y
+    
+    @y.setter
+    def y(self, y: int) -> None:
+        self.__y = int(y)
+        sdl3.SDL_SetWindowPosition(self.__frame, self.__x, self.__y)
     
     def add(self, cell: Cell | Layout, fill=None) -> Cell | Layout:
         name = f'_{cell.__class__.__name__}'
@@ -326,6 +349,8 @@ class Frame(UI):
         sdl3.SDL_SetWindowSize(self.__frame, w, h)
         self.width = w
         self.height = h
+        self.x = x
+        self.y = y
 
         self.__render_needs_updating = True
     

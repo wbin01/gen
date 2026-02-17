@@ -7,8 +7,7 @@ class Row(Layout):
     """..."""
     def __init__(self, *args, **kwargs) -> None:
         """..."""
-        super().__init__(*args, **kwargs)
-        self.align = Align.HORIZONTAL
+        super().__init__(align=Align.HORIZONTAL, *args, **kwargs)
     
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}()'

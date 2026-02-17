@@ -12,7 +12,14 @@ from ..ui import UI
 
 class Layout(Margin, Position, Size, UI):
     """..."""
-    def __init__(self, *args, **kwargs) -> None:
+    __colors = (
+            (30, 55, 100, 255), (150, 55, 55, 255), (205, 190, 100, 255),
+            (75, 110, 60, 255), (140, 170, 200, 255), (75, 60, 80, 255),
+            (190, 140, 80, 255), (30, 55, 100, 255), (150, 55, 55, 255),
+            (205, 190, 100, 255), (75, 110, 60, 255), (140, 170, 200, 255),
+            (75, 60, 80, 255), (190, 140, 80, 255))
+    __color = (190, 140, 80, 255)
+    def __init__(self, align: Align = Align.VERTICAL, *args, **kwargs) -> None:
         """..."""
         super().__init__(*args, **kwargs)
         self.__first = False
@@ -20,8 +27,8 @@ class Layout(Margin, Position, Size, UI):
         self.width = 0
         self.height = 0
         self.__spacing = 0
-        self.__align = Align.VERTICAL
-        self.__fill = Fill.NONE
+        self.__align = align
+        self.__fill = Fill.ALL
 
         self.__drawer = None
 
@@ -86,7 +93,8 @@ class Layout(Margin, Position, Size, UI):
     def __update(self) -> None:
         """..."""
         if self._Layout__first:
-            self.__expand_layouts_size(self)
+            self.__layout_size(self)
+            self.__layout_fill(self)
         
         ui_x, ui_y = self.x, self.y
         for ui in self.__uis:
@@ -105,7 +113,7 @@ class Layout(Margin, Position, Size, UI):
             if isinstance(ui, Layout):
                 ui._Layout__update()
     
-    def __expand_layouts_size(self, layout) -> None:
+    def __layout_size(self, layout) -> None:
         layout.height = 0
         layout.width = 0
 
@@ -114,7 +122,7 @@ class Layout(Margin, Position, Size, UI):
                 continue
             
             if isinstance(ui, Layout):
-                self.__expand_layouts_size(ui)
+                self.__layout_size(ui)
 
             if layout.align.value == 'VERTICAL':
                 h = ui.height + ui.margin[0] + ui.margin[2] + layout.spacing
@@ -130,6 +138,57 @@ class Layout(Margin, Position, Size, UI):
             
                 w = ui.width + ui.margin[1] + ui.margin[3] + layout.spacing
                 layout.width += w
+    
+    def __layout_fill(self, layout) -> None:
+        if layout._Layout__first:
+            layout.width = layout._parent.width
+            layout.height = layout._parent.height
+        
+        vlayouts = []
+        hlayouts = []
+        for ui in layout._Layout__uis:
+            if isinstance(ui, Layout):
+                if ui.align.value == 'VERTICAL':
+                    vlayouts.append(ui)
+                else:
+                    hlayouts.append(ui)
+        # VX
+        used = layout.width
+        free = layout._parent.width - used
+        delta = free if len(vlayouts) < 2 else free // len(vlayouts)
+
+        if delta > 1:
+            for vl in vlayouts:
+                if vl.fill.value == 'X' or vl.fill.value == 'ALL':
+                    vl.width += delta
+        # VY
+        used = 0
+        for v in vlayouts:
+            used += v.height + v.margin[0] + v.margin[2]
+        
+        free = 0
+        if layout._Layout__first:
+            free = layout._parent.height - used
+        else:
+            free = (
+                layout._parent.height +
+                layout._parent.margin[0] +
+                layout._parent.margin[2]) - used
+        
+        delta = free if len(vlayouts) < 2 else free // len(vlayouts)
+
+        if delta > 1:
+            for vl in vlayouts:
+                if vl.fill.value == 'Y' or vl.fill.value == 'ALL':
+                    vl.height += delta
+        
+        for vl in vlayouts:
+            self.__layout_fill(vl)
+        
+        for hl in hlayouts:
+            self.__layout_fill(hl)
+
+        # print(f'Used: {used}, Free: {free}, Delta: {delta}')
 
     def __redraw(self) -> None:
         """..."""
@@ -149,14 +208,21 @@ class Layout(Margin, Position, Size, UI):
 
         self._UI__dirty = False
     
-    def __draw(self) -> None:
-        red = random.randint(50, 100)
-        green = random.randint(50, 100)
-        blue = random.randint(50, 100)
+    @classmethod
+    def __get_bg(cls) -> tuple:
+        num_color = 0
+        for num, color in enumerate(cls.__colors):
+            if color == cls.__color:
+                num_color = num + 1
 
-        if not self._Layout__first:
-            self._Layout__drawer.rect(
-                self.x - self.margin[3], self.y - self.margin[0],
-                self.width + self.margin[3] + self.margin[1],
-                self.height + self.margin[0] + self.margin[2],
-                (red, green, blue, 255), 0)
+                if num_color > 14: num_color = 0
+                cls.__color = cls.__colors[num_color]
+                return cls.__color
+    
+    def __draw(self) -> None:
+        color = (125, 125, 125, 10) if self._Layout__first else self.__get_bg()
+        self._Layout__drawer.rect(
+            self.x - self.margin[3], self.y - self.margin[0],
+            self.width + self.margin[3] + self.margin[1],
+            self.height + self.margin[0] + self.margin[2],
+            color, 4)
