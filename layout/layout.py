@@ -101,7 +101,7 @@ class Layout(Margin, Position, Size, UI):
 
             if not ui._UI__dirty:
                 continue
-            
+
             ui.x = ui_x + ui.margin[3]
             ui.y = ui_y + ui.margin[0]
 
@@ -117,7 +117,8 @@ class Layout(Margin, Position, Size, UI):
         layout._Size__height = 0
         layout._Size__width = 0
         
-        for ui in layout._Layout__uis:
+        last = len(layout._Layout__uis) - 1
+        for num, ui in enumerate(layout._Layout__uis):
             if not ui._UI__dirty:
                 continue
             
@@ -126,7 +127,8 @@ class Layout(Margin, Position, Size, UI):
 
             if layout.align.value == 'VERTICAL':
                 h = ui._Size__base_height + ui.margin[0] + ui.margin[2]
-                layout._Size__height += h + layout.spacing
+                if num != last: h += layout.spacing
+                layout._Size__height += h
             
                 w = ui._Size__width + ui.margin[1] + ui.margin[3]
                 if w > layout.width:
@@ -137,7 +139,8 @@ class Layout(Margin, Position, Size, UI):
                     layout._Size__height = h
             
                 w = ui._Size__base_width + ui.margin[1] + ui.margin[3]
-                layout._Size__width += w + layout.spacing
+                if num != last: w += layout.spacing
+                layout._Size__width += w
     
     def __layout_fill(self, layout) -> None:
         if layout._Layout__first:

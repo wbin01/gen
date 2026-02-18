@@ -10,7 +10,7 @@ class ExpanderCol(Cell):
         super().__init__(*args, **kwargs)
         self.margin = 0, 0, 0, 0
         self.width = 0
-        self.height = 0        
+        self.height = 0
         self.fill = Fill.Y
 
     def __repr__(self) -> str:
