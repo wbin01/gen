@@ -169,10 +169,30 @@ class Layout(Margin, Position, Size, UI):
             delta = free // all_fill_y_num if all_fill_y_num > 1 else free
             for ui in all_fill_y:
                 ui.height += delta
+        
+        elif layout.align.value == 'HORIZONTAL':
+            for ui in layout._Layout__uis:
+                ui.height = total_h - ui.margin[0] - ui.margin[2]
+            
+            all_fill_x = []
+            width = 0
+            for ui in layout._Layout__uis:
+                if hasattr(ui, 'fill'):
+                    if ui.fill.value == 'X' or ui.fill.value == 'ALL':
+                        all_fill_x.append(ui)
+                
+                width += ui.width + ui.margin[1] + ui.margin[3] + layout.spacing
+            
+            all_fill_x_num = len(all_fill_x)
+            free = total_w - width
+            
+            delta = free // all_fill_x_num if all_fill_x_num > 1 else free
+            for ui in all_fill_x:
+                ui.width += delta
 
-        # for ui in layout._Layout__uis:
-        #     if isinstance(ui, Layout):
-        #         self.__layout_fill(ui)
+        for ui in layout._Layout__uis:
+            if isinstance(ui, Layout):
+                self.__layout_fill(ui)
 
     def __redraw(self) -> None:
         """..."""

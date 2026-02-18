@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from ..flag import Fill
 from ..mix import Margin, Position, Size
 from ..ui import UI
 
@@ -9,6 +10,16 @@ class Cell(Margin, Position, Size, UI):
         """..."""
         super().__init__(*args, **kwargs)
         self.__drawer = None
+        self.__fill = Fill.X
+    
+    @property
+    def fill(self) -> Fill:
+        """..."""
+        return self.__fill
+    
+    @fill.setter
+    def fill(self, fill: Fill) -> None:
+        self.__fill = fill
     
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}()'
