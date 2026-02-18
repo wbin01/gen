@@ -140,55 +140,39 @@ class Layout(Margin, Position, Size, UI):
                 layout.width += w
     
     def __layout_fill(self, layout) -> None:
+        x_margin = layout.margin[1] + layout.margin[3]
+        y_margin = layout.margin[0] + layout.margin[2]
+        
         if layout._Layout__first:
             layout.width = layout._parent.width
             layout.height = layout._parent.height
         
-        vlayouts = []
-        hlayouts = []
-        for ui in layout._Layout__uis:
-            if isinstance(ui, Layout):
-                if ui.align.value == 'VERTICAL':
-                    vlayouts.append(ui)
-                else:
-                    hlayouts.append(ui)
-        # VX
-        used = layout.width
-        free = layout._parent.width - used
-        delta = free if len(vlayouts) < 2 else free // len(vlayouts)
+        total_w = layout.width # - x_margin
+        total_h = layout.height # - y_margin
 
-        if delta > 1:
-            for vl in vlayouts:
-                if vl.fill.value == 'X' or vl.fill.value == 'ALL':
-                    vl.width += delta
-        # VY
-        used = 0
-        for v in vlayouts:
-            used += v.height + v.margin[0] + v.margin[2]
-        
-        free = 0
-        if layout._Layout__first:
-            free = layout._parent.height - used
-        else:
-            free = (
-                layout._parent.height +
-                layout._parent.margin[0] +
-                layout._parent.margin[2]) - used
-        
-        delta = free if len(vlayouts) < 2 else free // len(vlayouts)
+        if layout.align.value == 'VERTICAL':
+            for ui in layout._Layout__uis:
+                ui.width = total_w - ui.margin[1] - ui.margin[3]
+            
+            all_fill_y = []
+            height = 0
+            for ui in layout._Layout__uis:
+                if hasattr(ui, 'fill'):
+                    if ui.fill.value == 'Y' or ui.fill.value == 'ALL':
+                        all_fill_y.append(ui)
+                
+                height += ui.height + ui.margin[0] + ui.margin[2] + layout.spacing
+            
+            all_fill_y_num = len(all_fill_y)
+            free = total_h - height
+            
+            delta = free // all_fill_y_num if all_fill_y_num > 1 else free
+            for ui in all_fill_y:
+                ui.height += delta
 
-        if delta > 1:
-            for vl in vlayouts:
-                if vl.fill.value == 'Y' or vl.fill.value == 'ALL':
-                    vl.height += delta
-        
-        for vl in vlayouts:
-            self.__layout_fill(vl)
-        
-        for hl in hlayouts:
-            self.__layout_fill(hl)
-
-        # print(f'Used: {used}, Free: {free}, Delta: {delta}')
+        # for ui in layout._Layout__uis:
+        #     if isinstance(ui, Layout):
+        #         self.__layout_fill(ui)
 
     def __redraw(self) -> None:
         """..."""
