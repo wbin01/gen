@@ -7,8 +7,8 @@ class Size(object):
         super().__init__(*args, **kwargs)
         self.__width = 100
         self.__height = 30
-        self.__width_ = 100
-        self.__height_ = 30
+        self.__base_width = 100
+        self.__base_height = 30
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}()'
@@ -24,7 +24,7 @@ class Size(object):
     @width.setter
     def width(self, width: int) -> None:
         self.__width = width
-        # self.__width_ = width
+        self.__base_width = width
 
     @property
     def height(self) -> int:
@@ -34,4 +34,4 @@ class Size(object):
     @height.setter
     def height(self, height: int) -> None:
         self.__height = height
-        # self.__height_ = height
+        self.__base_height = height

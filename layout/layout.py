@@ -114,8 +114,8 @@ class Layout(Margin, Position, Size, UI):
                 ui._Layout__update()
     
     def __layout_size(self, layout) -> None:
-        layout._Size__height = 0  # layout.height = 0
-        layout._Size__width = 0  # layout.width = 0
+        layout._Size__height = 0
+        layout._Size__width = 0
         
         for ui in layout._Layout__uis:
             if not ui._UI__dirty:
@@ -123,33 +123,26 @@ class Layout(Margin, Position, Size, UI):
             
             if isinstance(ui, Layout):
                 self.__layout_size(ui)
-            
-            # ui._Size__height = ui._Size__height_
-            # ui._Size__width = ui._Size__width_
 
             if layout.align.value == 'VERTICAL':
-                # h = ui.height + ui.margin[0] + ui.margin[2] + layout.spacing
-                h = ui._Size__height_ + ui.margin[0] + ui.margin[2] + layout.spacing
-                layout._Size__height += h  # layout.height += h
+                h = ui._Size__base_height + ui.margin[0] + ui.margin[2]
+                layout._Size__height += h + layout.spacing
             
-                # w = ui.width + ui.margin[1] + ui.margin[3]
                 w = ui._Size__width + ui.margin[1] + ui.margin[3]
                 if w > layout.width:
-                    layout._Size__width = w  # layout.width = w
+                    layout._Size__width = w
             else:
-                # h = ui.height + ui.margin[0] + ui.margin[2]
                 h = ui._Size__height + ui.margin[0] + ui.margin[2]
                 if h > layout.height:
-                    layout._Size__height = h  # layout.height = h
+                    layout._Size__height = h
             
-                # w = ui.width + ui.margin[1] + ui.margin[3] + layout.spacing
-                w = ui._Size__width_ + ui.margin[1] + ui.margin[3] + layout.spacing
-                layout._Size__width += w  # layout.width += w
+                w = ui._Size__base_width + ui.margin[1] + ui.margin[3]
+                layout._Size__width += w + layout.spacing
     
     def __layout_fill(self, layout) -> None:
         if layout._Layout__first:
-            layout.width = layout._parent.width
-            layout.height = layout._parent.height
+            layout._Size__width = layout._parent.width
+            layout._Size__height = layout._parent.height
         
         total_width = layout.width
         total_height = layout.height
@@ -158,7 +151,7 @@ class Layout(Margin, Position, Size, UI):
             # Width
             for ui in layout._Layout__uis:
                 if ui.fill.value == 'X' or ui.fill.value == 'ALL':
-                    ui.width = total_width - ui.margin[1] - ui.margin[3]
+                    ui._Size__width = total_width - ui.margin[1] - ui.margin[3]
             # Height
             vertical, height, last = [], 0, len(layout._Layout__uis) - 1
             for num, ui in enumerate(layout._Layout__uis):
@@ -174,13 +167,13 @@ class Layout(Margin, Position, Size, UI):
             
             delta = free // vertical_num if vertical_num > 1 else free
             for ui in vertical:
-                ui.height += delta
+                ui._Size__height += delta
         
         elif layout.align.value == 'HORIZONTAL':
             # Height
             for ui in layout._Layout__uis:
                 if ui.fill.value == 'Y' or ui.fill.value == 'ALL':
-                    ui.height = total_height - ui.margin[0] - ui.margin[2]
+                    ui._Size__height = total_height - ui.margin[0] - ui.margin[2]
             # Width
             horizontal, width, last = [], 0, len(layout._Layout__uis) - 1
             for num, ui in enumerate(layout._Layout__uis):
@@ -196,7 +189,7 @@ class Layout(Margin, Position, Size, UI):
             
             delta = free // horizontal_num if horizontal_num > 1 else free
             for ui in horizontal:
-                ui.width += delta
+                ui._Size__width += delta
 
         for ui in layout._Layout__uis:
             if isinstance(ui, Layout):
