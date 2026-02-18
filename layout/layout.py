@@ -98,9 +98,8 @@ class Layout(Margin, Position, Size, UI):
         
         ui_x, ui_y = self.x, self.y
         for ui in self.__uis:
-
-            if not ui._UI__dirty:
-                continue
+            if isinstance(ui, Cell) and not ui.visible: continue
+            if not ui._UI__dirty: continue
 
             ui.x = ui_x + ui.margin[3]
             ui.y = ui_y + ui.margin[0]
@@ -119,8 +118,8 @@ class Layout(Margin, Position, Size, UI):
         
         last = len(layout._Layout__uis) - 1
         for num, ui in enumerate(layout._Layout__uis):
-            if not ui._UI__dirty:
-                continue
+            if isinstance(ui, Cell) and not ui.visible: continue
+            if not ui._UI__dirty: continue
             
             if isinstance(ui, Layout):
                 self.__layout_size(ui)
@@ -153,11 +152,15 @@ class Layout(Margin, Position, Size, UI):
         if layout.align.value == 'VERTICAL':
             # Width
             for ui in layout._Layout__uis:
+                if isinstance(ui, Cell) and not ui.visible: continue
+
                 if ui.fill.value == 'X' or ui.fill.value == 'ALL':
                     ui._Size__width = total_width - ui.margin[1] - ui.margin[3]
             # Height
             vertical, height, last = [], 0, len(layout._Layout__uis) - 1
             for num, ui in enumerate(layout._Layout__uis):
+                if isinstance(ui, Cell) and not ui.visible: continue
+
                 if hasattr(ui, 'fill'):
                     if ui.fill.value == 'Y' or ui.fill.value == 'ALL':
                         vertical.append(ui)
@@ -175,11 +178,15 @@ class Layout(Margin, Position, Size, UI):
         elif layout.align.value == 'HORIZONTAL':
             # Height
             for ui in layout._Layout__uis:
+                if isinstance(ui, Cell) and not ui.visible: continue
+
                 if ui.fill.value == 'Y' or ui.fill.value == 'ALL':
                     ui._Size__height = total_height - ui.margin[0] - ui.margin[2]
             # Width
             horizontal, width, last = [], 0, len(layout._Layout__uis) - 1
             for num, ui in enumerate(layout._Layout__uis):
+                if isinstance(ui, Cell) and not ui.visible: continue
+                
                 if hasattr(ui, 'fill'):
                     if ui.fill.value == 'X' or ui.fill.value == 'ALL':
                         horizontal.append(ui)
@@ -203,8 +210,8 @@ class Layout(Margin, Position, Size, UI):
         if self._app and self._app._Frame__debug: self.__draw()
 
         for ui in self.__uis:
-            if not ui._UI__dirty:
-                continue
+            if isinstance(ui, Cell) and not ui.visible: continue
+            if not ui._UI__dirty: continue
 
             if isinstance(ui, Layout):
                 ui._Layout__redraw()
