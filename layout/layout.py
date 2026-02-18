@@ -4,7 +4,7 @@ import random
 
 import sdl3
 
-from ..cell import Cell
+from ..cell import Cell, ExpanderCol, ExpanderRow
 from ..flag import Align, Fill
 from ..mix import Margin, Position, Size
 from ..ui import UI
@@ -114,30 +114,37 @@ class Layout(Margin, Position, Size, UI):
                 ui._Layout__update()
     
     def __layout_size(self, layout) -> None:
-        layout.height = 0
-        layout.width = 0
-
+        layout._Size__height = 0  # layout.height = 0
+        layout._Size__width = 0  # layout.width = 0
+        
         for ui in layout._Layout__uis:
             if not ui._UI__dirty:
                 continue
             
             if isinstance(ui, Layout):
                 self.__layout_size(ui)
+            
+            # ui._Size__height = ui._Size__height_
+            # ui._Size__width = ui._Size__width_
 
             if layout.align.value == 'VERTICAL':
-                h = ui.height + ui.margin[0] + ui.margin[2] + layout.spacing
-                layout.height += h
+                # h = ui.height + ui.margin[0] + ui.margin[2] + layout.spacing
+                h = ui._Size__height_ + ui.margin[0] + ui.margin[2] + layout.spacing
+                layout._Size__height += h  # layout.height += h
             
-                w = ui.width + ui.margin[1] + ui.margin[3]
+                # w = ui.width + ui.margin[1] + ui.margin[3]
+                w = ui._Size__width_ + ui.margin[1] + ui.margin[3]
                 if w > layout.width:
-                    layout.width = w
+                    layout._Size__width = w  # layout.width = w
             else:
-                h = ui.height + ui.margin[0] + ui.margin[2]
+                # h = ui.height + ui.margin[0] + ui.margin[2]
+                h = ui._Size__height_ + ui.margin[0] + ui.margin[2]
                 if h > layout.height:
-                    layout.height = h
+                    layout._Size__height = h  # layout.height = h
             
-                w = ui.width + ui.margin[1] + ui.margin[3] + layout.spacing
-                layout.width += w
+                # w = ui.width + ui.margin[1] + ui.margin[3] + layout.spacing
+                w = ui._Size__width_ + ui.margin[1] + ui.margin[3] + layout.spacing
+                layout._Size__width += w  # layout.width += w
     
     def __layout_fill(self, layout) -> None:
         if layout._Layout__first:
