@@ -10,8 +10,8 @@ class Cell(Margin, Position, Size, UI):
         """..."""
         super().__init__(*args, **kwargs)
         self.__drawer = None
-        self.__fill = Fill.X
-    
+        self.__fill = Fill.ALL
+
     @property
     def fill(self) -> Fill:
         """..."""

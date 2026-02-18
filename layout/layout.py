@@ -140,54 +140,55 @@ class Layout(Margin, Position, Size, UI):
                 layout.width += w
     
     def __layout_fill(self, layout) -> None:
-        x_margin = layout.margin[1] + layout.margin[3]
-        y_margin = layout.margin[0] + layout.margin[2]
-        
         if layout._Layout__first:
             layout.width = layout._parent.width
             layout.height = layout._parent.height
         
-        total_w = layout.width # - x_margin
-        total_h = layout.height # - y_margin
+        total_w = layout.width # - x margins
+        total_h = layout.height # - y margins
 
         if layout.align.value == 'VERTICAL':
             for ui in layout._Layout__uis:
                 ui.width = total_w - ui.margin[1] - ui.margin[3]
             
-            all_fill_y = []
+            fill_h = []
             height = 0
-            for ui in layout._Layout__uis:
+            last = len(layout._Layout__uis) - 1
+            for num, ui in enumerate(layout._Layout__uis):
                 if hasattr(ui, 'fill'):
-                    if ui.fill.value == 'Y' or ui.fill.value == 'ALL':
-                        all_fill_y.append(ui)
+                    if ui.fill.value == 'HEIGHT' or ui.fill.value == 'ALL':
+                        fill_h.append(ui)
                 
-                height += ui.height + ui.margin[0] + ui.margin[2] + layout.spacing
+                height += ui.height + ui.margin[0] + ui.margin[2]
+                if num != last: height += layout.spacing
             
-            all_fill_y_num = len(all_fill_y)
+            fill_h_num = len(fill_h)
             free = total_h - height
             
-            delta = free // all_fill_y_num if all_fill_y_num > 1 else free
-            for ui in all_fill_y:
+            delta = free // fill_h_num if fill_h_num > 1 else free
+            for ui in fill_h:
                 ui.height += delta
         
         elif layout.align.value == 'HORIZONTAL':
             for ui in layout._Layout__uis:
                 ui.height = total_h - ui.margin[0] - ui.margin[2]
             
-            all_fill_x = []
+            fill_w = []
             width = 0
-            for ui in layout._Layout__uis:
+            last = len(layout._Layout__uis) - 1
+            for num, ui in enumerate(layout._Layout__uis):
                 if hasattr(ui, 'fill'):
-                    if ui.fill.value == 'X' or ui.fill.value == 'ALL':
-                        all_fill_x.append(ui)
+                    if ui.fill.value == 'WIDTH' or ui.fill.value == 'ALL':
+                        fill_w.append(ui)
                 
-                width += ui.width + ui.margin[1] + ui.margin[3] + layout.spacing
+                width += ui.width + ui.margin[1] + ui.margin[3]
+                if num != last: width += layout.spacing
             
-            all_fill_x_num = len(all_fill_x)
+            fill_w_num = len(fill_w)
             free = total_w - width
             
-            delta = free // all_fill_x_num if all_fill_x_num > 1 else free
-            for ui in all_fill_x:
+            delta = free // fill_w_num if fill_w_num > 1 else free
+            for ui in fill_w:
                 ui.width += delta
 
         for ui in layout._Layout__uis:
