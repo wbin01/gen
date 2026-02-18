@@ -8,6 +8,11 @@ class ExpanderRow(Cell):
     def __init__(self, *args, **kwargs) -> None:
         """..."""
         super().__init__(*args, **kwargs)
+        self._Size__width_ = 0
+        self._Size__width = 0
+        self._Size__height_ = 0
+        self._Size__height = 0
+
         self.fill = Fill.X
 
     def __repr__(self) -> str:

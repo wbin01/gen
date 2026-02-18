@@ -133,12 +133,12 @@ class Layout(Margin, Position, Size, UI):
                 layout._Size__height += h  # layout.height += h
             
                 # w = ui.width + ui.margin[1] + ui.margin[3]
-                w = ui._Size__width_ + ui.margin[1] + ui.margin[3]
+                w = ui._Size__width + ui.margin[1] + ui.margin[3]
                 if w > layout.width:
                     layout._Size__width = w  # layout.width = w
             else:
                 # h = ui.height + ui.margin[0] + ui.margin[2]
-                h = ui._Size__height_ + ui.margin[0] + ui.margin[2]
+                h = ui._Size__height + ui.margin[0] + ui.margin[2]
                 if h > layout.height:
                     layout._Size__height = h  # layout.height = h
             
