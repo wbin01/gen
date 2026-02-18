@@ -24,6 +24,7 @@ class Size(object):
     @width.setter
     def width(self, width: int) -> None:
         self.__width = width
+        # self.__width_ = width
 
     @property
     def height(self) -> int:
@@ -33,3 +34,4 @@ class Size(object):
     @height.setter
     def height(self, height: int) -> None:
         self.__height = height
+        # self.__height_ = height
