@@ -10,7 +10,7 @@ class Cell(Margin, Position, Size, UI):
         """..."""
         super().__init__(*args, **kwargs)
         self.__drawer = None
-        self.__fill = Fill.ALL
+        self.__fill = Fill.HORIZONTAL
 
     @property
     def fill(self) -> Fill:

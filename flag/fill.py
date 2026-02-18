@@ -4,8 +4,8 @@ from enum import Enum
 
 class Fill(Enum):
     """..."""
-    WIDTH = 'WIDTH'
-    HEIGHT = 'HEIGHT'
+    VERTICAL = 'VERTICAL'
+    HORIZONTAL = 'HORIZONTAL'
     ALL = 'ALL'
     NONE = 'NONE'
 
