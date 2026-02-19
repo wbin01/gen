@@ -12,7 +12,7 @@ from ..ui import UI
 
 class Layout(Margin, Position, Size, UI):
     """..."""
-    def __init__(self, align: Align = Align.VERTICAL, *args, **kwargs) -> None:
+    def __init__(self, *args, **kwargs) -> None:
         """..."""
         super().__init__(*args, **kwargs)
         self.__first = False
@@ -20,7 +20,8 @@ class Layout(Margin, Position, Size, UI):
         self.width = 0
         self.height = 0
         self.__spacing = 0
-        self.__align = align
+        self.__align = Align.VERTICAL
+        self.__orientation = 'VERTICAL'
         self.__fill = Fill.ALL
 
         self.__drawer = None
@@ -96,32 +97,36 @@ class Layout(Margin, Position, Size, UI):
         self._UI__dirty = True
     
     def __update(self) -> None:
-        """..."""
+        # Updates the width, fill, alignment, and position of cells.
+
         if self._Layout__first:
             self.__layout_size(self)
             self.__layout_fill(self)
         
-        ui_x, ui_y = self.x, self.y
+        ui_x, ui_y = self.x, self.y  # Reset
         for ui in self.__uis:
             if isinstance(ui, Cell) and not ui.visible: continue
             if not ui._UI__dirty: continue
 
-            ui.x = ui_x + ui.margin[3]
+            ui.x = ui_x + ui.margin[3]  # Set current position
             ui.y = ui_y + ui.margin[0]
 
-            if self.__align == Align.VERTICAL:
+            if self.__orientation == 'VERTICAL':  # Prepare next position
                 ui_y += ui.margin[0] + ui.height + ui.margin[2] + self.__spacing
             else:
                 ui_x += ui.margin[1] + ui.width + ui.margin[3] + self.__spacing
             
-            if isinstance(ui, Layout):
+            if isinstance(ui, Layout):  # Repeat for all
                 ui._Layout__update()
     
     def __layout_size(self, layout) -> None:
-        layout._Size__height = 0
+        # Make sure the layout size are compatible with the number 
+        # of stacked cells.
+        
+        layout._Size__height = 0  # Reset
         layout._Size__width = 0
         
-        last = len(layout._Layout__uis) - 1
+        last = len(layout._Layout__uis) - 1  # To remove last extra 'spacing'
         for num, ui in enumerate(layout._Layout__uis):
             if isinstance(ui, Cell) and not ui.visible: continue
             if not ui._UI__dirty: continue
@@ -129,7 +134,7 @@ class Layout(Margin, Position, Size, UI):
             if isinstance(ui, Layout):
                 self.__layout_size(ui)
 
-            if layout.align.value == 'VERTICAL':
+            if layout._Layout__orientation == 'VERTICAL':  # Set width height
                 h = ui._Size__base_height + ui.margin[0] + ui.margin[2]
                 if num != last: h += layout.spacing
                 layout._Size__height += h
@@ -147,6 +152,8 @@ class Layout(Margin, Position, Size, UI):
                 layout._Size__width += w
     
     def __layout_fill(self, layout) -> None:
+        # Updates the fill of layouts and cells.
+        
         if layout._Layout__first:
             layout._Size__width = layout._parent.width
             layout._Size__height = layout._parent.height
@@ -154,9 +161,9 @@ class Layout(Margin, Position, Size, UI):
         total_width = layout.width
         total_height = layout.height
 
-        if layout.align.value == 'VERTICAL':
+        if layout._Layout__orientation == 'VERTICAL':
             # Width
-            for ui in layout._Layout__uis:
+            for ui in layout._Layout__uis:  # Width equal to the layout
                 if isinstance(ui, Cell) and not ui.visible: continue
 
                 if ui.fill.value == 'X' or ui.fill.value == 'ALL':
@@ -166,21 +173,21 @@ class Layout(Margin, Position, Size, UI):
             for num, ui in enumerate(layout._Layout__uis):
                 if isinstance(ui, Cell) and not ui.visible: continue
 
-                if hasattr(ui, 'fill'):
+                if hasattr(ui, 'fill'):  # Collects cells that expand
                     if ui.fill.value == 'Y' or ui.fill.value == 'ALL':
                         vertical.append(ui)
                 
-                height += ui.height + ui.margin[0] + ui.margin[2]
+                height += ui.height + ui.margin[0] + ui.margin[2] # Save height
                 if num != last: height += layout.spacing
             
             vertical_num = len(vertical)
-            free = total_height - height
+            free = total_height - height  # Discover available space
             
             delta = free // vertical_num if vertical_num > 1 else free
-            for ui in vertical:
+            for ui in vertical:  # Distributes space to the cells that require
                 ui._Size__height += delta
         
-        elif layout.align.value == 'HORIZONTAL':
+        elif layout._Layout__orientation == 'HORIZONTAL':
             # Height
             for ui in layout._Layout__uis:
                 if isinstance(ui, Cell) and not ui.visible: continue
@@ -206,7 +213,7 @@ class Layout(Margin, Position, Size, UI):
             for ui in horizontal:
                 ui._Size__width += delta
 
-        for ui in layout._Layout__uis:
+        for ui in layout._Layout__uis:  # Repeat for all
             if isinstance(ui, Layout):
                 self.__layout_fill(ui)
 
