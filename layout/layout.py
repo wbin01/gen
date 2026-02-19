@@ -112,9 +112,9 @@ class Layout(Margin, Position, Size, UI):
             ui.y = ui_y + ui.margin[0]
 
             if self.__orientation == 'VERTICAL':  # Prepare next position
-                ui_y += ui.margin[0] + ui.height + ui.margin[2] + self.__spacing
+                ui_y += ui.height + ui._Margin__margin_y + self.__spacing
             else:
-                ui_x += ui.margin[1] + ui.width + ui.margin[3] + self.__spacing
+                ui_x += ui.width + ui._Margin__margin_x + self.__spacing
             
             if isinstance(ui, Layout):  # Repeat for all
                 ui._Layout__update()
@@ -135,19 +135,19 @@ class Layout(Margin, Position, Size, UI):
                 self.__layout_size(ui)
 
             if layout._Layout__orientation == 'VERTICAL':  # Set width height
-                h = ui._Size__base_height + ui.margin[0] + ui.margin[2]
+                h = ui._Size__base_height + ui._Margin__margin_y
                 if num != last: h += layout.spacing
                 layout._Size__height += h
             
-                w = ui._Size__width + ui.margin[1] + ui.margin[3]
+                w = ui._Size__width + ui._Margin__margin_x
                 if w > layout.width:
                     layout._Size__width = w
             else:
-                h = ui._Size__height + ui.margin[0] + ui.margin[2]
+                h = ui._Size__height + ui._Margin__margin_y
                 if h > layout.height:
                     layout._Size__height = h
             
-                w = ui._Size__base_width + ui.margin[1] + ui.margin[3]
+                w = ui._Size__base_width + ui._Margin__margin_x
                 if num != last: w += layout.spacing
                 layout._Size__width += w
     
@@ -167,7 +167,7 @@ class Layout(Margin, Position, Size, UI):
                 if isinstance(ui, Cell) and not ui.visible: continue
 
                 if ui.fill.value == 'X' or ui.fill.value == 'ALL':
-                    ui._Size__width = total_width - ui.margin[1] - ui.margin[3]
+                    ui._Size__width = total_width - ui._Margin__margin_x
             # Height
             vertical, height, last = [], 0, len(layout._Layout__uis) - 1
             for num, ui in enumerate(layout._Layout__uis):
@@ -177,7 +177,7 @@ class Layout(Margin, Position, Size, UI):
                     if ui.fill.value == 'Y' or ui.fill.value == 'ALL':
                         vertical.append(ui)
                 
-                height += ui.height + ui.margin[0] + ui.margin[2] # Save height
+                height += ui.height + ui._Margin__margin_y # Save height
                 if num != last: height += layout.spacing
             
             vertical_num = len(vertical)
@@ -193,7 +193,7 @@ class Layout(Margin, Position, Size, UI):
                 if isinstance(ui, Cell) and not ui.visible: continue
 
                 if ui.fill.value == 'Y' or ui.fill.value == 'ALL':
-                    ui._Size__height = total_height - ui.margin[0] - ui.margin[2]
+                    ui._Size__height = total_height - ui._Margin__margin_y
             # Width
             horizontal, width, last = [], 0, len(layout._Layout__uis) - 1
             for num, ui in enumerate(layout._Layout__uis):
@@ -203,7 +203,7 @@ class Layout(Margin, Position, Size, UI):
                     if ui.fill.value == 'X' or ui.fill.value == 'ALL':
                         horizontal.append(ui)
                 
-                width += ui.width + ui.margin[1] + ui.margin[3]
+                width += ui.width + ui._Margin__margin_x
                 if num != last: width += layout.spacing
             
             horizontal_num = len(horizontal)
