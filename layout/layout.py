@@ -20,7 +20,7 @@ class Layout(Margin, Position, Size, UI):
         self.width = 0
         self.height = 0
         self.__spacing = 0
-        self.__align = Align.VERTICAL
+        self.__align = Align.TOP
         self.__orientation = 'VERTICAL'
         self.__fill = Fill.ALL
 
@@ -100,8 +100,9 @@ class Layout(Margin, Position, Size, UI):
         # Updates the width, fill, alignment, and position of cells.
 
         if self._Layout__first:
-            self.__layout_size(self)
-            self.__layout_fill(self)
+            self.__update_size(self)
+            self.__update_fill(self)
+            self.__update_align(self)
         
         ui_x, ui_y = self.x, self.y  # Reset
         for ui in self.__uis:
@@ -119,7 +120,7 @@ class Layout(Margin, Position, Size, UI):
             if isinstance(ui, Layout):  # Repeat for all
                 ui._Layout__update()
     
-    def __layout_size(self, layout) -> None:
+    def __update_size(self, layout: Layout) -> None:
         # Make sure the layout size are compatible with the number 
         # of stacked cells.
         
@@ -132,7 +133,7 @@ class Layout(Margin, Position, Size, UI):
             if not ui._UI__dirty: continue
             
             if isinstance(ui, Layout):
-                self.__layout_size(ui)
+                self.__update_size(ui)
 
             if layout._Layout__orientation == 'VERTICAL':  # Set width height
                 h = ui._Size__base_height + ui._Margin__margin_y
@@ -151,7 +152,7 @@ class Layout(Margin, Position, Size, UI):
                 if num != last: w += layout.spacing
                 layout._Size__width += w
     
-    def __layout_fill(self, layout) -> None:
+    def __update_fill(self, layout: Layout) -> None:
         # Updates the fill of layouts and cells.
         
         if layout._Layout__first:
@@ -215,7 +216,11 @@ class Layout(Margin, Position, Size, UI):
 
         for ui in layout._Layout__uis:  # Repeat for all
             if isinstance(ui, Layout):
-                self.__layout_fill(ui)
+                self.__update_fill(ui)
+    
+    def __update_align(self, layout: Layout) -> None:
+        if layout._Layout__orientation == 'VERTICAL':
+            pass
 
     def __redraw(self) -> None:
         """..."""
