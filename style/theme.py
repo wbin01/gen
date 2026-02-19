@@ -29,7 +29,7 @@ class Theme:
         'NORMAL': {
             'text': (200, 200, 200, 255),
             'background': (40, 40, 40, 250),
-            'border': (80, 80, 80, 200),
+            'border': (80, 80, 80, 255),
             'radius': 4,
             'font': 'DejaVuSans.ttf',
             'font-size': 12,

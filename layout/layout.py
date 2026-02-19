@@ -69,6 +69,12 @@ class Layout(Margin, Position, Size, UI):
 
     def add(self, ui: UI) -> UI:
         """..."""
+        if isinstance(ui, type):
+            ui = ui()
+
+        if not isinstance(ui, (Layout, Cell)):
+            raise TypeError('Layout only accepts Cell or Layout.')
+            
         self.__uis.append(ui)
         ui._UI__parent = self
         ui._UI__app = self._app
