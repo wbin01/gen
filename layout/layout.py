@@ -12,13 +12,6 @@ from ..ui import UI
 
 class Layout(Margin, Position, Size, UI):
     """..."""
-    __colors = (
-            (30, 55, 100, 255), (150, 55, 55, 255), (205, 190, 100, 255),
-            (75, 110, 60, 255), (140, 170, 200, 255), (75, 60, 80, 255),
-            (190, 140, 80, 255), (30, 55, 100, 255), (150, 55, 55, 255),
-            (205, 190, 100, 255), (75, 110, 60, 255), (140, 170, 200, 255),
-            (75, 60, 80, 255), (190, 140, 80, 255))
-    __color = (190, 140, 80, 255)
     def __init__(self, align: Align = Align.VERTICAL, *args, **kwargs) -> None:
         """..."""
         super().__init__(*args, **kwargs)
@@ -34,6 +27,12 @@ class Layout(Margin, Position, Size, UI):
 
         self._UI__dirty = True
         self.__uis = []
+
+        self.__debug_colors = (
+            (93, 93, 62, 255),   (58, 78, 59, 255),   (52, 51, 63, 255),
+            (88, 78, 84, 255),   (68, 47, 58, 255),   (99, 61, 61, 255),
+            (119, 139, 80, 255), (92, 114, 113, 255), (67, 67, 67, 255))
+        self.__debug_color_index = 0
     
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}()'
@@ -209,11 +208,16 @@ class Layout(Margin, Position, Size, UI):
         """..."""
         if self._app and self._app._Frame__debug: self.__draw()
 
+        num_color = -1
         for ui in self.__uis:
             if isinstance(ui, Cell) and not ui.visible: continue
             if not ui._UI__dirty: continue
 
+            num_color += 1
+            if num_color == 9: num_color = -1
+
             if isinstance(ui, Layout):
+                ui._Layout__debug_color_index = num_color
                 ui._Layout__redraw()
                 continue
 
@@ -223,22 +227,12 @@ class Layout(Margin, Position, Size, UI):
 
         self._UI__dirty = False
     
-    @classmethod
-    def __get_bg(cls) -> tuple:
-        num_color = 0
-        for num, color in enumerate(cls.__colors):
-            if color == cls.__color:
-                num_color = num + 1
-
-                if num_color > 14: num_color = 0
-                cls.__color = cls.__colors[num_color]
-                return cls.__color
-    
     def __draw(self) -> None:
-        color = (125, 125, 125, 10) if self._Layout__first else self.__get_bg()
-        # if not self._Layout__first:
-        self._Layout__drawer.rect(
-            self.x - self.margin[3], self.y - self.margin[0],
-            self.width + self.margin[3] + self.margin[1],
-            self.height + self.margin[0] + self.margin[2],
-            color, 4)
+        color = self.__debug_colors[self.__debug_color_index]
+        if self._Layout__first: color = (125, 125, 125, 10)
+        if not self._Layout__first:
+            self._Layout__drawer.rect(
+                self.x - self.margin[3], self.y - self.margin[0],
+                self.width + self.margin[3] + self.margin[1],
+                self.height + self.margin[0] + self.margin[2],
+                color, 4)
