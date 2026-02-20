@@ -13,6 +13,7 @@ class Align(Enum):
     TOP = 'TOP'
     TOP_LEFT = 'TOP_LEFT'
     TOP_RIGHT = 'TOP_RIGHT'
+    NONE = 'NONE'
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}()'
