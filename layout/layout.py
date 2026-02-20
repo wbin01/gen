@@ -1,9 +1,4 @@
 #!/usr/bin/env python3
-from ctypes import c_int
-import random
-
-import sdl3
-
 from ..cell import Cell, ExpanderCol, ExpanderRow
 from ..flag import Align, Fill
 from ..mix import Margin, Position, Size
@@ -67,9 +62,12 @@ class Layout(Margin, Position, Size, UI):
     @spacing.setter
     def spacing(self, spacing: int) -> None:
         self.__spacing = spacing
-
+    
     def add(self, ui: UI) -> UI:
         """..."""
+        return self.__add(ui)
+
+    def __add(self, ui: UI) -> UI:
         if isinstance(ui, type):
             ui = ui()
 
@@ -98,6 +96,8 @@ class Layout(Margin, Position, Size, UI):
     
     def __update(self) -> None:
         # Updates the width, fill, alignment, and position of cells.
+        if self.__orientation == 'POSITION':
+            return
 
         if self._Layout__first:
             self.__update_size(self)
@@ -114,7 +114,7 @@ class Layout(Margin, Position, Size, UI):
 
             if self.__orientation == 'VERTICAL':  # Prepare next position
                 ui_y += ui.height + ui._Margin__margin_y + self.__spacing
-            else:
+            elif self.__orientation == 'HORIZONTAL':
                 ui_x += ui.width + ui._Margin__margin_x + self.__spacing
             
             if isinstance(ui, Layout):  # Repeat for all
@@ -147,7 +147,7 @@ class Layout(Margin, Position, Size, UI):
                 if w > layout.width:
                     layout._Size__width = w
                     layout._Size__base_width = w
-            else:
+            elif layout._Layout__orientation == 'HORIZONTAL':
                 h = ui._Size__height + ui._Margin__margin_y
                 if h > layout.height:
                     layout._Size__height = h
