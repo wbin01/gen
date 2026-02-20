@@ -6,6 +6,8 @@ class Margin(object):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.__margin = (0, 0, 0, 0)
+        self.__base_margin = (0, 0, 0, 0)
+        
         self.__margin_x = 0
         self.__margin_y = 0
     
@@ -25,3 +27,4 @@ class Margin(object):
         self.__margin_x = margin[1] + margin[3]
         self.__margin_y = margin[0] + margin[2]
         self.__margin = margin
+        self.__base_margin = margin

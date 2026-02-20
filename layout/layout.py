@@ -101,8 +101,8 @@ class Layout(Margin, Position, Size, UI):
 
         if self._Layout__first:
             self.__update_size(self)
-            self.__update_fill(self)
             self.__update_align(self)
+            self.__update_fill(self)
         
         ui_x, ui_y = self.x, self.y  # Reset
         for ui in self.__uis:
@@ -164,11 +164,23 @@ class Layout(Margin, Position, Size, UI):
 
         if layout._Layout__orientation == 'VERTICAL':
             # Width
-            for ui in layout._Layout__uis:  # Width equal to the layout
+            for ui in layout._Layout__uis:  # Fill: Width equal to the layout
                 if isinstance(ui, Cell) and not ui.visible: continue
 
                 if ui.fill.value == 'X' or ui.fill.value == 'ALL':
                     ui._Size__width = total_width - ui._Margin__margin_x
+                
+                elif ui.fill.value == 'NONE':  # Center
+                    if layout.align.value in ['CENTER', 'TOP', 'BOTTOM']:
+                        dt = (total_width - ui.width) // 2
+                        ui._Margin__margin = ui.margin[0], dt, ui.margin[2], dt
+                    
+                    elif 'RIGHT' in layout.align.value:  # Right
+                        dt = total_width - ui.width
+                        ui._Margin__margin = (
+                            ui.margin[0], ui.margin[1], ui.margin[2], dt)
+                    # Left is default
+
             # Height
             vertical, height, last = [], 0, len(layout._Layout__uis) - 1
             for num, ui in enumerate(layout._Layout__uis):
@@ -178,7 +190,7 @@ class Layout(Margin, Position, Size, UI):
                     if ui.fill.value == 'Y' or ui.fill.value == 'ALL':
                         vertical.append(ui)
                 
-                height += ui.height + ui._Margin__margin_y # Save height
+                height += ui.height + ui._Margin__margin_y  # Save height
                 if num != last: height += layout.spacing
             
             vertical_num = len(vertical)
@@ -220,7 +232,33 @@ class Layout(Margin, Position, Size, UI):
     
     def __update_align(self, layout: Layout) -> None:
         if layout._Layout__orientation == 'VERTICAL':
+            # CENTER
+            if 'TOP' in layout.align.value:  # Turn off vertical fill of ui
+                if isinstance(layout._Layout__uis[0], ExpanderCol):
+                    del(layout._Layout__uis[0]) # Remov bottom exp: Top default
+            
+            elif 'BOTTOM' in layout.align.value:
+                if isinstance(layout._Layout__uis[-1], ExpanderCol):
+                    del(layout._Layout__uis[-1])  # Remove top exp
+                
+                if not isinstance(layout._Layout__uis[0], ExpanderCol):
+                    layout._Layout__uis.insert(0, ExpanderCol())  # Add top exp
+            
+            elif layout.align.value in ['CENTER', 'RIGHT', 'LEFT']: #top bottom
+                if not isinstance(layout._Layout__uis[0], ExpanderCol):
+                    layout._Layout__uis.insert(0, ExpanderCol())
+
+                if not isinstance(layout._Layout__uis[-1], ExpanderCol):
+                    layout._Layout__uis.insert(
+                        len(layout._Layout__uis), ExpanderCol())
+
+        elif layout._Layout__orientation == 'HORIZONTAL':
             pass
+
+        
+        for ui in layout._Layout__uis:  # Repeat for all
+            if isinstance(ui, Layout):
+                self.__update_align(ui)
 
     def __redraw(self) -> None:
         """..."""
