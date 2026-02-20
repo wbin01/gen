@@ -126,6 +126,8 @@ class Layout(Margin, Position, Size, UI):
         
         layout._Size__height = 0  # Reset
         layout._Size__width = 0
+        layout._Size__base_height = 0
+        layout._Size__base_width = 0
         
         last = len(layout._Layout__uis) - 1  # To remove last extra 'spacing'
         for num, ui in enumerate(layout._Layout__uis):
@@ -139,18 +141,22 @@ class Layout(Margin, Position, Size, UI):
                 h = ui._Size__base_height + ui._Margin__margin_y
                 if num != last: h += layout.spacing
                 layout._Size__height += h
+                layout._Size__base_height += h  # Set base for minimal
             
                 w = ui._Size__width + ui._Margin__margin_x
                 if w > layout.width:
                     layout._Size__width = w
+                    layout._Size__base_width = w
             else:
                 h = ui._Size__height + ui._Margin__margin_y
                 if h > layout.height:
                     layout._Size__height = h
+                    layout._Size__base_height = h
             
                 w = ui._Size__base_width + ui._Margin__margin_x
                 if num != last: w += layout.spacing
                 layout._Size__width += w
+                layout._Size__base_width += w
     
     def __update_fill(self, layout: Layout) -> None:
         # Updates the fill of layouts and cells.
