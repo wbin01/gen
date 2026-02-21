@@ -30,16 +30,12 @@ class Layout(Margin, Position, Size, UI):
 
                 To keep the width and height fixed, you need to set the 
                 `width` and `height` properties to values greater than zero. 
-                Also, the `width` property does not work with `Fill.X` and the 
-                `height` property does not work with `Fill.Y`.
+                Also, the `width` property does not work with `Fill.X` or 
+                `Fill.ALL` and the `height` property does not work with 
+                `Fill.Y` or `Fill.ALL`.
 
                 For the `fill` property to take effect, the `width` and 
                 `height` properties must have a value equal to zero.
-        
-        Returns:
-
-            The created window instance, already initialized and
-            ready to be shown.
         """
         super().__init__(*args, **kwargs)
         self.width = width
@@ -174,17 +170,22 @@ class Layout(Margin, Position, Size, UI):
     def __update_size(self, layout: Layout) -> None:
         # Make sure the layout size are compatible with the number 
         # of stacked cells.
-        if not layout._Size__fixed_width:
-            layout._Size__width = 0
-            layout._Size__base_width = 0
-        else:
-            layout._Size__width = layout._Size__base_width
+        # if not layout._Size__fixed_width:
+        #     layout._Size__width = 0
+        #     layout._Size__base_width = 0
+        # else:
+        #     layout._Size__width = layout._Size__base_width
 
-        if not layout._Size__fixed_height:
-            layout._Size__height = 0
-            layout._Size__base_height = 0
-        else:
-            layout._Size__height = layout._Size__base_height
+        # if not layout._Size__fixed_height:
+        #     layout._Size__height = 0
+        #     layout._Size__base_height = 0
+        # else:
+        #     layout._Size__height = layout._Size__base_height
+        
+        layout._Size__height = 0
+        layout._Size__base_height = 0
+        layout._Size__width = 0
+        layout._Size__base_width = 0
         
         last = len(layout._Layout__uis) - 1  # To remove last extra 'spacing'
         for num, ui in enumerate(layout._Layout__uis):
@@ -195,30 +196,30 @@ class Layout(Margin, Position, Size, UI):
                 self.__update_size(ui)
 
             if layout._Layout__orientation == 'VERTICAL':  # Set width height
-                if not layout._Size__fixed_height:
-                    h = ui._Size__base_height + ui._Margin__margin_y
-                    if num != last: h += layout.spacing
-                    layout._Size__height += h
-                    layout._Size__base_height += h  # Set base for minimal
+                # if not layout._Size__fixed_height:
+                h = ui._Size__base_height + ui._Margin__margin_y
+                if num != last: h += layout.spacing
+                layout._Size__height += h
+                layout._Size__base_height += h  # Set base for minimal
 
-                if not layout._Size__fixed_width:
-                    w = ui._Size__width + ui._Margin__margin_x
-                    if w > layout.width:
-                        layout._Size__width = w
-                        layout._Size__base_width = w
+                # if not layout._Size__fixed_width:
+                w = ui._Size__width + ui._Margin__margin_x
+                if w > layout.width:
+                    layout._Size__width = w
+                    layout._Size__base_width = w
             
             elif layout._Layout__orientation == 'HORIZONTAL':
-                if not layout._Size__fixed_height:
-                    h = ui._Size__height + ui._Margin__margin_y
-                    if h > layout.height:
-                        layout._Size__height = h
-                        layout._Size__base_height = h
+                # if not layout._Size__fixed_height:
+                h = ui._Size__height + ui._Margin__margin_y
+                if h > layout.height:
+                    layout._Size__height = h
+                    layout._Size__base_height = h
 
-                if not layout._Size__fixed_width:
-                    w = ui._Size__base_width + ui._Margin__margin_x
-                    if num != last: w += layout.spacing
-                    layout._Size__width += w
-                    layout._Size__base_width += w
+                # if not layout._Size__fixed_width:
+                w = ui._Size__base_width + ui._Margin__margin_x
+                if num != last: w += layout.spacing
+                layout._Size__width += w
+                layout._Size__base_width += w
     
     def __update_fill(self, layout: Layout) -> None:
         # Updates the fill of layouts and cells.
@@ -237,10 +238,6 @@ class Layout(Margin, Position, Size, UI):
 
                 if ui.fill.value == 'X' or ui.fill.value == 'ALL':
                     ui._Size__width = total_width - ui._Margin__margin_x
-
-                elif ui.fill.value == 'Y' or ui.fill.value == 'NONE':
-                    dt = (total_width - ui.width) // 2
-                    ui._Margin__margin = ui.margin[0], dt, ui.margin[2], dt
 
             # Height
             vertical, height, last = [], 0, len(layout._Layout__uis) - 1
@@ -268,10 +265,6 @@ class Layout(Margin, Position, Size, UI):
 
                 if ui.fill.value == 'Y' or ui.fill.value == 'ALL':
                     ui._Size__height = total_height - ui._Margin__margin_y
-                
-                elif ui.fill.value == 'X' or ui.fill.value == 'NONE':
-                    dt = (total_height - ui.height) // 2
-                    ui._Margin__margin = dt, ui.margin[1], dt, ui.margin[3]
             
             # Width
             horizontal, width, last = [], 0, len(layout._Layout__uis) - 1
@@ -297,11 +290,14 @@ class Layout(Margin, Position, Size, UI):
                 self.__update_fill(ui)
     
     def __update_align(self, layout: Layout) -> None:
-        if layout._Layout__orientation == 'VERTICAL':
-            if layout.fill == Fill.Y or layout.fill == Fill.ALL:
+        if not layout._Layout__first:
+            if layout._Layout__orientation == 'VERTICAL':
                 if layout.align == Align.START:
                     if isinstance(layout._Layout__uis[0], ExpanderCol):
                         del(layout._Layout__uis[0])
+                    
+                    if isinstance(layout._Layout__uis[-1], ExpanderCol):
+                        del(layout._Layout__uis[-1])
                     
                     # if not isinstance(layout._Layout__uis[-1], ExpanderCol):
                     #     layout._Layout__uis.insert(
@@ -321,9 +317,8 @@ class Layout(Margin, Position, Size, UI):
                     if not isinstance(layout._Layout__uis[-1], ExpanderCol):
                         layout._Layout__uis.insert(
                             len(layout._Layout__uis), ExpanderCol())
-        
-        elif layout._Layout__orientation == 'HORIZONTAL':
-            if layout.fill == Fill.X or layout.fill == Fill.ALL:
+            
+            elif layout._Layout__orientation == 'HORIZONTAL':
                 if layout.align == Align.START:
                     if isinstance(layout._Layout__uis[0], ExpanderRow):
                         del(layout._Layout__uis[0])
