@@ -7,7 +7,7 @@ import sdl3
 # import sdl3.sdlttf as ttf
 
 from ..flag import ResizeArea
-from ..layout import Layout
+from ..layout import Col
 from ..style import Theme
 from ..ui import UI, Drawer
 
@@ -63,12 +63,12 @@ class Frame(UI):
         self.__drawer = Drawer(self.__renderer)
         self.__style = self._Frame__theme
 
-        # Layout
-        self.__layout = Layout()
-        self.__layout._Layout__first = True
-        self.__layout._UI__parent = self
-        self.__layout._UI__app = self
-        self.__layout._Layout__drawer = self.__drawer
+        # Container
+        self.__container = Col()
+        self.__container._Box__first = True
+        self.__container._UI__parent = self
+        self.__container._UI__app = self
+        self.__container._Box__drawer = self.__drawer
         self.__debug = False
 
         # Control Frame
@@ -137,7 +137,7 @@ class Frame(UI):
     
     @spacing.setter
     def spacing(self, spacing: int) -> None:
-        self.__layout.spacing = spacing
+        self.__container.spacing = spacing
     
     @property
     def width(self) -> int:
@@ -169,11 +169,11 @@ class Frame(UI):
         self.__y = int(y)
         sdl3.SDL_SetWindowPosition(self.__frame, self.__x, self.__y)
     
-    def add(self, cell: Cell | Layout, fill=None) -> Cell | Layout:
+    def add(self, cell: Cell | Box, fill=None) -> Cell | Box:
         name = f'_{cell.__class__.__name__}'
         setattr(cell, name + '__drawer', self.__drawer)
 
-        return self.__layout.add(cell)
+        return self.__container.add(cell)
         
     def run(self) -> int:
         self.__event_loop()
@@ -398,7 +398,7 @@ class Frame(UI):
         self.__render_needs_updating = False
 
         if self.__resizing or self.__resizing_end <= 3:
-            self.__layout._Layout__invalidate()
+            self.__container._Box__invalidate()
             self.__draw()
 
             # Resizing: last redraw
@@ -412,10 +412,10 @@ class Frame(UI):
             
             if self.__resizing_first: self.__resizing_first = False
 
-        if self.__layout._UI__dirty:
-            self.__layout._Layout__update()
-            self.__layout._Layout__redraw()
-            
+        if self.__container._UI__dirty:
+            self.__container._Box__update()
+            self.__container._Box__redraw()
+        
         sdl3.SDL_RenderPresent(self.__renderer)
         sdl3.SDL_Delay(10)
 
