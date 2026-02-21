@@ -6,34 +6,40 @@ from ..ui import UI
 
 
 class Layout(Margin, Position, Size, UI):
-    """..."""
+    """Organizes the positioning of the elements."""
     def __init__(
             self,
-            spacing: int = 0, margin: tuple = (0, 0, 0, 0),
-            fill: Fill = Fill.ALL, align: Align = Align.NONE,
+            spacing: int = 0, margin: int | tuple = (0, 0, 0, 0),
+            fill: Fill = Fill.ALL, align: Align = Align.START,
             width: int = 0, height: int = 0,
             *args, **kwargs) -> None:
-        """
-        align: an `Enum` of type `Align`
+        """Layout Initializer.
 
-        The `CENTER`, `TOP_LEFT`, `TOP_RIGHT`, `BOTTOM_RIGHT`, and 
-        `BOTTOM_LEFT` alignments will only take effect if there is available 
-        lateral space.
+        Args:
 
-        The `align` property with values `TOP`, `BOTTOM`, `RIGHT`, and `LEFT` 
-        always aligns everything in the center of its respective side.
+            spacing: Space between the elements.
+            
+            margin: A tuple of integers with the values of the four margins 
+                (top, right, bottom, and left), or a single integer 
+                representing all margins. 
+                Example: `margin = 8` or `margin = 8, 8, 8, 8`.
+            
+            fill: An `Enum` of type `Fill`. Layout (`column`, `Row`, `Pos`) 
+                defined as `Fill.NONE` still expands minimally to fit the 
+                internal elements, but does not expand beyond that.
 
-        fill: an `Enum` of type `Fill`.
+                To keep the width and height fixed, you need to set the 
+                `width` and `height` properties to values greater than zero. 
+                Also, the `width` property does not work with `Fill.X` and the 
+                `height` property does not work with `Fill.Y`.
 
-        Layout (`column`, `Row`, `Pos`) defined as `Fill.NONE` still expands 
-        minimally to fit the internal elements, but does not expand beyond 
-        that.
+                For the `fill` property to take effect, the `width` and 
+                `height` properties must have a value equal to zero.
+        
+        Returns:
 
-        To keep the width and height fixed, simply set the `width` and 
-        `height` properties to a value greater than zero.
-
-        For the `fill` property to take effect, the `width` and `height` 
-        properties must have a value equal to zero.
+            The created window instance, already initialized and
+            ready to be shown.
         """
         super().__init__(*args, **kwargs)
         self.width = width
@@ -231,16 +237,10 @@ class Layout(Margin, Position, Size, UI):
 
                 if ui.fill.value == 'X' or ui.fill.value == 'ALL':
                     ui._Size__width = total_width - ui._Margin__margin_x
-                
-                elif ui.fill.value == 'NONE':  # Center
-                    if layout.align.value in ['CENTER', 'TOP', 'BOTTOM']:
-                        dt = (total_width - ui.width) // 2
-                        ui._Margin__margin = ui.margin[0], dt, ui.margin[2], dt
-                    
-                    elif 'RIGHT' in layout.align.value:  # Right: LEFT default
-                        dt = total_width - ui.width
-                        ui._Margin__margin = (
-                            ui.margin[0], ui.margin[1], ui.margin[2], dt)
+
+                elif ui.fill.value == 'Y' or ui.fill.value == 'NONE':
+                    dt = (total_width - ui.width) // 2
+                    ui._Margin__margin = ui.margin[0], dt, ui.margin[2], dt
 
             # Height
             vertical, height, last = [], 0, len(layout._Layout__uis) - 1
@@ -269,15 +269,9 @@ class Layout(Margin, Position, Size, UI):
                 if ui.fill.value == 'Y' or ui.fill.value == 'ALL':
                     ui._Size__height = total_height - ui._Margin__margin_y
                 
-                elif ui.fill.value == 'NONE':  # Center
-                    if layout.align.value in ['CENTER', 'LEFT', 'RIGHT']:
-                        dt = (total_height - ui.height) // 2
-                        ui._Margin__margin = dt, ui.margin[1], dt, ui.margin[3]
-                    
-                    elif 'BOTTOM' in layout.align.value:  # Bottom: TOP default
-                        dt = total_height - ui.height
-                        ui._Margin__margin = (
-                            dt, ui.margin[1], ui.margin[2], ui.margin[3])
+                elif ui.fill.value == 'X' or ui.fill.value == 'NONE':
+                    dt = (total_height - ui.height) // 2
+                    ui._Margin__margin = dt, ui.margin[1], dt, ui.margin[3]
             
             # Width
             horizontal, width, last = [], 0, len(layout._Layout__uis) - 1
@@ -298,54 +292,62 @@ class Layout(Margin, Position, Size, UI):
             for ui in horizontal:
                 ui._Size__width += delta
 
-        for ui in layout._Layout__uis:  # Repeat for all
+        for ui in layout._Layout__uis:
             if isinstance(ui, Layout):
                 self.__update_fill(ui)
     
     def __update_align(self, layout: Layout) -> None:
         if layout._Layout__orientation == 'VERTICAL':
-            # CENTER
-            if 'TOP' in layout.align.value:  # Default: rm exp bottom
-                if isinstance(layout._Layout__uis[0], ExpanderCol):
-                    del(layout._Layout__uis[0])
-            
-            elif 'BOTTOM' in layout.align.value:  # Add exp top and rm bottom
-                if isinstance(layout._Layout__uis[-1], ExpanderCol):
-                    del(layout._Layout__uis[-1])
+            if layout.fill == Fill.Y or layout.fill == Fill.ALL:
+                if layout.align == Align.START:
+                    if isinstance(layout._Layout__uis[0], ExpanderCol):
+                        del(layout._Layout__uis[0])
+                    
+                    # if not isinstance(layout._Layout__uis[-1], ExpanderCol):
+                    #     layout._Layout__uis.insert(
+                    #         len(layout._Layout__uis), ExpanderCol())
                 
-                if not isinstance(layout._Layout__uis[0], ExpanderCol):
-                    layout._Layout__uis.insert(0, ExpanderCol())
-            
-            elif layout.align.value in ['CENTER', 'RIGHT', 'LEFT']:
-                if not isinstance(layout._Layout__uis[0], ExpanderCol):
-                    layout._Layout__uis.insert(0, ExpanderCol())
-
-                if not isinstance(layout._Layout__uis[-1], ExpanderCol):
-                    layout._Layout__uis.insert(
-                        len(layout._Layout__uis), ExpanderCol())
-
-        elif layout._Layout__orientation == 'HORIZONTAL':
-            if 'LEFT' in layout.align.value:  # Default: rm exp left
-                if isinstance(layout._Layout__uis[0], ExpanderRow):
-                    del(layout._Layout__uis[0])
-            
-            elif 'RIGHT' in layout.align.value:  # Add exp left and rm right
-                if isinstance(layout._Layout__uis[-1], ExpanderRow):
-                    del(layout._Layout__uis[-1])
+                elif layout.align == Align.END:
+                    if isinstance(layout._Layout__uis[-1], ExpanderCol):
+                        del(layout._Layout__uis[-1])
+                    
+                    if not isinstance(layout._Layout__uis[0], ExpanderCol):
+                        layout._Layout__uis.insert(0, ExpanderCol())
                 
-                if not isinstance(layout._Layout__uis[0], ExpanderRow):
-                    layout._Layout__uis.insert(0, ExpanderRow())
-                
-            elif layout.align.value in ['CENTER', 'TOP', 'BOTTOM']:
-                if not isinstance(layout._Layout__uis[0], ExpanderRow):
-                    layout._Layout__uis.insert(0, ExpanderRow())
+                elif layout.align == Align.CENTER:
+                    if not isinstance(layout._Layout__uis[0], ExpanderCol):
+                        layout._Layout__uis.insert(0, ExpanderCol())
 
-                if not isinstance(layout._Layout__uis[-1], ExpanderRow):
-                    layout._Layout__uis.insert(
-                        len(layout._Layout__uis), ExpanderRow())
-
+                    if not isinstance(layout._Layout__uis[-1], ExpanderCol):
+                        layout._Layout__uis.insert(
+                            len(layout._Layout__uis), ExpanderCol())
         
-        for ui in layout._Layout__uis:  # Repeat for all
+        elif layout._Layout__orientation == 'HORIZONTAL':
+            if layout.fill == Fill.X or layout.fill == Fill.ALL:
+                if layout.align == Align.START:
+                    if isinstance(layout._Layout__uis[0], ExpanderRow):
+                        del(layout._Layout__uis[0])
+                    
+                    # if not isinstance(layout._Layout__uis[-1], ExpanderRow):
+                    #     layout._Layout__uis.insert(
+                    #         len(layout._Layout__uis), ExpanderRow())
+                
+                elif layout.align == Align.END:
+                    if isinstance(layout._Layout__uis[-1], ExpanderRow):
+                        del(layout._Layout__uis[-1])
+                    
+                    if not isinstance(layout._Layout__uis[0], ExpanderRow):
+                        layout._Layout__uis.insert(0, ExpanderRow())
+                
+                elif layout.align == Align.CENTER:
+                    if not isinstance(layout._Layout__uis[0], ExpanderRow):
+                        layout._Layout__uis.insert(0, ExpanderRow())
+
+                    if not isinstance(layout._Layout__uis[-1], ExpanderRow):
+                        layout._Layout__uis.insert(
+                            len(layout._Layout__uis), ExpanderRow())
+        
+        for ui in layout._Layout__uis:
             if isinstance(ui, Layout):
                 self.__update_align(ui)
 

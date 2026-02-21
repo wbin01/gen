@@ -19,12 +19,38 @@ class Margin(object):
     
     @property
     def margin(self) -> tuple:
-        """..."""
+        """The margins.
+
+        The margins are clockwise. To configure, use an integer tuple with the 
+        values of the four margins (top, right, bottom, and left), or a single 
+        integer representing all margins.
+        
+        Example:
+
+            margin = 8
+
+            margin = 8, 8, 8, 8
+        
+        Returns:
+
+            A tuple of integers.
+        
+        """
         return self.__margin
     
     @margin.setter
-    def margin(self, margin: tuple) -> None:
-        self.__margin_x = margin[1] + margin[3]
-        self.__margin_y = margin[0] + margin[2]
-        self.__margin = margin
-        self.__base_margin = margin
+    def margin(self, margin: tuple | int) -> None:
+        if not isinstance(margin, (tuple, int)):
+            raise TypeError(
+                'The value must be an "int" or a "tuple" of integers.')
+        
+        if isinstance(margin, int):
+            self.__margin_x = margin * 2
+            self.__margin_y = margin * 2
+            self.__margin = margin, margin, margin, margin
+            self.__base_margin = self.__margin
+        else:
+            self.__margin_x = margin[1] + margin[3]
+            self.__margin_y = margin[0] + margin[2]
+            self.__margin = margin
+            self.__base_margin = margin

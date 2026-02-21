@@ -4,16 +4,9 @@ from enum import Enum
 
 class Align(Enum):
     """..."""
-    BOTTOM = 'BOTTOM'
-    BOTTOM_LEFT = 'BOTTOM_LEFT'
-    BOTTOM_RIGHT = 'BOTTOM_RIGHT'
     CENTER = 'CENTER'
-    LEFT = 'LEFT'
-    RIGHT = 'RIGHT'
-    TOP = 'TOP'
-    TOP_LEFT = 'TOP_LEFT'
-    TOP_RIGHT = 'TOP_RIGHT'
-    NONE = 'NONE'
+    END = 'END'
+    START = 'START'
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}()'
