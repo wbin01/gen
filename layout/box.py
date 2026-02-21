@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
+from .layout import Layout
 from ..cell import Cell, ExpanderCol, ExpanderRow
 from ..flag import Align, Fill
-from ..mix import Margin, Position, Size
-from .layout import Layout
+from ..mix import Add, Margin, Position, Size
 
 
-class Box(Margin, Position, Size, Layout):
+class Box(Margin, Position, Size, Add, Layout):
     """Organizes the positioning of the elements."""
     def __init__(
             self,
@@ -46,11 +46,8 @@ class Box(Margin, Position, Size, Layout):
         self.__fill = fill
 
         self.__first = False
-        self.__drawer = None
         self.__orientation = 'VERTICAL'
-        self.__drawer = None
         self._UI__dirty = True
-        self.__uis = []
 
         self.__debug_colors = (
             (93, 93, 62, 255),   (58, 78, 59, 255),   (52, 51, 63, 255),
@@ -110,29 +107,8 @@ class Box(Margin, Position, Size, Layout):
     def spacing(self, spacing: int) -> None:
         self.__spacing = spacing
     
-    def add(self, ui: UI) -> UI:
-        """..."""
-        return self.__add(ui)
-
-    def __add(self, ui: UI) -> UI:
-        if isinstance(ui, type):
-            ui = ui()
-
-        if not isinstance(ui, (Layout, Cell)):
-            raise TypeError('Layout only accepts Cell or Layout.')
-            
-        self.__uis.append(ui)
-        ui._UI__parent = self
-        ui._UI__app = self._app
-
-        if isinstance(ui, Cell):
-            ui._Cell__drawer = self._app._Frame__drawer
-        elif isinstance(ui, Box):
-            ui._Box__drawer = self._app._Frame__drawer
-        return ui
-    
     def __invalidate(self) -> None:
-        for ui in self.__uis:
+        for ui in self._Add__uis:
             if isinstance(ui, Layout):
                 ui._Box__invalidate()
                 continue
@@ -152,7 +128,7 @@ class Box(Margin, Position, Size, Layout):
             self.__update_fill(self)
         
         ui_x, ui_y = self.x, self.y  # Reset
-        for ui in self.__uis:
+        for ui in self._Add__uis:
             if isinstance(ui, Cell) and not ui.visible: continue
             if not ui._UI__dirty: continue
 
@@ -180,8 +156,8 @@ class Box(Margin, Position, Size, Layout):
             layout._Size__height = 0
             layout._Size__base_height = 0
         
-        last = len(layout._Box__uis) - 1  # To remove last extra 'spacing'
-        for num, ui in enumerate(layout._Box__uis):
+        last = len(layout._Add__uis) - 1  # To remove last extra 'spacing'
+        for num, ui in enumerate(layout._Add__uis):
             if isinstance(ui, Cell) and not ui.visible: continue
             if not ui._UI__dirty: continue
 
@@ -225,14 +201,14 @@ class Box(Margin, Position, Size, Layout):
 
         if layout._Box__orientation == 'VERTICAL':
             # Width
-            for ui in layout._Box__uis:  # Fill: Width equal to the layout
+            for ui in layout._Add__uis:  # Fill: Width equal to the layout
                 if isinstance(ui, Cell) and not ui.visible: continue
 
                 if ui.fill in (Fill.X, Fill.ALL):
                     ui._Size__width = total_width - ui._Margin__margin_x
             # Height
-            vertical, height, last = [], 0, len(layout._Box__uis) - 1
-            for num, ui in enumerate(layout._Box__uis):
+            vertical, height, last = [], 0, len(layout._Add__uis) - 1
+            for num, ui in enumerate(layout._Add__uis):
                 if isinstance(ui, Cell) and not ui.visible: continue
 
                 if hasattr(ui, 'fill'):  # Collects cells that expand
@@ -250,14 +226,14 @@ class Box(Margin, Position, Size, Layout):
         
         elif layout._Box__orientation == 'HORIZONTAL':
             # Height
-            for ui in layout._Box__uis:
+            for ui in layout._Add__uis:
                 if isinstance(ui, Cell) and not ui.visible: continue
 
                 if ui.fill in (Fill.Y, Fill.ALL):
                     ui._Size__height = total_height - ui._Margin__margin_y
             # Width
-            horizontal, width, last = [], 0, len(layout._Box__uis) - 1
-            for num, ui in enumerate(layout._Box__uis):
+            horizontal, width, last = [], 0, len(layout._Add__uis) - 1
+            for num, ui in enumerate(layout._Add__uis):
                 if isinstance(ui, Cell) and not ui.visible: continue
                 
                 if hasattr(ui, 'fill'):
@@ -273,55 +249,55 @@ class Box(Margin, Position, Size, Layout):
             for ui in horizontal:
                 ui._Size__width += delta
 
-        for ui in layout._Box__uis:
+        for ui in layout._Add__uis:
             if isinstance(ui, Layout):
                 self.__update_fill(ui)
     
     def __update_align(self, layout: Box) -> None:
         if layout._Box__orientation == 'VERTICAL':
             if layout.align == Align.START:
-                if isinstance(layout._Box__uis[0], ExpanderCol):
-                    del(layout._Box__uis[0])
+                if isinstance(layout._Add__uis[0], ExpanderCol):
+                    del(layout._Add__uis[0])
                 
-                if isinstance(layout._Box__uis[-1], ExpanderCol):
-                    del(layout._Box__uis[-1])
+                if isinstance(layout._Add__uis[-1], ExpanderCol):
+                    del(layout._Add__uis[-1])
             
             elif layout.align == Align.END:
-                if isinstance(layout._Box__uis[-1], ExpanderCol):
-                    del(layout._Box__uis[-1])
+                if isinstance(layout._Add__uis[-1], ExpanderCol):
+                    del(layout._Add__uis[-1])
                 
-                if not isinstance(layout._Box__uis[0], ExpanderCol):
-                    layout._Box__uis.insert(0, ExpanderCol())
+                if not isinstance(layout._Add__uis[0], ExpanderCol):
+                    layout._Add__uis.insert(0, ExpanderCol())
             
             elif layout.align == Align.CENTER:
-                if not isinstance(layout._Box__uis[0], ExpanderCol):
-                    layout._Box__uis.insert(0, ExpanderCol())
+                if not isinstance(layout._Add__uis[0], ExpanderCol):
+                    layout._Add__uis.insert(0, ExpanderCol())
 
-                if not isinstance(layout._Box__uis[-1], ExpanderCol):
-                    layout._Box__uis.insert(
-                        len(layout._Box__uis), ExpanderCol())
+                if not isinstance(layout._Add__uis[-1], ExpanderCol):
+                    layout._Add__uis.insert(
+                        len(layout._Add__uis), ExpanderCol())
         
         elif layout._Box__orientation == 'HORIZONTAL':
             if layout.align == Align.START:
-                if isinstance(layout._Box__uis[0], ExpanderRow):
-                    del(layout._Box__uis[0])
+                if isinstance(layout._Add__uis[0], ExpanderRow):
+                    del(layout._Add__uis[0])
             
             elif layout.align == Align.END:
-                if isinstance(layout._Box__uis[-1], ExpanderRow):
-                    del(layout._Box__uis[-1])
+                if isinstance(layout._Add__uis[-1], ExpanderRow):
+                    del(layout._Add__uis[-1])
                 
-                if not isinstance(layout._Box__uis[0], ExpanderRow):
-                    layout._Box__uis.insert(0, ExpanderRow())
+                if not isinstance(layout._Add__uis[0], ExpanderRow):
+                    layout._Add__uis.insert(0, ExpanderRow())
             
             elif layout.align == Align.CENTER:
-                if not isinstance(layout._Box__uis[0], ExpanderRow):
-                    layout._Box__uis.insert(0, ExpanderRow())
+                if not isinstance(layout._Add__uis[0], ExpanderRow):
+                    layout._Add__uis.insert(0, ExpanderRow())
 
-                if not isinstance(layout._Box__uis[-1], ExpanderRow):
-                    layout._Box__uis.insert(
-                        len(layout._Box__uis), ExpanderRow())
+                if not isinstance(layout._Add__uis[-1], ExpanderRow):
+                    layout._Add__uis.insert(
+                        len(layout._Add__uis), ExpanderRow())
         
-        for ui in layout._Box__uis:
+        for ui in layout._Add__uis:
             if isinstance(ui, Layout):
                 self.__update_align(ui)
 
@@ -330,7 +306,7 @@ class Box(Margin, Position, Size, Layout):
         if self._app and self._app._Frame__debug: self.__draw()
 
         num_color = -1
-        for ui in self.__uis:
+        for ui in self._Add__uis:
             if isinstance(ui, Cell) and not ui.visible: continue
             if not ui._UI__dirty: continue
 
@@ -342,7 +318,6 @@ class Box(Margin, Position, Size, Layout):
                 ui._Box__redraw()
                 continue
 
-            # if isinstance(ui, Cell):  # mro = str(type(ui).__mro__)
             getattr(ui, f'_{ui.__class__.__name__}__draw')()
             ui._UI__dirty = False
 
@@ -352,7 +327,7 @@ class Box(Margin, Position, Size, Layout):
         color = self.__debug_colors[self.__debug_color_index]
         if self._Box__first: color = (125, 125, 125, 10)
         if not self._Box__first:
-            self._Box__drawer.rect(
+            self._Layout__drawer.rect(
                 self.x - self.margin[3], self.y - self.margin[0],
                 self.width + self.margin[3] + self.margin[1],
                 self.height + self.margin[0] + self.margin[2],

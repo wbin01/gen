@@ -4,5 +4,5 @@ from ..ui import UI
 
 class Layout(UI):
     """Organizes the positioning of the elements."""
-    def __init__(*args, **kwargs) -> None:
-        pass
+    def __init__(self, *args, **kwargs) -> None:
+        self.__drawer = None
