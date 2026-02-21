@@ -11,7 +11,7 @@ class Box(Margin, Position, Size, Add, Layout):
             self,
             spacing: int = 0, margin: int | tuple = (0, 0, 0, 0),
             fill: Fill = Fill.ALL, align: Align = Align.START,
-            width: int = 0, height: int = 0,
+            width: int = None, height: int = None,
             *args, **kwargs) -> None:
         """Layout Initializer.
 
@@ -38,8 +38,8 @@ class Box(Margin, Position, Size, Add, Layout):
                 `height` properties must have a value equal to zero.
         """
         super().__init__(*args, **kwargs)
-        self.width = width
-        self.height = height
+        if width: self.width = width
+        if height: self.height = height
         self.margin = margin
         self.__spacing = spacing
         self.__align = align
@@ -245,7 +245,7 @@ class Box(Margin, Position, Size, Add, Layout):
             vertical_num = len(vertical)
             free = total_height - height  # Discover available space
             
-            delta = free // vertical_num if vertical_num > 1 else free
+            delta = free / vertical_num if vertical_num > 1 else free
             for ui in vertical:  # Distributes space to the cells that require
                 ui._Size__height += delta
 
@@ -283,7 +283,7 @@ class Box(Margin, Position, Size, Add, Layout):
             horizontal_num = len(horizontal)
             free = total_width - width
             
-            delta = free // horizontal_num if horizontal_num > 1 else free
+            delta = free / horizontal_num if horizontal_num > 1 else free
             for ui in horizontal:
                 ui._Size__width += delta
 
