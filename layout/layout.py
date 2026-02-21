@@ -7,20 +7,46 @@ from ..ui import UI
 
 class Layout(Margin, Position, Size, UI):
     """..."""
-    def __init__(self, *args, **kwargs) -> None:
-        """..."""
+    def __init__(
+            self,
+            spacing: int = 0, margin: tuple = (0, 0, 0, 0),
+            fill: Fill = Fill.ALL, align: Align = Align.NONE,
+            width: int = 0, height: int = 0,
+            *args, **kwargs) -> None:
+        """
+        align: an `Enum` of type `Align`
+
+        The `CENTER`, `TOP_LEFT`, `TOP_RIGHT`, `BOTTOM_RIGHT`, and 
+        `BOTTOM_LEFT` alignments will only take effect if there is available 
+        lateral space.
+
+        The `align` property with values `TOP`, `BOTTOM`, `RIGHT`, and `LEFT` 
+        always aligns everything in the center of its respective side.
+
+        fill: an `Enum` of type `Fill`.
+
+        Layout (`column`, `Row`, `Pos`) defined as `Fill.NONE` still expands 
+        minimally to fit the internal elements, but does not expand beyond 
+        that.
+
+        To keep the width and height fixed, simply set the `width` and 
+        `height` properties to a value greater than zero.
+
+        For the `fill` property to take effect, the `width` and `height` 
+        properties must have a value equal to zero.
+        """
         super().__init__(*args, **kwargs)
+        self.width = width
+        self.height = height
+        self.margin = margin
+        self.__spacing = spacing
+        self.__align = align
+        self.__fill = fill
+
         self.__first = False
         self.__drawer = None
-        self.width = 0
-        self.height = 0
-        self.__spacing = 0
-        self.__align = Align.NONE
         self.__orientation = 'VERTICAL'
-        self.__fill = Fill.ALL
-
         self.__drawer = None
-
         self._UI__dirty = True
         self.__uis = []
 
@@ -38,7 +64,15 @@ class Layout(Margin, Position, Size, UI):
     
     @property
     def align(self) -> Align:
-        """..."""
+        """An `Enum` of type `Align`
+
+        The `CENTER`, `TOP_LEFT`, `TOP_RIGHT`, `BOTTOM_RIGHT`, and 
+        `BOTTOM_LEFT` alignments will only take effect if there is available 
+        lateral space.
+
+        The `align` property with values `TOP`, `BOTTOM`, `RIGHT`, and `LEFT` 
+        always aligns everything in the center of its respective side.
+        """
         return self.__align
     
     @align.setter
@@ -47,7 +81,18 @@ class Layout(Margin, Position, Size, UI):
     
     @property
     def fill(self) -> Fill:
-        """..."""
+        """An `Enum` of type `Fill`.
+
+        Layout (`column`, `Row`, `Pos`) defined as `Fill.NONE` still expands 
+        minimally to fit the internal elements, but does not expand beyond 
+        that.
+
+        To keep the width and height fixed, simply set the `width` and 
+        `height` properties to a value greater than zero.
+
+        For the `fill` property to take effect, the `width` and `height` 
+        properties must have a value equal to zero.
+        """
         return self.__fill
     
     @fill.setter
@@ -123,11 +168,17 @@ class Layout(Margin, Position, Size, UI):
     def __update_size(self, layout: Layout) -> None:
         # Make sure the layout size are compatible with the number 
         # of stacked cells.
-        
-        layout._Size__height = 0  # Reset
-        layout._Size__width = 0
-        layout._Size__base_height = 0
-        layout._Size__base_width = 0
+        if not layout._Size__fixed_width:
+            layout._Size__width = 0
+            layout._Size__base_width = 0
+        else:
+            layout._Size__width = layout._Size__base_width
+
+        if not layout._Size__fixed_height:
+            layout._Size__height = 0
+            layout._Size__base_height = 0
+        else:
+            layout._Size__height = layout._Size__base_height
         
         last = len(layout._Layout__uis) - 1  # To remove last extra 'spacing'
         for num, ui in enumerate(layout._Layout__uis):
@@ -138,25 +189,30 @@ class Layout(Margin, Position, Size, UI):
                 self.__update_size(ui)
 
             if layout._Layout__orientation == 'VERTICAL':  # Set width height
-                h = ui._Size__base_height + ui._Margin__margin_y
-                if num != last: h += layout.spacing
-                layout._Size__height += h
-                layout._Size__base_height += h  # Set base for minimal
+                if not layout._Size__fixed_height:
+                    h = ui._Size__base_height + ui._Margin__margin_y
+                    if num != last: h += layout.spacing
+                    layout._Size__height += h
+                    layout._Size__base_height += h  # Set base for minimal
+
+                if not layout._Size__fixed_width:
+                    w = ui._Size__width + ui._Margin__margin_x
+                    if w > layout.width:
+                        layout._Size__width = w
+                        layout._Size__base_width = w
             
-                w = ui._Size__width + ui._Margin__margin_x
-                if w > layout.width:
-                    layout._Size__width = w
-                    layout._Size__base_width = w
             elif layout._Layout__orientation == 'HORIZONTAL':
-                h = ui._Size__height + ui._Margin__margin_y
-                if h > layout.height:
-                    layout._Size__height = h
-                    layout._Size__base_height = h
-            
-                w = ui._Size__base_width + ui._Margin__margin_x
-                if num != last: w += layout.spacing
-                layout._Size__width += w
-                layout._Size__base_width += w
+                if not layout._Size__fixed_height:
+                    h = ui._Size__height + ui._Margin__margin_y
+                    if h > layout.height:
+                        layout._Size__height = h
+                        layout._Size__base_height = h
+
+                if not layout._Size__fixed_width:
+                    w = ui._Size__base_width + ui._Margin__margin_x
+                    if num != last: w += layout.spacing
+                    layout._Size__width += w
+                    layout._Size__base_width += w
     
     def __update_fill(self, layout: Layout) -> None:
         # Updates the fill of layouts and cells.
