@@ -24,18 +24,25 @@ class Box(Margin, Position, Size, Add, Layout):
                 representing all margins. 
                 Example: `margin = 8` or `margin = 8, 8, 8, 8`.
             
-            fill: An `Enum` of type `Fill`. Layout (`column`, `Row`, `Pos`) 
-                defined as `Fill.NONE` still expands minimally to fit the 
-                internal elements, but does not expand beyond that.
-
-                To keep the width and height fixed, you need to set the 
-                `width` and `height` properties to values greater than zero. 
-                Also, the `width` property does not work with `Fill.X` or 
-                `Fill.ALL` and the `height` property does not work with 
-                `Fill.Y` or `Fill.ALL`.
-
-                For the `fill` property to take effect, the `width` and 
-                `height` properties must have a value equal to zero.
+            fill: An `Enum` of type `Fill`. Fills the empty space in the 
+                layout and stretches the items in the configured direction 
+                (`Fill.X`, `Fill.Y`, `Fill.ALL`, `Fill.NONE`).
+                
+                `Fill` takes precedence over the `width` and `height` 
+                properties, so the `width` property does not work together 
+                with `Fill.X` and the `height` property does not work together 
+                with `Fill.Y`.
+            
+            align: An Enum of type `Align`. Alignment only works in the 
+                direction of the layout with the `fill` option active. This 
+                means that the `Col` needs to have `fill` set to `Fill.X` and 
+                the `Row` needs to have `fill` set to `Fill.Y`.
+                
+                In a `Row` layout, using `Align.START` will align to the left, 
+                `Align.CENTER` to the center, and `Align.END` will align to 
+                the right. In a `Col` layout, `Align.START` will align to the 
+                top, `Align.CENTER` to the center, and `Align.END` will align 
+                to the bottom.
         """
         super().__init__(*args, **kwargs)
         if width: self.width = width
@@ -60,14 +67,16 @@ class Box(Margin, Position, Size, Add, Layout):
     
     @property
     def align(self) -> Align:
-        """An `Enum` of type `Align`
+        """Align: An Enum of type `Align`.
 
-        The `CENTER`, `TOP_LEFT`, `TOP_RIGHT`, `BOTTOM_RIGHT`, and 
-        `BOTTOM_LEFT` alignments will only take effect if there is available 
-        lateral space.
-
-        The `align` property with values `TOP`, `BOTTOM`, `RIGHT`, and `LEFT` 
-        always aligns everything in the center of its respective side.
+        Alignment only works in the direction of the layout with the `fill` 
+        option active. This means that the `Col` needs to have `fill` set 
+        to `Fill.X` and the `Row` needs to have `fill` set to `Fill.Y`.
+        
+        In a `Row` layout, using `Align.START` will align to the left, 
+        `Align.CENTER` to the center, and `Align.END` will align to the right. 
+        In a `Col` layout, `Align.START` will align to the top, `Align.CENTER` 
+        to the center, and `Align.END` will align to the bottom.
         """
         return self.__align
     
@@ -78,16 +87,13 @@ class Box(Margin, Position, Size, Add, Layout):
     @property
     def fill(self) -> Fill:
         """An `Enum` of type `Fill`.
-
-        Layout (`column`, `Row`, `Pos`) defined as `Fill.NONE` still expands 
-        minimally to fit the internal elements, but does not expand beyond 
-        that.
-
-        To keep the width and height fixed, simply set the `width` and 
-        `height` properties to a value greater than zero.
-
-        For the `fill` property to take effect, the `width` and `height` 
-        properties must have a value equal to zero.
+        
+        Fills the empty space in the layout and stretches the items in the 
+        configured direction (`Fill.X`, `Fill.Y`, `Fill.ALL`, `Fill.NONE`).
+        
+        `Fill` takes precedence over the `width` and `height` properties, so 
+        the `width` property does not work together with `Fill.X` and the 
+        `height` property does not work together with `Fill.Y`.
         """
         return self.__fill
     
