@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from .layout import Layout
-from ..cell import Cell, ExpanderCol, ExpanderRow
+from ..cell import Cell, ColExpander, RowExpander
 from ..flag import Align, Fill
 from ..mixin import Add, Margin, Pos, Size
 
@@ -319,46 +319,46 @@ class Box(Margin, Pos, Size, Add, Layout):
     def __update_align(self, layout: Box) -> None:
         if layout._Box__orientation == 'VERTICAL':
             if layout.align == Align.START:
-                if isinstance(layout._Add__uis[0], ExpanderCol):
+                if isinstance(layout._Add__uis[0], ColExpander):
                     del(layout._Add__uis[0])
                 
-                if isinstance(layout._Add__uis[-1], ExpanderCol):
+                if isinstance(layout._Add__uis[-1], ColExpander):
                     del(layout._Add__uis[-1])
             
             elif layout.align == Align.END:
-                if isinstance(layout._Add__uis[-1], ExpanderCol):
+                if isinstance(layout._Add__uis[-1], ColExpander):
                     del(layout._Add__uis[-1])
                 
-                if not isinstance(layout._Add__uis[0], ExpanderCol):
-                    layout._Add__uis.insert(0, ExpanderCol())
+                if not isinstance(layout._Add__uis[0], ColExpander):
+                    layout._Add__uis.insert(0, ColExpander())
             
             elif layout.align == Align.CENTER:
-                if not isinstance(layout._Add__uis[0], ExpanderCol):
-                    layout._Add__uis.insert(0, ExpanderCol())
+                if not isinstance(layout._Add__uis[0], ColExpander):
+                    layout._Add__uis.insert(0, ColExpander())
 
-                if not isinstance(layout._Add__uis[-1], ExpanderCol):
+                if not isinstance(layout._Add__uis[-1], ColExpander):
                     layout._Add__uis.insert(
-                        len(layout._Add__uis), ExpanderCol())
+                        len(layout._Add__uis), ColExpander())
         
         elif layout._Box__orientation == 'HORIZONTAL':
             if layout.align == Align.START:
-                if isinstance(layout._Add__uis[0], ExpanderRow):
+                if isinstance(layout._Add__uis[0], RowExpander):
                     del(layout._Add__uis[0])
             
             elif layout.align == Align.END:
-                if isinstance(layout._Add__uis[-1], ExpanderRow):
+                if isinstance(layout._Add__uis[-1], RowExpander):
                     del(layout._Add__uis[-1])
                 
-                if not isinstance(layout._Add__uis[0], ExpanderRow):
-                    layout._Add__uis.insert(0, ExpanderRow())
+                if not isinstance(layout._Add__uis[0], RowExpander):
+                    layout._Add__uis.insert(0, RowExpander())
             
             elif layout.align == Align.CENTER:
-                if not isinstance(layout._Add__uis[0], ExpanderRow):
-                    layout._Add__uis.insert(0, ExpanderRow())
+                if not isinstance(layout._Add__uis[0], RowExpander):
+                    layout._Add__uis.insert(0, RowExpander())
 
-                if not isinstance(layout._Add__uis[-1], ExpanderRow):
+                if not isinstance(layout._Add__uis[-1], RowExpander):
                     layout._Add__uis.insert(
-                        len(layout._Add__uis), ExpanderRow())
+                        len(layout._Add__uis), RowExpander())
         
         for ui in layout._Add__uis:
             if isinstance(ui, Layout):

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
 from .button import Button
 from .cell import Cell
-from .expander_col import ExpanderCol
-from .expander_row import ExpanderRow
+from .col_expander import ColExpander
+from .row_expander import RowExpander

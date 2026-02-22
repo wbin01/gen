@@ -3,7 +3,7 @@ from .cell import Cell
 from ..flag import Fill
 
 
-class ExpanderCol(Cell):
+class ColExpander(Cell):
     """..."""
     def __init__(self, *args, **kwargs) -> None:
         """..."""

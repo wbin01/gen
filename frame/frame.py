@@ -8,8 +8,7 @@ import sdl3
 
 from ..flag import ResizeArea
 from ..layout import Col
-from ..style import Theme
-from ..ui import UI, Drawer
+from ..ui import UI, Drawer, Theme
 
 
 class Frame(UI):

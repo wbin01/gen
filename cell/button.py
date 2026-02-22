@@ -2,8 +2,7 @@
 import copy
 
 from .cell import Cell
-from ..style import Theme
-from ..ui import FontRender
+from ..ui import FontRender, Theme
 
 
 class Button(Cell):

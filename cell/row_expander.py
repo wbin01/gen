@@ -3,7 +3,7 @@ from .cell import Cell
 from ..flag import Fill
 
 
-class ExpanderRow(Cell):
+class RowExpander(Cell):
     """..."""
     def __init__(self, *args, **kwargs) -> None:
         """..."""
