@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 from ..flag import Fill
-from ..mix import Margin, Position, Size
+from ..mixin import Margin, Pos, Size
 from ..ui import UI
 
 
-class Cell(Margin, Position, Size, UI):
+class Cell(Margin, Pos, Size, UI):
     """..."""
     def __init__(self, *args, **kwargs) -> None:
         """..."""

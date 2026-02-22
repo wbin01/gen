@@ -2,10 +2,10 @@
 from .layout import Layout
 from ..cell import Cell, ExpanderCol, ExpanderRow
 from ..flag import Align, Fill
-from ..mix import Add, Margin, Position, Size
+from ..mixin import Add, Margin, Pos, Size
 
 
-class Box(Margin, Position, Size, Add, Layout):
+class Box(Margin, Pos, Size, Add, Layout):
     """Organizes the positioning of the elements."""
     def __init__(
             self,
@@ -113,7 +113,7 @@ class Box(Margin, Position, Size, Add, Layout):
     
     @property
     def spacing(self) -> int:
-        """..."""
+        """Space between the elements."""
         return self.__spacing
     
     @spacing.setter
@@ -140,13 +140,13 @@ class Box(Margin, Position, Size, Add, Layout):
             self.__update_align(self)
             self.__update_fill(self)
         
-        ui_x, ui_y = self.x, self.y  # Reset
+        ui_x, ui_y = self._x, self._y  # Reset
         for ui in self._Add__uis:
             if isinstance(ui, Cell) and not ui.visible: continue
             if not ui._UI__dirty: continue
 
-            ui.x = ui_x + ui.margin[3]  # Set current position
-            ui.y = ui_y + ui.margin[0]
+            ui._Pos__x = ui_x + ui.margin[3]  # Set current position
+            ui._Pos__y = ui_y + ui.margin[0]
 
             if self.__orientation == 'VERTICAL':  # Prepare next position
                 ui_y += ui.height + ui._Margin__margin_y + self.__spacing
@@ -367,7 +367,7 @@ class Box(Margin, Position, Size, Add, Layout):
     def __draw(self) -> None:
         if not self._Box__first:
             self._Layout__drawer.rect(
-                self.x - self.margin[3], self.y - self.margin[0],
+                self._x - self.margin[3], self._y - self.margin[0],
                 self.width + self.margin[3] + self.margin[1],
                 self.height + self.margin[0] + self.margin[2],
                 self.__debug_color, 4)

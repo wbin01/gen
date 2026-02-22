@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from .layout import Layout
 from ..flag import Fill
-from ..mix import Add
+from ..mixin import Add
 
 
 class Pos(Add, Layout):

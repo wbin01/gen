@@ -16,8 +16,8 @@ class Button(Cell):
         """..."""
         super().__init__(*args, **kwargs)
         self.__text = text
-        self.x = x
-        self.y = y
+        self._Pos_x = x
+        self._Pos_y = y
         self.width = width
         self.height = height
         self.__elided = elided
@@ -58,16 +58,16 @@ class Button(Cell):
             if self.width < text.width + pad: self.width = text.width + pad
             if self.height < text.height + pad: self.height = text.height + pad
 
-            tx = self.x + (self.width // 2) - (text.width // 2)
-            ty = self.y + (self.height // 2) - (text.height // 2)
+            tx = self._x + (self.width // 2) - (text.width // 2)
+            ty = self._y + (self.height // 2) - (text.height // 2)
         
         self._Cell__drawer.rect(
-            self.x, self.y, self.width, self.height,
+            self._x, self._y, self.width, self.height,
             self.__style['NORMAL']['border'],
             self.__style['NORMAL']['radius'])
         
         self._Cell__drawer.rect(
-            self.x + 1, self.y +1, self.width - 2,self.height - 2,
+            self._x + 1, self._y +1, self.width - 2,self.height - 2,
             self.__style['NORMAL']['background'],
             self.__style['NORMAL']['radius'] - 1)
         

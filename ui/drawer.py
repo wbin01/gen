@@ -64,6 +64,7 @@ class Drawer(object):
             self.__corner_filled_circle(x + bl, y + h - bl - 1, bl)
     
     def __corner_filled_circle(self, cx, cy, r):
+        r = int(r)
         for dy in range(-r, r + 1):
             dx = int((r*r - dy*dy) ** 0.5)
             sdl3.SDL_RenderLine(

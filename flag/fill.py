@@ -3,7 +3,15 @@ from enum import Enum
 
 
 class Fill(Enum):
-    """..."""
+    """Fills the empty space in the layout.
+        
+    Stretches the items in the configured direction: `Fill.X`, `Fill.Y`, 
+    `Fill.ALL`, `Fill.NONE`.
+                
+    `Fill` takes precedence over the `width` and `height` properties, so the 
+    `width` property does not work together with `Fill.X` and the `height` 
+    property does not work together with `Fill.Y`.
+    """
     X = 'X'
     Y = 'Y'
     ALL = 'ALL'

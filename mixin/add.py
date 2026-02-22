@@ -2,9 +2,7 @@
 
 
 class Add(object):
-    """..."""
     def __init__(self, *args, **kwargs) -> None:
-        """..."""
         super().__init__(*args, **kwargs)
         self.__uis = []
     
