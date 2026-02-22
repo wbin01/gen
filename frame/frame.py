@@ -414,7 +414,7 @@ class Frame(UI):
 
         if self.__container._UI__dirty:
             self.__container._Box__update()
-            self.__container._Box__redraw()
+            self.__container._Layout__redraw()
         
         sdl3.SDL_RenderPresent(self.__renderer)
         sdl3.SDL_Delay(10)

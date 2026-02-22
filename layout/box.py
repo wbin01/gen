@@ -50,12 +50,7 @@ class Box(Margin, Position, Size, Add, Layout):
         self.__first = False
         self.__orientation = 'VERTICAL'
         self._UI__dirty = True
-
-        self.__debug_colors = (
-            (93, 93, 62, 255),   (58, 78, 59, 255),   (52, 51, 63, 255),
-            (88, 78, 84, 255),   (68, 47, 58, 255),   (99, 61, 61, 255),
-            (119, 139, 80, 255), (92, 114, 113, 255), (67, 67, 67, 255))
-        self.__debug_color_index = 0
+        self.__debug_color = (93, 93, 62, 255)
     
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}()'
@@ -343,34 +338,10 @@ class Box(Margin, Position, Size, Add, Layout):
             if isinstance(ui, Layout):
                 self.__update_align(ui)
 
-    def __redraw(self) -> None:
-        """..."""
-        if self._app and self._app._Frame__debug: self.__draw()
-
-        num_color = -1
-        for ui in self._Add__uis:
-            if isinstance(ui, Cell) and not ui.visible: continue
-            if not ui._UI__dirty: continue
-
-            num_color += 1
-            if num_color == 9: num_color = -1
-
-            if isinstance(ui, Layout):
-                ui._Box__debug_color_index = num_color
-                ui._Box__redraw()
-                continue
-
-            getattr(ui, f'_{ui.__class__.__name__}__draw')()
-            ui._UI__dirty = False
-
-        self._UI__dirty = False
-    
     def __draw(self) -> None:
-        color = self.__debug_colors[self.__debug_color_index]
-        if self._Box__first: color = (125, 125, 125, 10)
         if not self._Box__first:
             self._Layout__drawer.rect(
                 self.x - self.margin[3], self.y - self.margin[0],
                 self.width + self.margin[3] + self.margin[1],
                 self.height + self.margin[0] + self.margin[2],
-                color, 4)
+                self.__debug_color, 4)
