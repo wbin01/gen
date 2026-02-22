@@ -24,7 +24,7 @@ class Layout(UI):
             if not ui._UI__dirty: continue
 
             if 'layout.box.Box' in mro:
-                ui._Box__debug_color = self.__get_debug_color()
+                ui._Box__debug_color = self.__color(ui == self._Add__uis[-1])
                 if self._app and self._app._Frame__debug: ui._Box__draw()
                 ui._Layout__redraw()
                 continue
@@ -35,7 +35,9 @@ class Layout(UI):
         self._UI__dirty = False
     
     @classmethod
-    def __get_debug_color(cls) -> tuple:
+    def __color(cls, reset: bool) -> tuple:
         cls.__debug_color_index += 1
         if cls.__debug_color_index == 9: cls.__debug_color_index = 0
+
+        if reset: cls.__debug_color_index = 0
         return cls.__debug_colors[cls.__debug_color_index]
