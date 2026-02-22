@@ -9,8 +9,8 @@ class Box(Margin, Position, Size, Add, Layout):
     """Organizes the positioning of the elements."""
     def __init__(
             self,
-            spacing: int = 0, margin: int | tuple = (0, 0, 0, 0),
-            fill: Fill = Fill.ALL, align: Align = Align.START,
+            spacing: int = 0, margin: tuple | int = 0, fill: Fill = Fill.ALL,
+            align: Align = Align.START, base_align: Align = Align.CENTER,
             width: int = None, height: int = None,
             *args, **kwargs) -> None:
         """Layout Initializer.
@@ -50,6 +50,7 @@ class Box(Margin, Position, Size, Add, Layout):
         self.margin = margin
         self.__spacing = spacing
         self.__align = align
+        self.__base_align = base_align
         self.__fill = fill
         self.__min_height = 0
         self.__min_width = 0
@@ -83,6 +84,15 @@ class Box(Margin, Position, Size, Add, Layout):
     @align.setter
     def align(self, align: Align) -> None:
         self.__align = align
+    
+    @property
+    def base_align(self) -> Align:
+        """Align: An Enum of type `Align`."""
+        return self.__base_align
+    
+    @base_align.setter
+    def base_align(self, base_align: Align) -> None:
+        self.__base_align = base_align
     
     @property
     def fill(self) -> Fill:
@@ -229,8 +239,13 @@ class Box(Margin, Position, Size, Add, Layout):
                         ui._Size__width = self.__min_width
                 
                 if isinstance(ui, Cell) and ui.fill in (Fill.Y, Fill.NONE):
-                    dt = (total_width - ui.width) // 2  # Center Cell
-                    ui.margin = ui.margin[0], dt, ui.margin[2], dt
+                    if layout.base_align == Align.CENTER:
+                        dt = (total_width - ui.width) // 2
+                        ui.margin = ui.margin[0], dt, ui.margin[2], dt
+
+                    elif layout.base_align == Align.END:
+                        dt = (total_width - ui.width)
+                        ui.margin = ui.margin[0], ui.margin[1],ui.margin[2], dt
 
             # Height
             vertical, height, last = [], 0, len(layout._Add__uis) - 1
@@ -267,8 +282,13 @@ class Box(Margin, Position, Size, Add, Layout):
                 #         ui._Size__height = self.__min_height
 
                 if isinstance(ui, Cell) and ui.fill in (Fill.X, Fill.NONE):
-                    dt = (total_height - ui.height) // 2  # Center Cell
-                    ui.margin = dt, ui.margin[1], dt, ui.margin[3]
+                    if layout.base_align == Align.CENTER:
+                        dt = (total_height - ui.height) // 2
+                        ui.margin = dt, ui.margin[1], dt, ui.margin[3]
+                    
+                    elif layout.base_align == Align.END:
+                        dt = (total_height - ui.height)
+                        ui.margin = dt, ui.margin[1], ui.margin[2],ui.margin[3]
         
             # Width
             horizontal, width, last = [], 0, len(layout._Add__uis) - 1
