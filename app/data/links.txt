@@ -15,6 +15,9 @@ SDL_VIDEODRIVER=x11 python main.py
 SDL_RENDERER_DRIVER=opengl python main.py
 SDL_RENDERER_DRIVER=vulkan python main.py
 
+SDL_VIDEODRIVER=x11 SDL_RENDERER_DRIVER=vulkan ./venv/bin/python -O main.py
+
+
 #TODO
 SDL_SetWindowShape ou o hack X11 pra click-through
 

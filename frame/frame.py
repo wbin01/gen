@@ -6,7 +6,7 @@ from ctypes import c_float, c_int
 import sdl3
 # import sdl3.sdlttf as ttf
 
-from ..flag import ResizeArea
+from ..flag import ResizeArea, Cursor
 from ..layout import Col
 from ..ui import UI, Drawer, Theme
 
@@ -95,10 +95,10 @@ class Frame(UI):
             'BOTTOM': sdl3.SDL_CreateSystemCursor(8),
             'LEFT': sdl3.SDL_CreateSystemCursor(7),
             'RIGHT': sdl3.SDL_CreateSystemCursor(7),
-            'TOPLEFT': sdl3.SDL_CreateSystemCursor(5),
-            'BOTTOMRIGHT': sdl3.SDL_CreateSystemCursor(5),
-            'TOPRIGHT': sdl3.SDL_CreateSystemCursor(6),
-            'BOTTOMLEFT': sdl3.SDL_CreateSystemCursor(6),
+            'TOP_LEFT': sdl3.SDL_CreateSystemCursor(5),
+            'BOTTOM_RIGHT': sdl3.SDL_CreateSystemCursor(5),
+            'TOP_RIGHT': sdl3.SDL_CreateSystemCursor(6),
+            'BOTTOM_LEFT': sdl3.SDL_CreateSystemCursor(6),
             'NONE': sdl3.SDL_CreateSystemCursor(0),
             'DRAG': sdl3.SDL_CreateSystemCursor(9),
         }
@@ -207,11 +207,11 @@ class Frame(UI):
         if top and left:
             return ResizeArea.TOPLEFT
         if top and right:
-            return ResizeArea.TOPRIGHT
+            return ResizeArea.TOP_RIGHT
         if bottom and left:
-            return ResizeArea.BOTTOMLEFT
+            return ResizeArea.BOTTOM_LEFT
         if bottom and right:
-            return ResizeArea.BOTTOMRIGHT
+            return ResizeArea.BOTTOM_RIGHT
         if top:
             return ResizeArea.TOP
         if bottom:
@@ -330,14 +330,14 @@ class Frame(UI):
 
         r = self.__resize_area.value
 
-        if r in ('RIGHT', 'TOPRIGHT', 'BOTTOMRIGHT'):
+        if r in ('RIGHT', 'TOP_RIGHT', 'BOTTOM_RIGHT'):
             w += dx
-        if r in ('LEFT', 'TOPLEFT', 'BOTTOMLEFT'):
+        if r in ('LEFT', 'TOP_LEFT', 'BOTTOM_LEFT'):
             x += dx
             w -= dx
-        if r in ('BOTTOM', 'BOTTOMLEFT', 'BOTTOMRIGHT'):
+        if r in ('BOTTOM', 'BOTTOM_LEFT', 'BOTTOM_RIGHT'):
             h += dy
-        if r in ('TOP', 'TOPLEFT', 'TOPRIGHT'):
+        if r in ('TOP', 'TOP_LEFT', 'TOP_RIGHT'):
             y += dy
             h -= dy
 
