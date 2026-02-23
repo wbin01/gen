@@ -30,10 +30,10 @@ class Button(Cell):
             self.__style = Theme.button
     
     def __repr__(self) -> str:
-        return f'{self.__class__.__name__}({self.__text})'
+        return f'{self.__class__.__name__}(text="{self.__text}")'
     
     def __str__(self) -> str:
-        return f'{self.__class__.__name__}({self.__text})'
+        return f'{self.__class__.__name__}("{self.__text}")'
     
     @property
     def style(self) -> dict:

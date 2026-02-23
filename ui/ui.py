@@ -36,14 +36,10 @@ class UI(object):
         return self.__parent
     
     def __rect_contains(self, ui: UI, x: int, y: int) -> bool:
-        ui_x = int(ui._x)
-        ui_y = int(ui._y)
-        ui_w = int(ui.width)
-        ui_h = int(ui.height)
-        if ui_x <= x.value <= (ui_x + ui_w) and ui_y <= y.value <= (ui_y + ui_h):
-            # print(ui_x, 'a', ui_x + ui_w, '|', ui_y, 'a', ui_y + ui_h, ui, ui_x, 'x', ui_y)
+        ui_x, ui_y = int(ui._x), int(ui._y)
+        ui_w, ui_h = int(ui.width), int(ui.height)
+        if ui_x <= x.value <= ui_x + ui_w and ui_y <= y.value <= ui_y + ui_h:
             return True
-
         return False
     
     def __set_state(self, state: State | str) -> None:
@@ -52,8 +48,12 @@ class UI(object):
                 self.__state = State.HOVER
                 # self.emit_click()
                 # self.emit_released()
-        
+
         elif self.__state != state:
             self.__state = state
+
+            if state == 'HOVER':
+                # self.on_mouse_enter()
+                pass
         
         self._UI__dirty = True

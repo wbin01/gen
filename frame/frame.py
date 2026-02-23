@@ -103,7 +103,7 @@ class Frame(UI):
             'DRAG': sdl3.SDL_CreateSystemCursor(9),
         }
         self.__last_resize_cursor_on_hover = 'NONE'
-        self.__hovered_ui: UI | None
+        self.__hovered_ui = None
     
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}()'
@@ -305,18 +305,17 @@ class Frame(UI):
                     elif self.__dragging:
                         self.__frame_start_drag()
                     
-                    print(self.__container._Layout__hit_test(lm_x, lm_y))
-                    # if new_hover_ui: print(new_hover_ui)
+                    hovered_ui = self.__container._Layout__hit_test(lm_x, lm_y)
+                    if hovered_ui:
+                        if self.__logging and not self.__dragging:
+                            print('HOVER:', hovered_ui)
 
-                    # if new_hover_ui != self.__hovered_ui:
-                    #         self.__hovered_ui
-                    #     if self.__hovered_ui:
-                    #         self.__hovered_ui.on_mouse_leave()
-
-                    #     if new_hover_ui:
-                    #         new_hover_ui.on_mouse_enter()
-
-                    #     self.__hovered_ui = new_hover_ui
+                        if hovered_ui != self.__hovered_ui:
+                            if self.__hovered_ui:
+                                self.__hovered_ui._UI__set_state('HOVER')
+                            
+                            # hovered_ui.on_mouse_enter()
+                            self.__hovered_ui = hovered_ui
 
 
             if self.__render_needs_updating:
@@ -336,6 +335,8 @@ class Frame(UI):
             sdl3.SDL_SetWindowPosition(self.__frame, new_x, new_y)
             self.x = new_x
             self.y = new_y
+        
+        if self.__logging: print(f'MOVING: {new_x}x{new_y}')
 
     def __frame_start_resize(self) -> None:
         if not self.__resizing:

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from ..cell import Cell
 from ..ui import UI
 
 
@@ -21,23 +22,21 @@ class Layout(UI):
         if not self.visible:
             return None
 
-        # if not self._UI__rect_contains(self, x, y):
-        #     return None
+        if not self._UI__rect_contains(self, x, y):
+            return None
 
-        hit = None
         for ui in self._Add__uis:
-            mro = str(type(ui).__mro__)
             if isinstance(ui, Layout):
-                ui._Layout__hit_test(x, y)
+                hit_ui =  ui._Layout__hit_test(x, y)
+                if hit_ui: return hit_ui
                 continue
-            
-            if 'cell.cell.Cell' in mro:
-                hit = ui._Cell__hit_test(x, y)
-                if hit:
-                    return hit
+
+            if isinstance(ui, Cell):
+                hit_ui = ui._Cell__hit_test(x, y)
+                if hit_ui:
+                    return hit_ui
         
         return self
-        # return False # self
 
     def __invalidate(self) -> None:
         for ui in self._Add__uis:
@@ -52,10 +51,10 @@ class Layout(UI):
     def __redraw(self) -> None:
         """..."""
         for ui in self._Add__uis:
-            mro = str(type(ui).__mro__)
-            if 'cell.cell.Cell' in mro and not ui.visible: continue
+            if isinstance(ui, Cell) and not ui.visible: continue
             if not ui._UI__dirty: continue
 
+            mro = str(type(ui).__mro__)
             if 'layout.box.Box' in mro:
                 ui._Box__debug_color = self.__color(ui == self._Add__uis[-1])
                 if self._app and self._app._Frame__debug: ui._Box__draw()
