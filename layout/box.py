@@ -124,7 +124,7 @@ class Box(Margin, Pos, Size, Add, Layout):
         # Updates the width, fill, alignment, and position of cells.
         if self.__orientation == 'POSITION':
             return
-
+        
         if self._Box__first:
             self.__update_size(self)
             self.__update_align(self)
@@ -132,7 +132,7 @@ class Box(Margin, Pos, Size, Add, Layout):
         
         ui_x, ui_y = self._x, self._y  # Reset
         for ui in self._Add__uis:
-            if isinstance(ui, Cell) and not ui.visible: continue
+            if not ui.visible: continue
             if not ui._UI__dirty: continue
 
             ui._Pos__x = ui_x + ui.margin[3]  # Set current position
@@ -161,7 +161,7 @@ class Box(Margin, Pos, Size, Add, Layout):
         
         last = len(layout._Add__uis) - 1  # To remove last extra 'spacing'
         for num, ui in enumerate(layout._Add__uis):
-            if isinstance(ui, Cell) and not ui.visible: continue
+            if not ui.visible: continue
             if not ui._UI__dirty: continue
 
             if isinstance(ui, Layout):
@@ -219,7 +219,8 @@ class Box(Margin, Pos, Size, Add, Layout):
         if layout._Box__orientation == 'VERTICAL':
             # Width
             for ui in layout._Add__uis:  # Fill: Width equal to the layout
-                if isinstance(ui, Cell) and not ui.visible: continue
+                if not ui.visible: continue
+                if not ui._UI__dirty: continue
 
                 if ui.fill in (Fill.X, Fill.ALL):
                     ui._Size__width = total_width - ui._Margin__margin_x

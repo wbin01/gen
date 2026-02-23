@@ -46,14 +46,20 @@ class UI(object):
         if state == 'RELEASED':
             if self.__state == State.PRESSED:
                 self.__state = State.HOVER
-                # self.emit_click()
-                # self.emit_released()
+                # self.__click_signal.emit()
+            else:
+                # self.__released_signal.emit()
+                pass
 
         elif self.__state != state:
-            self.__state = state
-
             if state == 'HOVER':
-                # self.on_mouse_enter()
-                pass
-        
+                self.__state = State.HOVER
+                # self.__hover_signal.emit()
+
+            if state == 'NORMAL':
+                self.__state = State.NORMAL
+                # self.__leave_signal.emit()
+
         self._UI__dirty = True
+        if hasattr(self._parent, '_Layout__invalidate'):
+            self._parent._Layout__invalidate()

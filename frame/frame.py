@@ -72,6 +72,7 @@ class Frame(UI):
 
         # Control Frame
         self.__running = True
+        self.__render_update_hover = False
         self.__render_needs_updating = True
         self.__render_update_count = 0
         
@@ -103,7 +104,7 @@ class Frame(UI):
             'DRAG': sdl3.SDL_CreateSystemCursor(9),
         }
         self.__last_resize_cursor_on_hover = 'NONE'
-        self.__hovered_ui = None
+        self.__hovered_ui = self.__container
     
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}()'
@@ -305,18 +306,18 @@ class Frame(UI):
                     elif self.__dragging:
                         self.__frame_start_drag()
                     
-                    hovered_ui = self.__container._Layout__hit_test(lm_x, lm_y)
-                    if hovered_ui:
-                        if self.__logging and not self.__dragging:
-                            print('HOVER:', hovered_ui)
+                    hovered = self.__container._Layout__hit_test(lm_x, lm_y)
+                    if hovered and hovered != self.__hovered_ui:
+                        if self.__logging:
+                            if not self.__dragging and not self.__resizing:
+                                print('HOVER:', hovered)
 
-                        if hovered_ui != self.__hovered_ui:
-                            if self.__hovered_ui:
-                                self.__hovered_ui._UI__set_state('HOVER')
-                            
-                            # hovered_ui.on_mouse_enter()
-                            self.__hovered_ui = hovered_ui
-
+                        self.__hovered_ui._UI__set_state('NORMAL')
+                        self.__hovered_ui = hovered
+                        self.__hovered_ui._UI__set_state('HOVER')
+                        
+                        self.__render_update_hover = True
+                        self.__render_needs_updating = True
 
             if self.__render_needs_updating:
                 self.__render()
@@ -378,6 +379,7 @@ class Frame(UI):
         self.y = y
 
         self.__render_needs_updating = True
+        if self.__logging: print(f'RESIZING: {w}x{h}')
     
     def __frame_stop_drag(self) -> None:
         self.__dragging = False
@@ -421,32 +423,33 @@ class Frame(UI):
     
     def __render(self) -> None:
         self.__render_needs_updating = False
+        self.__container._Layout__invalidate()
+        self.__draw()
+        
+        if not self.__render_update_hover:
+            if self.__resizing or self.__resizing_end <= 3:
+                # self.__render_update_count += 1
+                # if not self.__logging:
+                #     print('Frame update:', self.__render_update_count)
 
-        if self.__resizing or self.__resizing_end <= 3:
-            self.__container._Layout__invalidate()
-            self.__draw()
-
-            # Resizing: last redraw
-            if not self.__resizing and not self.__resizing_first:
-                if self.__resizing_end > 2:
-                    self.__resizing_end -= 1
-                    self.__render_needs_updating = True
+                # Resizing: last redraw
+                if not self.__resizing and not self.__resizing_first:
+                    if self.__resizing_end > 2:
+                        self.__resizing_end -= 1
+                        self.__render_needs_updating = True
+                    
+                    if self.__resizing_end < 2:
+                        self.__resizing_end = 3
                 
-                if self.__resizing_end < 2:
-                    self.__resizing_end = 3
-            
-            if self.__resizing_first: self.__resizing_first = False
+                if self.__resizing_first:
+                    self.__resizing_first = False
 
         if self.__container._UI__dirty:
             self.__container._Box__update()
             self.__container._Layout__redraw()
-        
+    
         sdl3.SDL_RenderPresent(self.__renderer)
         sdl3.SDL_Delay(10)
-
-        # Tmp log
-        self.__render_update_count += 1
-        if self.__logging: print('Frame update:', self.__render_update_count)
 
 
 if __name__ == "__main__":

@@ -37,22 +37,21 @@ class Layout(UI):
                     return hit_ui
         
         return self
-
+    
     def __invalidate(self) -> None:
+        self._UI__dirty = True
         for ui in self._Add__uis:
             if isinstance(ui, Layout):
                 ui._Layout__invalidate()
                 continue
-
             ui._UI__dirty = True
-        
-        self._UI__dirty = True
 
     def __redraw(self) -> None:
         """..."""
         for ui in self._Add__uis:
-            if isinstance(ui, Cell) and not ui.visible: continue
-            if not ui._UI__dirty: continue
+            if not ui.visible: continue
+            if not ui._UI__dirty:
+                continue
 
             mro = str(type(ui).__mro__)
             if 'layout.box.Box' in mro:
@@ -60,7 +59,7 @@ class Layout(UI):
                 if self._app and self._app._Frame__debug: ui._Box__draw()
                 ui._Layout__redraw()
                 continue
-
+            
             getattr(ui, f'_{ui.__class__.__name__}__draw')()
             ui._UI__dirty = False
 

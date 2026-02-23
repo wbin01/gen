@@ -44,31 +44,36 @@ class Button(Cell):
         self.__style = style
 
     def __draw(self):
-        pad = self.__style['NORMAL']['padding'] * 2
+        state = self._UI__state.name
+
+        text = self.__style[state]['text']
+        background = self.__style[state]['background']
+        border = self.__style[state]['border']
+
+        if self._UI__state.name != 'NORMAL':
+            state = 'NORMAL'
+        
+        radius = self.__style[state]['radius']
+        font = self.__style[state]['font']
+        font_size = self.__style[state]['font-size']
+        pad = self.__style[state]['padding'] * 2
 
         if self.__text:
             text = FontRender(
-                self.__text,
-                self.__style['NORMAL']['text'],
-                self.__style['NORMAL']['font'],
-                self.__style['NORMAL']['font-size'],
-                self.width if self.__elided else None,
-                pad)
+                self.__text, text, font, font_size,
+                self.width if self.__elided else None, pad)
             if self.width < text.width + pad: self.width = text.width + pad
             if self.height < text.height + pad: self.height = text.height + pad
 
             tx = self._x + (self.width // 2) - (text.width // 2)
             ty = self._y + (self.height // 2) - (text.height // 2)
-        
+
         self._Cell__drawer.rect(
-            self._x, self._y, self.width, self.height,
-            self.__style['NORMAL']['border'],
-            self.__style['NORMAL']['radius'])
-        
+            self._x, self._y, self.width, self.height, border, radius)
+
         self._Cell__drawer.rect(
             self._x + 1, self._y +1, self.width - 2,self.height - 2,
-            self.__style['NORMAL']['background'],
-            self.__style['NORMAL']['radius'] - 1)
-        
+            background, radius - 1)
+
         if self.__text:
             self._Cell__drawer.text(tx, ty, text)
