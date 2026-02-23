@@ -120,16 +120,6 @@ class Box(Margin, Pos, Size, Add, Layout):
     def spacing(self, spacing: int) -> None:
         self.__spacing = spacing
     
-    def __invalidate(self) -> None:
-        for ui in self._Add__uis:
-            if isinstance(ui, Layout):
-                ui._Box__invalidate()
-                continue
-
-            ui._UI__dirty = True
-        
-        self._UI__dirty = True
-    
     def __update(self) -> None:
         # Updates the width, fill, alignment, and position of cells.
         if self.__orientation == 'POSITION':

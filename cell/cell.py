@@ -11,8 +11,13 @@ class Cell(Margin, Pos, Size, UI):
         super().__init__(*args, **kwargs)
         self.__drawer = None
         self.__fill = Fill.X
-        self.__visible = True
+    
+    def __repr__(self) -> str:
+        return f'{self.__class__.__name__}()'
 
+    def __str__(self) -> str:
+        return self.__class__.__name__
+    
     @property
     def fill(self) -> Fill:
         """..."""
@@ -22,20 +27,14 @@ class Cell(Margin, Pos, Size, UI):
     def fill(self, fill: Fill) -> None:
         self.__fill = fill
     
-    @property
-    def visible(self) -> bool:
-        """..."""
-        return self.__visible
-    
-    @visible.setter
-    def visible(self, visible: bool) -> None:
-        self.__visible = visible
-    
-    def __repr__(self) -> str:
-        return f'{self.__class__.__name__}()'
+    def __hit_test(self, x: int, y: int) -> UI | None:
+        if not self.visible:
+            return None
 
-    def __str__(self) -> str:
-        return self.__class__.__name__
+        if self._UI__rect_contains(self, x, y):
+            return self
+        
+        return None
 
     def __draw(self) -> None:
         pass

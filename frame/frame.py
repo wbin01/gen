@@ -103,6 +103,7 @@ class Frame(UI):
             'DRAG': sdl3.SDL_CreateSystemCursor(9),
         }
         self.__last_resize_cursor_on_hover = 'NONE'
+        self.__hovered_ui: UI | None
     
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}()'
@@ -179,10 +180,12 @@ class Frame(UI):
         self.__destroy()
         return 0
     
-    def __cursor_find_resize_area(self) -> ResizeArea:
-        mx = c_float()
-        my = c_float()
-        sdl3.SDL_GetGlobalMouseState(mx, my)
+    def __cursor_resize_area(self, mouse_x, mouse_y) -> ResizeArea:
+        # mx = c_float()
+        # my = c_float()
+        # sdl3.SDL_GetGlobalMouseState(mx, my)
+        mx = mouse_x
+        my = mouse_y
 
         wx = c_int()
         wy = c_int()
@@ -205,7 +208,7 @@ class Frame(UI):
         bottom = y > h - b
 
         if top and left:
-            return ResizeArea.TOPLEFT
+            return ResizeArea.TOP_LEFT
         if top and right:
             return ResizeArea.TOP_RIGHT
         if bottom and left:
@@ -256,10 +259,18 @@ class Frame(UI):
     def __event_loop(self) -> None:
         while self.__running:
             event = sdl3.SDL_Event()
+            
+            mouse_x = c_float()
+            mouse_y = c_float()
+            sdl3.SDL_GetGlobalMouseState(mouse_x, mouse_y)
+            resize_area = self.__cursor_resize_area(mouse_x, mouse_y)
+
+            lm_x = c_float()
+            lm_y = c_float()
+            sdl3.SDL_GetMouseState(lm_x, lm_y)
+
 
             while sdl3.SDL_PollEvent(event):
-                resize_area = self.__cursor_find_resize_area()
-
                 if resize_area.value != self.__last_resize_cursor_on_hover:
                     self.__cursor_update_shape(resize_area.value)
                     self.__last_resize_cursor_on_hover = resize_area.value
@@ -273,7 +284,7 @@ class Frame(UI):
                 
                 if event.type == sdl3.SDL_EVENT_MOUSE_BUTTON_DOWN:
                     if event.button.button == sdl3.SDL_BUTTON_LEFT:
-                        self.__resize_area = self.__cursor_find_resize_area()
+                        self.__resize_area = resize_area
                         if self.__resize_area != ResizeArea.NONE:
                             self.__cursor_update_shape(self.__resize_area.value)
                             self.__frame_update_resize_settings()
@@ -293,6 +304,20 @@ class Frame(UI):
                         self.__frame_start_resize()
                     elif self.__dragging:
                         self.__frame_start_drag()
+                    
+                    print(self.__container._Layout__hit_test(lm_x, lm_y))
+                    # if new_hover_ui: print(new_hover_ui)
+
+                    # if new_hover_ui != self.__hovered_ui:
+                    #         self.__hovered_ui
+                    #     if self.__hovered_ui:
+                    #         self.__hovered_ui.on_mouse_leave()
+
+                    #     if new_hover_ui:
+                    #         new_hover_ui.on_mouse_enter()
+
+                    #     self.__hovered_ui = new_hover_ui
+
 
             if self.__render_needs_updating:
                 self.__render()
@@ -397,7 +422,7 @@ class Frame(UI):
         self.__render_needs_updating = False
 
         if self.__resizing or self.__resizing_end <= 3:
-            self.__container._Box__invalidate()
+            self.__container._Layout__invalidate()
             self.__draw()
 
             # Resizing: last redraw

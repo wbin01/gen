@@ -11,10 +11,43 @@ class Layout(UI):
     __debug_color_index = 0
 
     def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
         self.__drawer = None
     
     def __update(self) -> None:
         pass
+    
+    def __hit_test(self, x: int, y: int) -> UI | None:
+        if not self.visible:
+            return None
+
+        # if not self._UI__rect_contains(self, x, y):
+        #     return None
+
+        hit = None
+        for ui in self._Add__uis:
+            mro = str(type(ui).__mro__)
+            if isinstance(ui, Layout):
+                ui._Layout__hit_test(x, y)
+                continue
+            
+            if 'cell.cell.Cell' in mro:
+                hit = ui._Cell__hit_test(x, y)
+                if hit:
+                    return hit
+        
+        return self
+        # return False # self
+
+    def __invalidate(self) -> None:
+        for ui in self._Add__uis:
+            if isinstance(ui, Layout):
+                ui._Layout__invalidate()
+                continue
+
+            ui._UI__dirty = True
+        
+        self._UI__dirty = True
 
     def __redraw(self) -> None:
         """..."""

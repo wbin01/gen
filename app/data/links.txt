@@ -18,7 +18,19 @@ SDL_RENDERER_DRIVER=vulkan python main.py
 SDL_VIDEODRIVER=x11 SDL_RENDERER_DRIVER=vulkan ./venv/bin/python -O main.py
 
 
-#TODO
+# Done
+Dirty propagation
+
+# Working on
+Event Dispatch + Hit Testing + State Machine por componente
+
+# Roadmap
+Mouse events (drag)
+Keyboard keys focus
+event bubbling (DOM)
+z-index
+clipping
+
 SDL_SetWindowShape ou o hack X11 pra click-through
 
 # Supondo que tenha uma surface com alpha
