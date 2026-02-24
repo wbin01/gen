@@ -55,8 +55,8 @@ class Layout(UI):
 
             mro = str(type(ui).__mro__)
             if 'layout.box.Box' in mro:
-                ui._Box__debug_color = self.__color(ui == self._Add__uis[-1])
-                if self._app and self._app._Frame__debug: ui._Box__draw()
+                # ui._Box__debug_color = self.__color(ui == self._Add__uis[-1])
+                # if self._app and self._app._Frame__debug: ui._Box__draw()
                 ui._Layout__redraw()
                 continue
 

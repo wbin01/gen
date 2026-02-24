@@ -26,8 +26,9 @@ class Frame(UI):
         self.__y = y
         self.__width = width
         self.__height = height
-        self.__logging = True
+        self.__logging = False
         self.__log = None
+        self.cached = True
 
         sdl3.SDL_SetHint(
             sdl3.SDL_HINT_X11_WINDOW_TYPE, b'_NET_WM_WINDOW_TYPE_NORMAL')
@@ -77,7 +78,8 @@ class Frame(UI):
         self.__render_needs_updating = True
         self.__render_count = 0
         
-        self.__draw()
+        self.__frame_texture = None
+        # self.__draw()
 
         # Control Frame - Drag 
         self.__dragging = False
@@ -178,6 +180,11 @@ class Frame(UI):
         return self.__container.add(cell)
         
     def run(self) -> int:
+        if self.cached:
+            self.__frame_texture = self.__create_texture()
+        else:
+            self.__draw()
+        
         self.__event_loop()
         self.__destroy()
         return 0
@@ -320,7 +327,11 @@ class Frame(UI):
                     print(self.__log, self.__render_count)
 
             if self.__render_needs_updating:
-                self.__render()
+                if self.cached:
+                    self.__fast_render()
+                else:
+                    self.__render()
+                                
                 self.__render_count += 1
     
     def __frame_start_drag(self) -> None:
@@ -424,12 +435,110 @@ class Frame(UI):
         self.__start_h = c_int()
         sdl3.SDL_GetWindowSize(self.__frame, self.__start_w, self.__start_h)
     
-    def __render(self) -> None:
+    def __fast_render(self) -> None:
         self.__render_needs_updating = False
-        self.__container._Layout__invalidate()
-        self.__draw()
         self.__render_count += 1
+
+        # if not self.__render_update_hover:
+        #     if self.__resizing or self.__resizing_end <= 3:
+        #         if not self.__resizing and not self.__resizing_first:
+        #             if self.__resizing_end > 2:
+        #                 self.__resizing_end -= 1
+        #                 self.__render_needs_updating = True
+                    
+        #             if self.__resizing_end < 2:
+        #                 self.__resizing_end = 3
+                
+        #         if self.__resizing_first:
+        #             self.__resizing_first = False
+
+        #     self.__container._Layout__invalidate()
+        #     self.__container._Box__update()
+            
+        #     self.__frame_texture = self.__create_texture()
+        #     # self.__container._Layout__redraw()
+        #     # print('creating texture...')
+
+        # if self.__render_count <= 1:
+        #     print('creating texture...')
+        #     self.__frame_texture = self.__create_texture()
+
+        # Draw cached
+        # sdl3.SDL_RenderTexture(self.__renderer, self.__frame_texture, None, None)
         
+        # Draw overlay hover
+        # if self.__render_update_hover:
+        #     if self.__container._Add__uis and self.__container._UI__dirty:
+        #         # self.__container._Box__update()
+        #         sdl3.SDL_RenderTexture(self.__renderer, self.__frame_texture, None, None)
+        #         self.__container._Layout__redraw()
+
+        sdl3.SDL_SetRenderDrawColor(self.__renderer, 0,0,0,0)
+        sdl3.SDL_RenderClear(self.__renderer)
+        
+        sdl3.SDL_RenderTexture(self.__renderer, self.__frame_texture, None, None)
+        self.__container._Layout__redraw()
+
+        sdl3.SDL_RenderPresent(self.__renderer)
+        sdl3.SDL_Delay(10)
+
+    def __create_texture(self):
+        # DRAW BG
+        sdl3.SDL_SetRenderDrawColor(self.__renderer, 0, 0, 0, 0)
+        sdl3.SDL_RenderClear(self.__renderer)
+
+        width = c_int()
+        height = c_int()
+        sdl3.SDL_GetWindowSize(self.__frame, width, height)
+        self.__drawer.rect(
+            x=0, y=0, w=width.value, h=height.value,
+            color=self.__style.frame['NORMAL']['border'], r=8)
+        
+        self.__drawer.rect(
+            x=1, y=1, w=width.value - 2, h=height.value - 2,
+            color=self.__style.frame['NORMAL']['background'], r=8)
+        
+        # CREATE TEXTURE
+        texture = sdl3.SDL_CreateTexture(
+            self.__renderer,
+            sdl3.SDL_PIXELFORMAT_RGBA8888,
+            sdl3.SDL_TEXTUREACCESS_TARGET,
+            width, height)
+        
+        # Salva render target anterior
+        old_target = sdl3.SDL_GetRenderTarget(self.__renderer)
+        
+        # Define texture como alvo
+        sdl3.SDL_SetRenderTarget(self.__renderer, texture)
+        
+        # Limpa com transparência
+        sdl3.SDL_SetRenderDrawColor(self.__renderer, 0,0,0,0)
+        sdl3.SDL_RenderClear(self.__renderer)
+        
+        # Desenha elementos estáticos        
+        if self.__container._Add__uis:
+            self.__container._Box__update()
+            self.__draw_uis(self.__container)
+        
+        # Restaura render target anterior
+        sdl3.SDL_SetRenderTarget(self.__renderer, old_target)
+
+        return texture
+    
+    def __draw_uis(self, layout) -> None:
+        """..."""
+        for ui in layout._Add__uis:
+            mro = str(type(ui).__mro__)
+            if 'layout.box.Box' in mro:
+                self.__draw_uis(ui)
+                continue
+            getattr(ui, f'_{ui.__class__.__name__}__draw')()
+    
+    def __render(self) -> None:
+        print('render')
+        self.__render_needs_updating = False
+        self.__render_count += 1
+
         if not self.__render_update_hover:
             if self.__resizing or self.__resizing_end <= 3:
                 if not self.__resizing and not self.__resizing_first:
@@ -442,13 +551,43 @@ class Frame(UI):
                 
                 if self.__resizing_first:
                     self.__resizing_first = False
+        
+        
+        self.__container._Layout__invalidate()
+        self.__draw()
 
-        if self.__container._UI__dirty:
+        if self.__container._Add__uis and self.__container._UI__dirty:
             self.__container._Box__update()
             self.__container._Layout__redraw()
 
         sdl3.SDL_RenderPresent(self.__renderer)
         sdl3.SDL_Delay(10)
+    
+    # def __render_bkp(self) -> None:
+    #     self.__render_needs_updating = False
+    #     self.__container._Layout__invalidate()
+    #     self.__draw()
+    #     self.__render_count += 1
+        
+    #     if not self.__render_update_hover:
+    #         if self.__resizing or self.__resizing_end <= 3:
+    #             if not self.__resizing and not self.__resizing_first:
+    #                 if self.__resizing_end > 2:
+    #                     self.__resizing_end -= 1
+    #                     self.__render_needs_updating = True
+                    
+    #                 if self.__resizing_end < 2:
+    #                     self.__resizing_end = 3
+                
+    #             if self.__resizing_first:
+    #                 self.__resizing_first = False
+
+    #     if self.__container._UI__dirty:
+    #         self.__container._Box__update()
+    #         self.__container._Layout__redraw()
+
+    #     sdl3.SDL_RenderPresent(self.__renderer)
+    #     sdl3.SDL_Delay(10)
 
 
 if __name__ == "__main__":
