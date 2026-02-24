@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
-from ctypes import c_void_p, cast
+from ctypes import c_void_p, cast, byref
 import io
+import math
 
 # python3 -m pip install --upgrade Pillow
 from PIL import Image, ImageDraw, ImageFont
@@ -27,6 +28,93 @@ class Drawer(object):
         pass
 
     def rect(
+            self, x: int, y: int, w: int, h: int,
+            color=(0, 0, 0, 255), r: int = 8, aa: int = 1) -> None:
+        # SDL2
+        #     SDL_RenderDrawLine
+        #     SDL_RenderDrawPoint
+        # SDL3 (float)
+        #     SDL_RenderLine
+        #     SDL_RenderPoint
+        #     SDL_RenderLines
+        #     SDL_RenderPoints
+
+        x = int(x)
+        w = int(w)
+        h = int(h)
+        r = int(r)
+        # r = min(r, (w - 1)//2, (h - 1)//2)
+        # if (w - 2*r) % 2 != 0: w -= 1
+
+        renderer = self.__renderer
+        cr, cg, cb, ca = color
+
+        r = min(r, w // 2, h // 2)
+
+        sdl3.SDL_SetRenderDrawColor(renderer, cr, cg, cb, ca)
+
+        # Body
+        sdl3.SDL_RenderFillRect(
+            renderer,
+            sdl3.SDL_FRect(x + r, y, w - 2*r, h)
+        )
+        sdl3.SDL_RenderFillRect(
+            renderer,
+            sdl3.SDL_FRect(x, y + r, w, h - 2*r)
+        )
+
+        # Center
+        corners = [
+            (x + r,         y + r,         -1, -1),  # TL
+            (x + w - r - 1, y + r,          1, -1),  # TR
+            (x + r,         y + h - r - 1, -1,  1),  # BL
+            (x + w - r - 1, y + h - r - 1,  1,  1),  # BR
+        ]
+
+        # Circle (1/4 fill)
+        for cx, cy, sx, sy in corners:
+            for dy in range(0, r):  # range(0, r+1):
+                for dx in range(0, r):  # range(0, r+1):
+                    if dx*dx + dy*dy <= r*r:
+                        px = cx + dx * sx
+                        py = cy + dy * sy
+                        sdl3.SDL_RenderPoint(renderer, px, py)
+
+        # AA
+        if aa > 0:
+
+            sdl3.SDL_SetRenderDrawBlendMode(
+                renderer,
+                sdl3.SDL_BLENDMODE_BLEND
+            )
+
+            for cx, cy, sx, sy in corners:
+                for dy in range(0, r+aa+1):
+                    for dx in range(0, r+aa+1):
+
+                        dist2 = dx*dx + dy*dy
+                        r2 = r*r
+                        outer2 = (r+aa)*(r+aa)
+
+                        if r2 < dist2 <= outer2:
+                            dist = math.sqrt(dist2)
+                            edge = (r + aa) - dist
+                            alpha = int(ca * (edge / aa))
+
+                            if alpha > 0:
+                                sdl3.SDL_SetRenderDrawColor(
+                                    renderer, cr, cg, cb, alpha
+                                )
+                                px = cx + dx * sx
+                                py = cy + dy * sy
+                                sdl3.SDL_RenderPoint(renderer, px, py)
+
+            sdl3.SDL_SetRenderDrawBlendMode(
+                renderer,
+                sdl3.SDL_BLENDMODE_NONE
+            )
+
+    def base_rect(
             self, x, y, w, h, color, r: int = 0,
             top_left: int = None, top_right: int = None,
             bottom_right: int = None, bottom_left: int = None):

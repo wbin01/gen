@@ -30,7 +30,7 @@ class Theme:
             'text': (200, 200, 200, 255),
             'background': (40, 40, 40, 250),
             'border': (80, 80, 80, 255),
-            'radius': 4,
+            'radius': 6,
             'font': 'DejaVuSans.ttf',
             'font-size': 12,
             'padding': 10
@@ -38,7 +38,7 @@ class Theme:
         'HOVER': {
             'text': (200, 200, 200, 255),
             'background': (50, 50, 50, 255),
-            'border': (20, 20, 80, 255),
+            'border': (60, 100, 150, 255),
             },
         'CLICKED': {
             'text': (200, 200, 200, 255),
