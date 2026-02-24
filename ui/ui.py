@@ -60,6 +60,13 @@ class UI(object):
                 self.__state = State.NORMAL
                 # self.__leave_signal.emit()
 
-        self._UI__dirty = True
-        if hasattr(self._parent, '_Layout__invalidate'):
-            self._parent._Layout__invalidate()
+        self._UI__dirty = 'HOVER'
+        # if hasattr(self._parent, '_Layout__invalidate'):
+        #     self._parent._Layout__invalidate()
+
+        def inv(ui):
+            if hasattr(ui, '_parent') and ui._parent:
+                ui._parent._UI__dirty = 'HOVER'
+                inv(ui._parent)
+        
+        inv(self)

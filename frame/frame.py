@@ -27,12 +27,13 @@ class Frame(UI):
         self.__width = width
         self.__height = height
         self.__logging = True
+        self.__log = None
 
         sdl3.SDL_SetHint(
             sdl3.SDL_HINT_X11_WINDOW_TYPE, b'_NET_WM_WINDOW_TYPE_NORMAL')
         # Init
         if sdl3.SDL_Init(sdl3.SDL_INIT_VIDEO) < 0: # X SDL_INIT_EVERYTHING
-            if self.__logging: print('SDL3 init error:', sdl3.SDL_GetError())
+            print('SDL3 init error:', sdl3.SDL_GetError())
             sys.exit(1) # X SDL_SetHint(sdl3.SDL_HINT_RENDER_DRIVER, b'vulkan')
 
         # Frame
@@ -43,7 +44,7 @@ class Frame(UI):
                 sdl3.SDL_WINDOW_RESIZABLE))    # SDL_WINDOW_UTILITY
 
         if not self.__frame:
-            if self.__logging: print('Frame error:', sdl3.SDL_GetError())
+            print('Frame error:', sdl3.SDL_GetError())
             sdl3.SDL_Quit()
             sys.exit(1)
 
@@ -52,7 +53,7 @@ class Frame(UI):
         # Style
         self.__renderer = sdl3.SDL_CreateRenderer(self.__frame, None)
         if not self.__renderer:
-            if self.__logging: print('Renderer error:', sdl3.SDL_GetError())
+            print('Renderer error:', sdl3.SDL_GetError())
             sdl3.SDL_DestroyWindow(self.__frame)
             sdl3.SDL_Quit()
             sys.exit(1)
@@ -74,7 +75,7 @@ class Frame(UI):
         self.__running = True
         self.__render_update_hover = False
         self.__render_needs_updating = True
-        self.__render_update_count = 0
+        self.__render_count = 0
         
         self.__draw()
 
@@ -308,19 +309,19 @@ class Frame(UI):
                     
                     hovered = self.__container._Layout__hit_test(lm_x, lm_y)
                     if hovered and hovered != self.__hovered_ui:
-                        if self.__logging:
-                            if not self.__dragging and not self.__resizing:
-                                print('HOVER:', hovered)
-
                         self.__hovered_ui._UI__set_state('NORMAL')
                         self.__hovered_ui = hovered
                         self.__hovered_ui._UI__set_state('HOVER')
                         
                         self.__render_update_hover = True
                         self.__render_needs_updating = True
+                
+                if self.__logging and self.__log:
+                    print(self.__log, self.__render_count)
 
             if self.__render_needs_updating:
                 self.__render()
+                self.__render_count += 1
     
     def __frame_start_drag(self) -> None:
         if hasattr(sdl3, 'SDL_StartWindowMove'):
@@ -337,7 +338,7 @@ class Frame(UI):
             self.x = new_x
             self.y = new_y
         
-        if self.__logging: print(f'MOVING: {new_x}x{new_y}')
+        self.__log = f'MOVING: {new_x}x{new_y}'
 
     def __frame_start_resize(self) -> None:
         if not self.__resizing:
@@ -379,11 +380,12 @@ class Frame(UI):
         self.y = y
 
         self.__render_needs_updating = True
-        if self.__logging: print(f'RESIZING: {w}x{h}')
+        self.__log = f'RESIZING: {w}x{h}'
     
     def __frame_stop_drag(self) -> None:
         self.__dragging = False
         self.__cursor_update_shape('NONE')
+        self.__log = None
     
     def __frame_stop_resize(self) -> None:
         self.__resize_area = ResizeArea.NONE
@@ -391,6 +393,7 @@ class Frame(UI):
         self.__resizing = False
         self.__resizing_end = 3
         self.__render_needs_updating = True
+        self.__log = None
     
     def __frame_update_drag_settings(self) -> None:
         self.__dragging = True
@@ -425,14 +428,10 @@ class Frame(UI):
         self.__render_needs_updating = False
         self.__container._Layout__invalidate()
         self.__draw()
+        self.__render_count += 1
         
         if not self.__render_update_hover:
             if self.__resizing or self.__resizing_end <= 3:
-                # self.__render_update_count += 1
-                # if not self.__logging:
-                #     print('Frame update:', self.__render_update_count)
-
-                # Resizing: last redraw
                 if not self.__resizing and not self.__resizing_first:
                     if self.__resizing_end > 2:
                         self.__resizing_end -= 1
@@ -447,7 +446,7 @@ class Frame(UI):
         if self.__container._UI__dirty:
             self.__container._Box__update()
             self.__container._Layout__redraw()
-    
+
         sdl3.SDL_RenderPresent(self.__renderer)
         sdl3.SDL_Delay(10)
 

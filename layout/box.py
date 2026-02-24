@@ -125,6 +125,9 @@ class Box(Margin, Pos, Size, Add, Layout):
         if self.__orientation == 'POSITION':
             return
         
+        if self._UI__dirty == 'HOVER':
+            return
+        
         if self._Box__first:
             self.__update_size(self)
             self.__update_align(self)

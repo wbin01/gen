@@ -59,7 +59,7 @@ class Layout(UI):
                 if self._app and self._app._Frame__debug: ui._Box__draw()
                 ui._Layout__redraw()
                 continue
-            
+
             getattr(ui, f'_{ui.__class__.__name__}__draw')()
             ui._UI__dirty = False
 
