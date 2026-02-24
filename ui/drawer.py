@@ -16,6 +16,8 @@ class Drawer(object):
     """..."""
     def __init__(self, renderer, *args, **kwargs) -> None:
         self.__renderer = renderer
+        self.__light = True
+        self.__visual_level = 2
         
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}()'
@@ -30,46 +32,49 @@ class Drawer(object):
     def rect(
             self, x: int, y: int, w: int, h: int,
             color=(0, 0, 0, 255), r: int = 8, aa: int = 1) -> None:
-        # SDL2
-        #     SDL_RenderDrawLine
-        #     SDL_RenderDrawPoint
-        # SDL3 (float)
-        #     SDL_RenderLine
-        #     SDL_RenderPoint
-        #     SDL_RenderLines
-        #     SDL_RenderPoints
+        """..."""
+        if self.__visual_level >= 1:
+            self.__rounded_rect_antialiasing(x, y, w, h, color, r)
+        else:
+            self.__rounded_rect(x, y, w, h, color, r)
+    
+    def text(self, x: int, y: int, text: FontRender) -> None:
+        """..."""
+        surface = sdl3.SDL_CreateSurfaceFrom(
+            text.width, text.height, sdl3.SDL_PIXELFORMAT_RGBA32,
+            text._bytes, text.width * 4)
+        
+        texture = sdl3.SDL_CreateTextureFromSurface(self.__renderer, surface)
+        sdl3.SDL_DestroySurface(surface)
 
-        x = int(x)
-        w = int(w)
-        h = int(h)
-        r = int(r)
+        dst = sdl3.SDL_FRect(x, y, text.width, text.height)
+        sdl3.SDL_RenderTexture(self.__renderer, texture, None, dst)
+
+    def __rounded_rect_antialiasing(
+            self, x: int, y: int, w: int, h: int,
+            color=(0, 0, 0, 255), r: int = 8, aa: int = 1) -> None:
+
+        w, h = int(w), int(h)
         # r = min(r, (w - 1)//2, (h - 1)//2)
         # if (w - 2*r) % 2 != 0: w -= 1
 
-        renderer = self.__renderer
         cr, cg, cb, ca = color
-
         r = min(r, w // 2, h // 2)
-
-        sdl3.SDL_SetRenderDrawColor(renderer, cr, cg, cb, ca)
+        sdl3.SDL_SetRenderDrawColor(self.__renderer, cr, cg, cb, ca)
 
         # Body
         sdl3.SDL_RenderFillRect(
-            renderer,
-            sdl3.SDL_FRect(x + r, y, w - 2*r, h)
-        )
+            self.__renderer, sdl3.SDL_FRect(x + r, y, w - 2*r, h))
+
         sdl3.SDL_RenderFillRect(
-            renderer,
-            sdl3.SDL_FRect(x, y + r, w, h - 2*r)
-        )
+            self.__renderer,sdl3.SDL_FRect(x, y + r, w, h - 2*r))
 
         # Center
         corners = [
             (x + r,         y + r,         -1, -1),  # TL
             (x + w - r - 1, y + r,          1, -1),  # TR
             (x + r,         y + h - r - 1, -1,  1),  # BL
-            (x + w - r - 1, y + h - r - 1,  1,  1),  # BR
-        ]
+            (x + w - r - 1, y + h - r - 1,  1,  1)]  # BR
 
         # Circle (1/4 fill)
         for cx, cy, sx, sy in corners:
@@ -78,15 +83,11 @@ class Drawer(object):
                     if dx*dx + dy*dy <= r*r:
                         px = cx + dx * sx
                         py = cy + dy * sy
-                        sdl3.SDL_RenderPoint(renderer, px, py)
-
+                        sdl3.SDL_RenderPoint(self.__renderer, px, py)
         # AA
         if aa > 0:
-
             sdl3.SDL_SetRenderDrawBlendMode(
-                renderer,
-                sdl3.SDL_BLENDMODE_BLEND
-            )
+                self.__renderer, sdl3.SDL_BLENDMODE_BLEND)
 
             for cx, cy, sx, sy in corners:
                 for dy in range(0, r+aa+1):
@@ -103,22 +104,27 @@ class Drawer(object):
 
                             if alpha > 0:
                                 sdl3.SDL_SetRenderDrawColor(
-                                    renderer, cr, cg, cb, alpha
-                                )
+                                    self.__renderer, cr, cg, cb, alpha)
                                 px = cx + dx * sx
                                 py = cy + dy * sy
-                                sdl3.SDL_RenderPoint(renderer, px, py)
+                                sdl3.SDL_RenderPoint(self.__renderer, px, py)
 
             sdl3.SDL_SetRenderDrawBlendMode(
-                renderer,
-                sdl3.SDL_BLENDMODE_NONE
-            )
+                self.__renderer, sdl3.SDL_BLENDMODE_NONE)
+        # SDL2
+        #     SDL_RenderDrawLine
+        #     SDL_RenderDrawPoint
+        # SDL3 (float)
+        #     SDL_RenderLine
+        #     SDL_RenderPoint
+        #     SDL_RenderLines
+        #     SDL_RenderPoints
 
-    def base_rect(
+    def __rounded_rect(
             self, x, y, w, h, color, r: int = 0,
             top_left: int = None, top_right: int = None,
             bottom_right: int = None, bottom_left: int = None):
-        """..."""
+
         tl = tr = br = bl = r
         rmax = min(w // 2, h // 2)
         tl = min(tl, rmax)
@@ -157,14 +163,3 @@ class Drawer(object):
             dx = int((r*r - dy*dy) ** 0.5)
             sdl3.SDL_RenderLine(
                 self.__renderer, cx - dx, cy + dy, cx + dx, cy + dy)
-
-    def text(self, x: int, y: int, text: FontRender) -> None:
-        surface = sdl3.SDL_CreateSurfaceFrom(
-            text.width, text.height, sdl3.SDL_PIXELFORMAT_RGBA32,
-            text._bytes, text.width * 4)
-        
-        texture = sdl3.SDL_CreateTextureFromSurface(self.__renderer, surface)
-        sdl3.SDL_DestroySurface(surface)
-
-        dst = sdl3.SDL_FRect(x, y, text.width, text.height)
-        sdl3.SDL_RenderTexture(self.__renderer, texture, None, dst)
