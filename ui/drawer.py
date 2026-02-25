@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-from ctypes import c_void_p, cast, byref
 import io
 import math
 
 # python3 -m pip install --upgrade Pillow
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont, ImageFilter, ImageEnhance, ImageDraw2
+import pyscreenshot as ImageGrab
+
 import sdl3
 
 
@@ -163,3 +164,38 @@ class Drawer(object):
             dx = int((r*r - dy*dy) ** 0.5)
             sdl3.SDL_RenderLine(
                 self.__renderer, cx - dx, cy + dy, cx + dx, cy + dy)
+    
+    def screen_texture(self, x, y, w, h, r) -> None:
+        im = ImageGrab.grab(bbox=(int(x), int(y), w+(w//3), h+(h//3)))
+        im.save('partial_screenshot.png')
+        blurred = im.filter(ImageFilter.GaussianBlur(radius=6))
+
+        mask = Image.new("L", blurred.size, 0)
+        draw = ImageDraw.Draw(mask)
+        draw.rounded_rectangle(
+            (0, 0, blurred.width, blurred.height), radius=r, fill=255)
+
+        # aplica como alpha
+        blurred.putalpha(mask)
+
+        # small = im.resize(
+        #     (im.width // 2, im.height // 2), resample=Image.BILINEAR)
+        # blurred = small.resize((im.width, im.height), resample=Image.BILINEAR)
+
+        # enhancer = ImageEnhance.Color(blurred)
+        # blurred = enhancer.enhance(0.8)
+
+        data = blurred.tobytes() # SDL_PIXELFORMAT_RGBA8888 370546692 SDL_PIXELFORMAT_BGRA8888
+
+        texture = sdl3.SDL_CreateTexture(
+            self.__renderer,
+            sdl3.SDL_PIXELFORMAT_ARGB8888, sdl3.SDL_TEXTUREACCESS_STATIC,
+            blurred.width, blurred.height)
+
+        sdl3.SDL_UpdateTexture(texture, None, data, blurred.width * 4)
+
+        sdl3.SDL_SetTextureBlendMode(texture, sdl3.SDL_BLENDMODE_BLEND)
+        sdl3.SDL_RenderTexture(self.__renderer, texture, None, None)
+
+        return texture
+

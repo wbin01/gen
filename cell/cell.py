@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 import copy
+import ctypes
+
+import sdl3
 
 from ..flag import Fill
 from ..mixin import Margin, Pos, Size
@@ -15,18 +18,14 @@ class Cell(Margin, Pos, Size, UI):
         self.__fill = Fill.X
         self.__style_class = style_class
 
-        theme = getattr(Theme, self.__class__.__name__.lower())  # Theme.button
+        theme = getattr(Theme, self.__class__.__name__.lower())
         if self.__style_class:
             if self.__style_class not in Theme.classes:
                 Theme.classes[self.__style_class] = copy.deepcopy(theme)
             self.__style = Theme.classes[self.__style_class]
         else:
-            self.__style = theme # Theme.button
-        
-        self.texture_base = None
-        self.texture_hover = None
-        self.needs_rebuild = True
-    
+            self.__style = theme
+
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}()'
 
@@ -58,6 +57,3 @@ class Cell(Margin, Pos, Size, UI):
             return self
         
         return None
-
-    def __draw(self) -> None:
-        pass

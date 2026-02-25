@@ -6,7 +6,7 @@ class Theme:
     frame = {
         'NORMAL': {
             'text': (200, 200, 200, 255),
-            'background': (20, 20, 20, 230),
+            'background': (20, 20, 20, 200),
             'border': (55, 55, 55, 200),
             'radius': 8,
             'font': 'DejaVuSans.ttf',

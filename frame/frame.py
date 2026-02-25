@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-
 import sys
 from ctypes import c_float, c_int
 
@@ -77,7 +76,7 @@ class Frame(UI):
         self.__render_update_mode = 'ALL'
         self.__render_needs_updating = True
         self.__render_count = 0
-        
+        self.__screen_texture = None
         self.__frame_texture = None
         # self.__draw()
 
@@ -181,6 +180,13 @@ class Frame(UI):
         
     def run(self) -> int:
         if self.cached:
+            wx = c_int()
+            wy = c_int()
+            sdl3.SDL_GetWindowPosition(self.__frame, wx, wy)
+            self.__screen_texture = self.__drawer.screen_texture(
+                wx.value, wy.value, self.width, self.height,
+                self.__style.frame['NORMAL']['radius'])
+        
             self.__frame_texture = self.__create_texture()
         else:
             self.__draw()
@@ -444,7 +450,7 @@ class Frame(UI):
         sdl3.SDL_GetWindowSize(self.__frame, self.__start_w, self.__start_h)
     
     def __render(self) -> None:
-        print('render')
+        # print('render')
         self.__render_needs_updating = False
         self.__render_count += 1
 
@@ -473,7 +479,7 @@ class Frame(UI):
         sdl3.SDL_Delay(10)
     
     def __fast_render(self) -> None:
-        print('fast render')
+        # print('fast render')
         self.__render_needs_updating = False
         self.__render_count += 1
 
@@ -491,20 +497,32 @@ class Frame(UI):
             #         self.__resizing_first = False
                 
                 if not self.__resizing and self.__resizing_end:
+                    self.__container._Layout__invalidate()
+                    
+                    # self.__screen_texture = self.__drawer.screen_texture(
+                    #     (self.x, self.y, self.width, self.height))
+                    
                     self.__frame_texture = self.__create_texture()
+                    
                     print('Create texture', self.__render_count)
 
         self.__render_update_mode = 'ALL'
         sdl3.SDL_SetRenderDrawColor(self.__renderer, 0,0,0,0)
         sdl3.SDL_RenderClear(self.__renderer)
         
+        if self.__screen_texture:
+            dst = sdl3.SDL_FRect(0, 0, self.width, self.height)
+            sdl3.SDL_RenderTexture(self.__renderer, self.__screen_texture, None, dst)
+        
         sdl3.SDL_RenderTexture(self.__renderer, self.__frame_texture, None, None)
-        self.__container._Layout__redraw()
+        if not self.__resizing:
+            self.__container._Box__update()
+            self.__container._Layout__redraw()
 
         sdl3.SDL_RenderPresent(self.__renderer)
         sdl3.SDL_Delay(10)
-    
-    def __create_texture(self, full: bool = True):
+
+    def __create_texture(self):
         width = c_int()
         height = c_int()
         sdl3.SDL_GetWindowSize(self.__frame, width, height)
@@ -534,20 +552,10 @@ class Frame(UI):
         # Draw elements
         if self.__container._Add__uis:
             self.__container._Box__update()
-            self.__draw_uis(self.__container)
+            self.__container._Layout__redraw()
 
         sdl3.SDL_SetRenderTarget(self.__renderer, old_target)
-
         return texture
-    
-    def __draw_uis(self, layout) -> None:
-        """..."""
-        for ui in layout._Add__uis:
-            mro = str(type(ui).__mro__)
-            if 'layout.box.Box' in mro:
-                self.__draw_uis(ui)
-                continue
-            getattr(ui, f'_{ui.__class__.__name__}__draw')()
 
 
 if __name__ == "__main__":
