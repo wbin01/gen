@@ -44,7 +44,7 @@ class Button(Cell):
         self.__style = style
 
     def __draw(self):
-        # print(self, self._UI__state.name)
+        print(self, self._UI__state.name)
         state = self._UI__state.name
 
         text = self.__style[state]['text']

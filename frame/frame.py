@@ -74,7 +74,7 @@ class Frame(UI):
 
         # Control Frame
         self.__running = True
-        self.__render_update_hover = False
+        self.__render_update_mode = 'ALL'
         self.__render_needs_updating = True
         self.__render_count = 0
         
@@ -274,10 +274,9 @@ class Frame(UI):
             sdl3.SDL_GetGlobalMouseState(mouse_x, mouse_y)
             resize_area = self.__cursor_resize_area(mouse_x, mouse_y)
 
-            lm_x = c_float()
-            lm_y = c_float()
-            sdl3.SDL_GetMouseState(lm_x, lm_y)
-
+            mx = c_float()
+            my = c_float()
+            sdl3.SDL_GetMouseState(mx, my)
 
             while sdl3.SDL_PollEvent(event):
                 if resize_area.value != self.__last_resize_cursor_on_hover:
@@ -313,14 +312,20 @@ class Frame(UI):
                         self.__frame_start_resize()
                     elif self.__dragging:
                         self.__frame_start_drag()
-                    
-                    hovered = self.__container._Layout__hit_test(lm_x, lm_y)
-                    if hovered and hovered != self.__hovered_ui:
+
+                    if resize_area == ResizeArea.NONE:
+                        hovered = self.__container._Layout__hit_test(mx, my)
+                        if hovered and hovered != self.__hovered_ui:
+                            self.__hovered_ui._UI__set_state('NORMAL')
+                            self.__hovered_ui = hovered
+                            self.__hovered_ui._UI__set_state('HOVER')
+
+                            self.__render_update_mode = 'HOVER'
+                            self.__render_needs_updating = True
+
+                    if resize_area != ResizeArea.NONE:
                         self.__hovered_ui._UI__set_state('NORMAL')
-                        self.__hovered_ui = hovered
-                        self.__hovered_ui._UI__set_state('HOVER')
-                        
-                        self.__render_update_hover = True
+                        self.__render_update_mode = 'HOVER'
                         self.__render_needs_updating = True
                 
                 if self.__logging and self.__log:
@@ -328,7 +333,10 @@ class Frame(UI):
 
             if self.__render_needs_updating:
                 if self.cached:
-                    self.__fast_render()
+                    if self.__resizing:
+                        self.__render()
+                    else:
+                        self.__fast_render()
                 else:
                     self.__render()
                                 
@@ -435,111 +443,12 @@ class Frame(UI):
         self.__start_h = c_int()
         sdl3.SDL_GetWindowSize(self.__frame, self.__start_w, self.__start_h)
     
-    def __fast_render(self) -> None:
-        self.__render_needs_updating = False
-        self.__render_count += 1
-
-        # if not self.__render_update_hover:
-        #     if self.__resizing or self.__resizing_end <= 3:
-        #         if not self.__resizing and not self.__resizing_first:
-        #             if self.__resizing_end > 2:
-        #                 self.__resizing_end -= 1
-        #                 self.__render_needs_updating = True
-                    
-        #             if self.__resizing_end < 2:
-        #                 self.__resizing_end = 3
-                
-        #         if self.__resizing_first:
-        #             self.__resizing_first = False
-
-        #     self.__container._Layout__invalidate()
-        #     self.__container._Box__update()
-            
-        #     self.__frame_texture = self.__create_texture()
-        #     # self.__container._Layout__redraw()
-        #     # print('creating texture...')
-
-        # if self.__render_count <= 1:
-        #     print('creating texture...')
-        #     self.__frame_texture = self.__create_texture()
-
-        # Draw cached
-        # sdl3.SDL_RenderTexture(self.__renderer, self.__frame_texture, None, None)
-        
-        # Draw overlay hover
-        # if self.__render_update_hover:
-        #     if self.__container._Add__uis and self.__container._UI__dirty:
-        #         # self.__container._Box__update()
-        #         sdl3.SDL_RenderTexture(self.__renderer, self.__frame_texture, None, None)
-        #         self.__container._Layout__redraw()
-
-        sdl3.SDL_SetRenderDrawColor(self.__renderer, 0,0,0,0)
-        sdl3.SDL_RenderClear(self.__renderer)
-        
-        sdl3.SDL_RenderTexture(self.__renderer, self.__frame_texture, None, None)
-        self.__container._Layout__redraw()
-
-        sdl3.SDL_RenderPresent(self.__renderer)
-        sdl3.SDL_Delay(10)
-
-    def __create_texture(self):
-        # DRAW BG
-        sdl3.SDL_SetRenderDrawColor(self.__renderer, 0, 0, 0, 0)
-        sdl3.SDL_RenderClear(self.__renderer)
-
-        width = c_int()
-        height = c_int()
-        sdl3.SDL_GetWindowSize(self.__frame, width, height)
-        self.__drawer.rect(
-            x=0, y=0, w=width.value, h=height.value,
-            color=self.__style.frame['NORMAL']['border'], r=8)
-        
-        self.__drawer.rect(
-            x=1, y=1, w=width.value - 2, h=height.value - 2,
-            color=self.__style.frame['NORMAL']['background'], r=8)
-        
-        # CREATE TEXTURE
-        texture = sdl3.SDL_CreateTexture(
-            self.__renderer,
-            sdl3.SDL_PIXELFORMAT_RGBA8888,
-            sdl3.SDL_TEXTUREACCESS_TARGET,
-            width, height)
-        
-        # Salva render target anterior
-        old_target = sdl3.SDL_GetRenderTarget(self.__renderer)
-        
-        # Define texture como alvo
-        sdl3.SDL_SetRenderTarget(self.__renderer, texture)
-        
-        # Limpa com transparência
-        sdl3.SDL_SetRenderDrawColor(self.__renderer, 0,0,0,0)
-        sdl3.SDL_RenderClear(self.__renderer)
-        
-        # Desenha elementos estáticos        
-        if self.__container._Add__uis:
-            self.__container._Box__update()
-            self.__draw_uis(self.__container)
-        
-        # Restaura render target anterior
-        sdl3.SDL_SetRenderTarget(self.__renderer, old_target)
-
-        return texture
-    
-    def __draw_uis(self, layout) -> None:
-        """..."""
-        for ui in layout._Add__uis:
-            mro = str(type(ui).__mro__)
-            if 'layout.box.Box' in mro:
-                self.__draw_uis(ui)
-                continue
-            getattr(ui, f'_{ui.__class__.__name__}__draw')()
-    
     def __render(self) -> None:
         print('render')
         self.__render_needs_updating = False
         self.__render_count += 1
 
-        if not self.__render_update_hover:
+        if self.__render_update_mode == 'All':
             if self.__resizing or self.__resizing_end <= 3:
                 if not self.__resizing and not self.__resizing_first:
                     if self.__resizing_end > 2:
@@ -563,31 +472,82 @@ class Frame(UI):
         sdl3.SDL_RenderPresent(self.__renderer)
         sdl3.SDL_Delay(10)
     
-    # def __render_bkp(self) -> None:
-    #     self.__render_needs_updating = False
-    #     self.__container._Layout__invalidate()
-    #     self.__draw()
-    #     self.__render_count += 1
-        
-    #     if not self.__render_update_hover:
-    #         if self.__resizing or self.__resizing_end <= 3:
-    #             if not self.__resizing and not self.__resizing_first:
-    #                 if self.__resizing_end > 2:
-    #                     self.__resizing_end -= 1
-    #                     self.__render_needs_updating = True
+    def __fast_render(self) -> None:
+        print('fast render')
+        self.__render_needs_updating = False
+        self.__render_count += 1
+
+        if self.__render_update_mode == 'ALL':
+            # if self.__resizing or self.__resizing_end <= 3:
+            #     if not self.__resizing and not self.__resizing_first:
+            #         if self.__resizing_end > 2:
+            #             self.__resizing_end -= 1
+            #             self.__render_needs_updating = True
                     
-    #                 if self.__resizing_end < 2:
-    #                     self.__resizing_end = 3
+            #         if self.__resizing_end < 2:
+            #             self.__resizing_end = 3
                 
-    #             if self.__resizing_first:
-    #                 self.__resizing_first = False
+            #     if self.__resizing_first:
+            #         self.__resizing_first = False
+                
+                if not self.__resizing and self.__resizing_end:
+                    self.__frame_texture = self.__create_texture()
+                    print('Create texture', self.__render_count)
 
-    #     if self.__container._UI__dirty:
-    #         self.__container._Box__update()
-    #         self.__container._Layout__redraw()
+        self.__render_update_mode = 'ALL'
+        sdl3.SDL_SetRenderDrawColor(self.__renderer, 0,0,0,0)
+        sdl3.SDL_RenderClear(self.__renderer)
+        
+        sdl3.SDL_RenderTexture(self.__renderer, self.__frame_texture, None, None)
+        self.__container._Layout__redraw()
 
-    #     sdl3.SDL_RenderPresent(self.__renderer)
-    #     sdl3.SDL_Delay(10)
+        sdl3.SDL_RenderPresent(self.__renderer)
+        sdl3.SDL_Delay(10)
+    
+    def __create_texture(self, full: bool = True):
+        width = c_int()
+        height = c_int()
+        sdl3.SDL_GetWindowSize(self.__frame, width, height)
+
+        texture = sdl3.SDL_CreateTexture(
+            self.__renderer,
+            sdl3.SDL_PIXELFORMAT_RGBA8888,
+            sdl3.SDL_TEXTUREACCESS_TARGET,
+            width.value, height.value)
+
+        old_target = sdl3.SDL_GetRenderTarget(self.__renderer)
+        sdl3.SDL_SetRenderTarget(self.__renderer, texture)
+
+        # Clear texture
+        sdl3.SDL_SetRenderDrawColor(self.__renderer, 0, 0, 0, 0)
+        sdl3.SDL_RenderClear(self.__renderer)
+
+        # Frame background
+        self.__drawer.rect(
+            x=0, y=0, w=width.value, h=height.value,
+            color=self.__style.frame['NORMAL']['border'], r=8)
+
+        self.__drawer.rect(
+            x=1, y=1, w=width.value - 2, h=height.value - 2,
+            color=self.__style.frame['NORMAL']['background'], r=8)
+
+        # Draw elements
+        if self.__container._Add__uis:
+            self.__container._Box__update()
+            self.__draw_uis(self.__container)
+
+        sdl3.SDL_SetRenderTarget(self.__renderer, old_target)
+
+        return texture
+    
+    def __draw_uis(self, layout) -> None:
+        """..."""
+        for ui in layout._Add__uis:
+            mro = str(type(ui).__mro__)
+            if 'layout.box.Box' in mro:
+                self.__draw_uis(ui)
+                continue
+            getattr(ui, f'_{ui.__class__.__name__}__draw')()
 
 
 if __name__ == "__main__":
