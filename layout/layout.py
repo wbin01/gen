@@ -69,7 +69,7 @@ class Layout(UI):
             if isinstance(ui, Layout):
                 if rebuild:
                     ui._Box__debug_color = self.__color(ui == self._Add__uis[-1])
-                    if self._app and self._app._Frame__layout_debug:
+                    if self._app and self._app._Frame__view_layout:
                         ui._Box__draw()
                 ui._Layout__redraw(rebuild)
                 continue
