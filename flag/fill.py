@@ -6,7 +6,7 @@ class Fill(Enum):
     """Fills the empty space in the layout.
         
     Stretches the items in the configured direction: `Fill.X`, `Fill.Y`, 
-    `Fill.ALL`, `Fill.NONE`.
+    `Fill.XY`, `Fill.NONE`.
                 
     `Fill` takes precedence over the `width` and `height` properties, so the 
     `width` property does not work together with `Fill.X` and the `height` 
@@ -14,7 +14,7 @@ class Fill(Enum):
     """
     X = 'X'
     Y = 'Y'
-    ALL = 'ALL'
+    XY = 'XY'
     NONE = 'NONE'
 
     def __repr__(self) -> str:

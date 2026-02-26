@@ -9,7 +9,7 @@ class Box(Margin, Pos, Size, Add, Layout):
     """Organizes the positioning of the elements."""
     def __init__(
             self,
-            spacing: int = 0, margin: tuple | int = 0, fill: Fill = Fill.ALL,
+            spacing: int = 0, margin: tuple | int = 0, fill: Fill = Fill.XY,
             align: Align = Align.START, base_align: Align = Align.CENTER,
             width: int = None, height: int = None,
             *args, **kwargs) -> None:
@@ -26,7 +26,7 @@ class Box(Margin, Pos, Size, Add, Layout):
             
             fill: An `Enum` of type `Fill`. Fills the empty space in the 
                 layout and stretches the items in the configured direction 
-                (`Fill.X`, `Fill.Y`, `Fill.ALL`, `Fill.NONE`).
+                (`Fill.X`, `Fill.Y`, `Fill.XY`, `Fill.NONE`).
                 
                 `Fill` takes precedence over the `width` and `height` 
                 properties, so the `width` property does not work together 
@@ -99,7 +99,7 @@ class Box(Margin, Pos, Size, Add, Layout):
         """An `Enum` of type `Fill`.
         
         Fills the empty space in the layout and stretches the items in the 
-        configured direction (`Fill.X`, `Fill.Y`, `Fill.ALL`, `Fill.NONE`).
+        configured direction (`Fill.X`, `Fill.Y`, `Fill.XY`, `Fill.NONE`).
         
         `Fill` takes precedence over the `width` and `height` properties, so 
         the `width` property does not work together with `Fill.X` and the 
@@ -128,6 +128,9 @@ class Box(Margin, Pos, Size, Add, Layout):
         if self._UI__dirty == 'HOVER':
             return
         
+        if not self._Add__uis:
+            return
+        
         # print(self._UI__dirty)
         
         if self._Box__first:
@@ -154,13 +157,16 @@ class Box(Margin, Pos, Size, Add, Layout):
     def __update_size(self, layout: Box) -> None:
         # Make sure the layout size are compatible with the number 
         # of stacked cells.
+        if not layout._Add__uis:
+            return
+        
         layout._Size__width = layout._Size__base_width
-        if layout.fill in (Fill.X, Fill.ALL):
+        if layout.fill in (Fill.X, Fill.XY):
             layout._Size__width = 0
             layout._Size__base_width = 0
             
         layout._Size__height = layout._Size__base_height
-        if layout.fill in (Fill.Y, Fill.ALL):
+        if layout.fill in (Fill.Y, Fill.XY):
             layout._Size__height = 0
             layout._Size__base_height = 0
         
@@ -173,13 +179,13 @@ class Box(Margin, Pos, Size, Add, Layout):
                 self.__update_size(ui)
 
             if layout._Box__orientation == 'VERTICAL':  # Set width height
-                if layout.fill in (Fill.X, Fill.ALL):
+                if layout.fill in (Fill.X, Fill.XY):
                     w = ui._Size__width + ui._Margin__margin_x
                     if w > layout.width:
                         layout._Size__width = w
                         layout._Size__base_width = w
 
-                if layout.fill in (Fill.Y, Fill.ALL):
+                if layout.fill in (Fill.Y, Fill.XY):
                     h = ui._Size__base_height + ui._Margin__margin_y
                     if num != last: h += layout.spacing
                     layout._Size__height += h
@@ -193,13 +199,13 @@ class Box(Margin, Pos, Size, Add, Layout):
                     #     self.__min_height = layout._Size__base_height
 
             elif layout._Box__orientation == 'HORIZONTAL':
-                if layout.fill in (Fill.X, Fill.ALL):
+                if layout.fill in (Fill.X, Fill.XY):
                     w = ui._Size__base_width + ui._Margin__margin_x
                     if num != last: w += layout.spacing
                     layout._Size__width += w
                     layout._Size__base_width += w
                 
-                if layout.fill in (Fill.Y, Fill.ALL):
+                if layout.fill in (Fill.Y, Fill.XY):
                     h = ui._Size__height + ui._Margin__margin_y
                     if h > layout.height:
                         layout._Size__height = h
@@ -214,6 +220,9 @@ class Box(Margin, Pos, Size, Add, Layout):
 
     def __update_fill(self, layout: Box) -> None:
         # Updates the fill of layouts and cells.
+        if not layout._Add__uis:
+            return
+        
         if layout._Box__first:
             layout._Size__width = layout._parent.width
             layout._Size__height = layout._parent.height
@@ -227,7 +236,7 @@ class Box(Margin, Pos, Size, Add, Layout):
                 if not ui.visible: continue
                 if not ui._UI__dirty: continue
 
-                if ui.fill in (Fill.X, Fill.ALL):
+                if ui.fill in (Fill.X, Fill.XY):
                     ui._Size__width = total_width - ui._Margin__margin_x
                 
                 if isinstance(ui, Layout):
@@ -249,7 +258,7 @@ class Box(Margin, Pos, Size, Add, Layout):
                 if isinstance(ui, Cell) and not ui.visible: continue
 
                 if hasattr(ui, 'fill'):  # Collects cells that expand
-                    if ui.fill in (Fill.Y, Fill.ALL): vertical.append(ui)
+                    if ui.fill in (Fill.Y, Fill.XY): vertical.append(ui)
                 
                 height += ui.height + ui._Margin__margin_y  # Save height
                 if num != last: height += layout.spacing
@@ -270,7 +279,7 @@ class Box(Margin, Pos, Size, Add, Layout):
             for ui in layout._Add__uis:
                 if isinstance(ui, Cell) and not ui.visible: continue
 
-                if ui.fill in (Fill.Y, Fill.ALL):
+                if ui.fill in (Fill.Y, Fill.XY):
                     ui._Size__height = total_height - ui._Margin__margin_y
                 
                 # if isinstance(ui, Layout):
@@ -292,7 +301,7 @@ class Box(Margin, Pos, Size, Add, Layout):
                 if isinstance(ui, Cell) and not ui.visible: continue
                 
                 if hasattr(ui, 'fill'):
-                    if ui.fill in (Fill.X, Fill.ALL): horizontal.append(ui)
+                    if ui.fill in (Fill.X, Fill.XY): horizontal.append(ui)
                 
                 width += ui.width + ui._Margin__margin_x
                 if num != last: width += layout.spacing
@@ -313,6 +322,9 @@ class Box(Margin, Pos, Size, Add, Layout):
                 self.__update_fill(ui)
     
     def __update_align(self, layout: Box) -> None:
+        if not layout._Add__uis:
+            return
+        
         if layout._Box__orientation == 'VERTICAL':
             if layout.align == Align.START:
                 if isinstance(layout._Add__uis[0], ColExpander):

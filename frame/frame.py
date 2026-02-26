@@ -377,6 +377,7 @@ class Frame(UI):
             color=self.__style.frame['NORMAL']['background'], r=8)
 
         if self.__container._Add__uis:
+            self.__container._Layout__invalidate()
             self.__container._Box__update()
             self.__container._Layout__redraw(rebuild=True)
 
@@ -385,7 +386,6 @@ class Frame(UI):
     
     def __frame_rebuild_background(self) -> None:
         if not self.__resizing and self.__resizing_end:
-            self.__container._Layout__invalidate()
             self.__frame_build_background()
 
     def __frame_rebuild_texture(self) -> None:

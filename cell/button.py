@@ -25,14 +25,70 @@ class Button(Cell):
         self.height = height
         self.__elided = elided
 
+        self.__texture_normal = None
+        self.__texture_hover = None
+
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}(text="{self.__text}")'
     
     def __str__(self) -> str:
         return f'{self.__class__.__name__}("{self.__text}")'
 
-    def __draw(self):
-        state = self._UI__state.name
+    def __draw(self, rebuild: bool = False):
+        if rebuild:
+            self.__texture_normal = self._Cell__drawer.build_texture(
+                int(self.width), int(self.height), self.__render, 'NORMAL')
+            
+            self.__texture_hover = self._Cell__drawer.build_texture(
+                int(self.width), int(self.height), self.__render, 'HOVER')          
+        
+        if self._UI__state.name == 'HOVER':
+            self._Cell__drawer.set_texture(
+                self.__texture_hover,
+                int(self._x), int(self._y), int(self.width), int(self.height))
+        else:
+            self._Cell__drawer.set_texture(
+                self.__texture_normal,
+                int(self._x), int(self._y), int(self.width), int(self.height))
+    
+    def __render(self, state: str = 'NORMAL'):
+        # state = self._UI__state.name
+
+        text = self.style[state]['text']
+        background = self.style[state]['background']
+        border = self.style[state]['border']
+
+        state = 'NORMAL'
+        
+        radius = self.style[state]['radius']
+        font = self.style[state]['font']
+        font_size = self.style[state]['font-size']
+        pad = self.style[state]['padding'] * 2
+
+        x = y = 0
+
+        if self.__text:
+            text = FontRender(
+                self.__text, text, font, font_size,
+                self.width if self.__elided else None, pad)
+            if self.width < text.width + pad: self.width = text.width + pad
+            if self.height < text.height + pad: self.height = text.height + pad
+
+            tx = x + (self.width // 2) - (text.width // 2)
+            ty = y + (self.height // 2) - (text.height // 2)
+
+        self._Cell__drawer.rect(
+            x, y, self.width, self.height, border, radius)
+
+        self._Cell__drawer.rect(
+            x + 1, y + 1, self.width - 2,self.height - 2,
+            background, radius - 1)
+
+        if self.__text:
+            self._Cell__drawer.text(tx, ty, text)
+
+    def __renderxxx(self, state: str = 'NORMAL'):
+        # state = self._UI__state.name
 
         text = self.style[state]['text']
         background = self.style[state]['background']

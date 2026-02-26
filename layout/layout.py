@@ -59,6 +59,9 @@ class Layout(UI):
 
     def __redraw(self, rebuild: bool = False) -> None:
         """..."""
+        if not self._Add__uis:
+            return
+        
         for ui in self._Add__uis:
             if not ui.visible: continue
             if not ui._UI__dirty:
@@ -74,7 +77,7 @@ class Layout(UI):
                 ui._Layout__redraw(rebuild)
                 continue
 
-            getattr(ui, f'_{ui.__class__.__name__}__draw')()
+            getattr(ui, f'_{ui.__class__.__name__}__draw')(rebuild)
             ui._UI__dirty = False
 
         self._UI__dirty = False
