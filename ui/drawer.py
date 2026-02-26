@@ -177,7 +177,7 @@ class Drawer(object):
 
         im = ImageGrab.grab(bbox=(int(x), int(y), w+(w//3), h+(h//3)))
         # im.save('screen.png')
-        blurred = im.filter(ImageFilter.GaussianBlur(radius=6))
+        blurred = im.filter(ImageFilter.GaussianBlur(radius=8))
 
         mask = Image.new("L", blurred.size, 0)
         draw = ImageDraw.Draw(mask)

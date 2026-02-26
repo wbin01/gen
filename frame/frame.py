@@ -27,6 +27,7 @@ class Frame(UI):
         self.__height = height
         self.__logging = False
         self.__log = None
+        self.__use_screen_texture = False
         self.cached = True
 
         sdl3.SDL_SetHint(
@@ -78,14 +79,12 @@ class Frame(UI):
         self.__render_count = 0
         self.__screen_texture = None
         self.__frame_texture = None
-        # self.__draw()
 
         # Control Frame - Drag
         self.__dragging = False
         self.__dragging_count = 0
         self.__drag_offset_x = 0
         self.__drag_offset_y = 0
-        self.__use_screen_texture = False
 
         # Control Frame - resize
         self.__resizing = False
@@ -416,7 +415,7 @@ class Frame(UI):
     
     def __frame_stop_drag(self) -> None:
         if self.__use_screen_texture:
-            self.__rebuild_screen_texture()
+            # self.__rebuild_screen_texture()
             self.__render_needs_updating = True
             self.__update_frame_texture('ALL')
             self.__dragging_count = 0
@@ -509,7 +508,7 @@ class Frame(UI):
 
         self.__render_update_mode = 'ALL'
         self.__update_frame_texture()
-    
+
     def __rebuild_screen_texture(self) -> None:
         self.__container._Layout__invalidate()
         wx = c_int()
@@ -573,7 +572,7 @@ class Frame(UI):
         # Draw elements
         if self.__container._Add__uis:
             self.__container._Box__update()
-            self.__container._Layout__redraw()
+            self.__container._Layout__redraw(rebuild=True)
 
         sdl3.SDL_SetRenderTarget(self.__renderer, old_target)
         return texture

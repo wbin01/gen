@@ -15,7 +15,7 @@ class Layout(UI):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.__drawer = None
-        self.__reg_instances()
+        self.__first_redraw = True
     
     def __update(self) -> None:
         pass
@@ -41,7 +41,7 @@ class Layout(UI):
                 if hit_ui: return hit_ui
                 continue
 
-            if isinstance(ui, Cell):
+            if isinstance(ui, Cell):  # or isinstance(ui, Layout):
                 hit_ui = ui._Cell__hit_test(x, y)
                 if hit_ui:
                     return hit_ui
@@ -56,7 +56,7 @@ class Layout(UI):
                 continue
             ui._UI__dirty = True
 
-    def __redraw(self) -> None:
+    def __redraw(self, rebuild: bool = False) -> None:
         """..."""
         for ui in self._Add__uis:
             if not ui.visible: continue
@@ -66,9 +66,10 @@ class Layout(UI):
             # mro = str(type(ui).__mro__)
             # if 'layout.box.Box' in mro:
             if isinstance(ui, Layout):
-                # ui._Box__debug_color = self.__color(ui == self._Add__uis[-1])
-                # if self._app and self._app._Frame__debug: ui._Box__draw()
-                ui._Layout__redraw()
+                if rebuild:
+                    ui._Box__debug_color = self.__color(ui == self._Add__uis[-1])
+                    if self._app and self._app._Frame__debug: ui._Box__draw()
+                ui._Layout__redraw(rebuild)
                 continue
 
             getattr(ui, f'_{ui.__class__.__name__}__draw')()
