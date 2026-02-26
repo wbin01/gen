@@ -80,10 +80,12 @@ class Frame(UI):
         self.__frame_texture = None
         # self.__draw()
 
-        # Control Frame - Drag 
+        # Control Frame - Drag
         self.__dragging = False
+        self.__dragging_count = 0
         self.__drag_offset_x = 0
         self.__drag_offset_y = 0
+        self.__use_screen_texture = False
 
         # Control Frame - resize
         self.__resizing = False
@@ -180,12 +182,13 @@ class Frame(UI):
         
     def run(self) -> int:
         if self.cached:
-            wx = c_int()
-            wy = c_int()
-            sdl3.SDL_GetWindowPosition(self.__frame, wx, wy)
-            self.__screen_texture = self.__drawer.screen_texture(
-                wx.value, wy.value, self.width, self.height,
-                self.__style.frame['NORMAL']['radius'])
+            if self.__use_screen_texture:
+                wx = c_int()
+                wy = c_int()
+                sdl3.SDL_GetWindowPosition(self.__frame, wx, wy)
+                self.__screen_texture = self.__drawer.screen_texture(
+                    wx.value, wy.value, self.width, self.height,
+                    self.__style.frame['NORMAL']['radius'])
         
             self.__frame_texture = self.__create_texture()
         else:
@@ -340,7 +343,7 @@ class Frame(UI):
             if self.__render_needs_updating:
                 if self.cached:
                     if self.__resizing:
-                        self.__render()
+                        self.__fast_render()
                     else:
                         self.__fast_render()
                 else:
@@ -349,6 +352,10 @@ class Frame(UI):
                 self.__render_count += 1
     
     def __frame_start_drag(self) -> None:
+        if self.__use_screen_texture and self.__dragging_count == 0:
+            self.__update_frame_texture('FRAME')
+            self.__dragging_count += 1
+        
         if hasattr(sdl3, 'SDL_StartWindowMove'):
             sdl3.SDL_StartWindowMove(self.__frame)
         else:
@@ -408,6 +415,12 @@ class Frame(UI):
         self.__log = f'RESIZING: {w}x{h}'
     
     def __frame_stop_drag(self) -> None:
+        if self.__use_screen_texture:
+            self.__rebuild_screen_texture()
+            self.__render_needs_updating = True
+            self.__update_frame_texture('ALL')
+            self.__dragging_count = 0
+        
         self.__dragging = False
         self.__cursor_update_shape('NONE')
         self.__log = None
@@ -450,7 +463,6 @@ class Frame(UI):
         sdl3.SDL_GetWindowSize(self.__frame, self.__start_w, self.__start_h)
     
     def __render(self) -> None:
-        # print('render')
         self.__render_needs_updating = False
         self.__render_count += 1
 
@@ -467,7 +479,6 @@ class Frame(UI):
                 if self.__resizing_first:
                     self.__resizing_first = False
         
-        
         self.__container._Layout__invalidate()
         self.__draw()
 
@@ -479,43 +490,53 @@ class Frame(UI):
         sdl3.SDL_Delay(10)
     
     def __fast_render(self) -> None:
-        # print('fast render')
         self.__render_needs_updating = False
         self.__render_count += 1
 
         if self.__render_update_mode == 'ALL':
-            # if self.__resizing or self.__resizing_end <= 3:
-            #     if not self.__resizing and not self.__resizing_first:
-            #         if self.__resizing_end > 2:
-            #             self.__resizing_end -= 1
-            #             self.__render_needs_updating = True
+            if self.__resizing or self.__resizing_end <= 3:
+                if not self.__resizing and not self.__resizing_first:
+                    if self.__resizing_end > 2:
+                        self.__resizing_end -= 1
+                        self.__render_needs_updating = True
                     
-            #         if self.__resizing_end < 2:
-            #             self.__resizing_end = 3
+                    if self.__resizing_end < 2:
+                        self.__resizing_end = 3
                 
-            #     if self.__resizing_first:
-            #         self.__resizing_first = False
-                
-                if not self.__resizing and self.__resizing_end:
-                    self.__container._Layout__invalidate()
-                    
-                    # self.__screen_texture = self.__drawer.screen_texture(
-                    #     (self.x, self.y, self.width, self.height))
-                    
-                    self.__frame_texture = self.__create_texture()
-                    
-                    print('Create texture', self.__render_count)
+                if self.__resizing_first:
+                    self.__resizing_first = False
+                self.__rebuild_frame_texture()
 
         self.__render_update_mode = 'ALL'
+        self.__update_frame_texture()
+    
+    def __rebuild_screen_texture(self) -> None:
+        self.__container._Layout__invalidate()
+        wx = c_int()
+        wy = c_int()
+        sdl3.SDL_GetWindowPosition(self.__frame, wx, wy)
+        self.__screen_texture = self.__drawer.screen_texture(
+            wx.value, wy.value, self.width, self.height,
+            self.__style.frame['NORMAL']['radius'])
+    
+    def __rebuild_frame_texture(self) -> None:
+        if not self.__resizing and self.__resizing_end:
+            self.__container._Layout__invalidate()
+            self.__frame_texture = self.__create_texture()
+    
+    def __update_frame_texture(self, mode: str = 'ALL') -> None:
         sdl3.SDL_SetRenderDrawColor(self.__renderer, 0,0,0,0)
         sdl3.SDL_RenderClear(self.__renderer)
         
-        if self.__screen_texture:
-            dst = sdl3.SDL_FRect(0, 0, self.width, self.height)
-            sdl3.SDL_RenderTexture(self.__renderer, self.__screen_texture, None, dst)
+        if mode == 'ALL' and self.__use_screen_texture:
+            if self.__screen_texture and self.__dragging_count == 0:
+                dst = sdl3.SDL_FRect(0, 0, self.width, self.height)
+                sdl3.SDL_RenderTexture(
+                    self.__renderer, self.__screen_texture, None, dst)
         
         sdl3.SDL_RenderTexture(self.__renderer, self.__frame_texture, None, None)
-        if not self.__resizing:
+
+        if mode == 'ALL' and not self.__resizing:
             self.__container._Box__update()
             self.__container._Layout__redraw()
 

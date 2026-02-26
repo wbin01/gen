@@ -166,6 +166,15 @@ class Drawer(object):
                 self.__renderer, cx - dx, cy + dy, cx + dx, cy + dy)
     
     def screen_texture(self, x, y, w, h, r) -> None:
+        # import mss
+        # import mss.tools
+        #
+        # with mss.mss() as sct:
+        #     monitor = sct.monitors[1]
+        #     im = sct.grab(monitor)
+        #     mss.tools.to_png(im.rgb, im.size, output='screenshot_mss.png')
+
+
         im = ImageGrab.grab(bbox=(int(x), int(y), w+(w//3), h+(h//3)))
         # im.save('screen.png')
         blurred = im.filter(ImageFilter.GaussianBlur(radius=6))
