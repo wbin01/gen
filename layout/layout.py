@@ -5,10 +5,11 @@ from ..ui import UI
 
 class Layout(UI):
     """Organizes the positioning of the elements."""
+    __alpha = 240
     __debug_colors = (
-        (93, 93, 62, 255),   (58, 78, 59, 255),   (52, 51, 63, 255),
-        (88, 78, 84, 255),   (68, 47, 58, 255),   (99, 61, 61, 255),
-        (119, 139, 80, 255), (92, 114, 113, 255), (67, 67, 67, 255))
+        (93, 93, 62, __alpha),  (58, 78, 59, __alpha),   (52, 51, 63, __alpha),
+        (88, 78, 84, __alpha),  (68, 47, 58, __alpha),   (99, 61, 61, __alpha),
+        (119, 139,80, __alpha), (92, 114, 113, __alpha), (67, 67, 67, __alpha))
     __debug_color_index = 0
     __instances = 0
 
@@ -68,7 +69,8 @@ class Layout(UI):
             if isinstance(ui, Layout):
                 if rebuild:
                     ui._Box__debug_color = self.__color(ui == self._Add__uis[-1])
-                    if self._app and self._app._Frame__debug: ui._Box__draw()
+                    if self._app and self._app._Frame__layout_debug:
+                        ui._Box__draw()
                 ui._Layout__redraw(rebuild)
                 continue
 

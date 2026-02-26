@@ -27,8 +27,10 @@ class Frame(UI):
         self.__height = height
         self.__logging = False
         self.__log = None
-        self.__use_screen_texture = False
-        self.cached = True
+        self.__layout_debug = False
+        self.cached_rendering = True
+        self.texture = False
+        if self.__layout_debug: self.texture = False
 
         sdl3.SDL_SetHint(
             sdl3.SDL_HINT_X11_WINDOW_TYPE, b'_NET_WM_WINDOW_TYPE_NORMAL')
@@ -70,11 +72,10 @@ class Frame(UI):
         self.__container._UI__parent = self
         self.__container._UI__app = self
         self.__container._Box__drawer = self.__drawer
-        self.__debug = False
 
         # Control Frame
         self.__running = True
-        self.__render_update_mode = 'ALL'
+        self.__render_update_mode = 'RESIZE'
         self.__render_needs_updating = True
         self.__render_count = 0
         self.__screen_texture = None
@@ -116,13 +117,13 @@ class Frame(UI):
         return self.__class__.__name__
     
     @property
-    def debug(self) -> bool:
+    def layout_debug(self) -> bool:
         """..."""
-        return self.__debug
+        return self.__layout_debug
     
-    @debug.setter
-    def debug(self, debug: bool) -> None:
-        self.__debug = debug
+    @layout_debug.setter
+    def layout_debug(self, layout_debug: bool) -> None:
+        self.__layout_debug = layout_debug
     
     @property
     def height(self) -> int:
@@ -180,8 +181,8 @@ class Frame(UI):
         return self.__container.add(cell)
         
     def run(self) -> int:
-        if self.cached:
-            if self.__use_screen_texture:
+        if self.cached_rendering:
+            if self.texture:
                 wx = c_int()
                 wy = c_int()
                 sdl3.SDL_GetWindowPosition(self.__frame, wx, wy)
@@ -189,7 +190,7 @@ class Frame(UI):
                     wx.value, wy.value, self.width, self.height,
                     self.__style.frame['NORMAL']['radius'])
         
-            self.__frame_texture = self.__create_texture()
+            self.__frame_texture = self.__frame_build_background()
         else:
             self.__draw()
         
@@ -340,19 +341,65 @@ class Frame(UI):
                     print(self.__log, self.__render_count)
 
             if self.__render_needs_updating:
-                if self.cached:
+                if self.cached_rendering:
                     if self.__resizing:
-                        self.__fast_render()
+                        self.__render_fast()
                     else:
-                        self.__fast_render()
+                        self.__render_fast()
                 else:
-                    self.__render()
+                    self.__render_base()
                                 
                 self.__render_count += 1
     
+    def __frame_build_background(self):
+        width = c_int()
+        height = c_int()
+        sdl3.SDL_GetWindowSize(self.__frame, width, height)
+
+        texture = sdl3.SDL_CreateTexture(
+            self.__renderer,
+            sdl3.SDL_PIXELFORMAT_RGBA8888,
+            sdl3.SDL_TEXTUREACCESS_TARGET,
+            width.value, height.value)
+
+        old_target = sdl3.SDL_GetRenderTarget(self.__renderer)
+        sdl3.SDL_SetRenderTarget(self.__renderer, texture)
+
+        sdl3.SDL_SetRenderDrawColor(self.__renderer, 0, 0, 0, 0)
+        sdl3.SDL_RenderClear(self.__renderer)
+
+        self.__drawer.rect(
+            x=0, y=0, w=width.value, h=height.value,
+            color=self.__style.frame['NORMAL']['border'], r=8)
+
+        self.__drawer.rect(
+            x=1, y=1, w=width.value - 2, h=height.value - 2,
+            color=self.__style.frame['NORMAL']['background'], r=8)
+
+        if self.__container._Add__uis:
+            self.__container._Box__update()
+            self.__container._Layout__redraw(rebuild=True)
+
+        sdl3.SDL_SetRenderTarget(self.__renderer, old_target)
+        return texture
+    
+    def __frame_rebuild_background(self) -> None:
+        if not self.__resizing and self.__resizing_end:
+            self.__container._Layout__invalidate()
+            self.__frame_texture = self.__frame_build_background()
+
+    def __frame_rebuild_texture(self) -> None:
+        self.__container._Layout__invalidate()
+        wx = c_int()
+        wy = c_int()
+        sdl3.SDL_GetWindowPosition(self.__frame, wx, wy)
+        self.__screen_texture = self.__drawer.screen_texture(
+            wx.value, wy.value, self.width, self.height,
+            self.__style.frame['NORMAL']['radius'])
+    
     def __frame_start_drag(self) -> None:
-        if self.__use_screen_texture and self.__dragging_count == 0:
-            self.__update_frame_texture('FRAME')
+        if self.texture and self.__dragging_count == 0:
+            self.__frame_update('BACKGROUND')
             self.__dragging_count += 1
         
         if hasattr(sdl3, 'SDL_StartWindowMove'):
@@ -414,11 +461,11 @@ class Frame(UI):
         self.__log = f'RESIZING: {w}x{h}'
     
     def __frame_stop_drag(self) -> None:
-        if self.__use_screen_texture:
-            # self.__rebuild_screen_texture()
-            self.__render_needs_updating = True
-            self.__update_frame_texture('ALL')
+        if self.texture:
+            self.__frame_rebuild_texture()
+            self.__frame_update('TEXTURE')
             self.__dragging_count = 0
+            self.__render_needs_updating = True
         
         self.__dragging = False
         self.__cursor_update_shape('NONE')
@@ -431,6 +478,26 @@ class Frame(UI):
         self.__resizing_end = 3
         self.__render_needs_updating = True
         self.__log = None
+    
+    def __frame_update(self, mode: str = 'TEXTURE') -> None:
+        sdl3.SDL_SetRenderDrawColor(self.__renderer, 0,0,0,0)
+        sdl3.SDL_RenderClear(self.__renderer)
+        
+        if mode == 'TEXTURE' and self.texture:
+            if self.__screen_texture and self.__dragging_count == 0:
+                dst = sdl3.SDL_FRect(0, 0, self.width, self.height)
+                sdl3.SDL_RenderTexture(
+                    self.__renderer, self.__screen_texture, None, dst)
+        
+        sdl3.SDL_RenderTexture(
+            self.__renderer, self.__frame_texture, None, None)
+
+        if mode == 'TEXTURE' and not self.__resizing:
+            self.__container._Box__update()
+            self.__container._Layout__redraw()
+
+        sdl3.SDL_RenderPresent(self.__renderer)
+        sdl3.SDL_Delay(10)
     
     def __frame_update_drag_settings(self) -> None:
         self.__dragging = True
@@ -461,11 +528,11 @@ class Frame(UI):
         self.__start_h = c_int()
         sdl3.SDL_GetWindowSize(self.__frame, self.__start_w, self.__start_h)
     
-    def __render(self) -> None:
+    def __render_base(self) -> None:
         self.__render_needs_updating = False
         self.__render_count += 1
 
-        if self.__render_update_mode == 'All':
+        if self.__render_update_mode == 'RESIZE':
             if self.__resizing or self.__resizing_end <= 3:
                 if not self.__resizing and not self.__resizing_first:
                     if self.__resizing_end > 2:
@@ -488,11 +555,11 @@ class Frame(UI):
         sdl3.SDL_RenderPresent(self.__renderer)
         sdl3.SDL_Delay(10)
     
-    def __fast_render(self) -> None:
+    def __render_fast(self) -> None:
         self.__render_needs_updating = False
         self.__render_count += 1
 
-        if self.__render_update_mode == 'ALL':
+        if self.__render_update_mode == 'RESIZE':
             if self.__resizing or self.__resizing_end <= 3:
                 if not self.__resizing and not self.__resizing_first:
                     if self.__resizing_end > 2:
@@ -504,78 +571,10 @@ class Frame(UI):
                 
                 if self.__resizing_first:
                     self.__resizing_first = False
-                self.__rebuild_frame_texture()
+                self.__frame_rebuild_background()
 
-        self.__render_update_mode = 'ALL'
-        self.__update_frame_texture()
-
-    def __rebuild_screen_texture(self) -> None:
-        self.__container._Layout__invalidate()
-        wx = c_int()
-        wy = c_int()
-        sdl3.SDL_GetWindowPosition(self.__frame, wx, wy)
-        self.__screen_texture = self.__drawer.screen_texture(
-            wx.value, wy.value, self.width, self.height,
-            self.__style.frame['NORMAL']['radius'])
-    
-    def __rebuild_frame_texture(self) -> None:
-        if not self.__resizing and self.__resizing_end:
-            self.__container._Layout__invalidate()
-            self.__frame_texture = self.__create_texture()
-    
-    def __update_frame_texture(self, mode: str = 'ALL') -> None:
-        sdl3.SDL_SetRenderDrawColor(self.__renderer, 0,0,0,0)
-        sdl3.SDL_RenderClear(self.__renderer)
-        
-        if mode == 'ALL' and self.__use_screen_texture:
-            if self.__screen_texture and self.__dragging_count == 0:
-                dst = sdl3.SDL_FRect(0, 0, self.width, self.height)
-                sdl3.SDL_RenderTexture(
-                    self.__renderer, self.__screen_texture, None, dst)
-        
-        sdl3.SDL_RenderTexture(self.__renderer, self.__frame_texture, None, None)
-
-        if mode == 'ALL' and not self.__resizing:
-            self.__container._Box__update()
-            self.__container._Layout__redraw()
-
-        sdl3.SDL_RenderPresent(self.__renderer)
-        sdl3.SDL_Delay(10)
-
-    def __create_texture(self):
-        width = c_int()
-        height = c_int()
-        sdl3.SDL_GetWindowSize(self.__frame, width, height)
-
-        texture = sdl3.SDL_CreateTexture(
-            self.__renderer,
-            sdl3.SDL_PIXELFORMAT_RGBA8888,
-            sdl3.SDL_TEXTUREACCESS_TARGET,
-            width.value, height.value)
-
-        old_target = sdl3.SDL_GetRenderTarget(self.__renderer)
-        sdl3.SDL_SetRenderTarget(self.__renderer, texture)
-
-        # Clear texture
-        sdl3.SDL_SetRenderDrawColor(self.__renderer, 0, 0, 0, 0)
-        sdl3.SDL_RenderClear(self.__renderer)
-
-        # Frame background
-        self.__drawer.rect(
-            x=0, y=0, w=width.value, h=height.value,
-            color=self.__style.frame['NORMAL']['border'], r=8)
-
-        self.__drawer.rect(
-            x=1, y=1, w=width.value - 2, h=height.value - 2,
-            color=self.__style.frame['NORMAL']['background'], r=8)
-
-        # Draw elements
-        if self.__container._Add__uis:
-            self.__container._Box__update()
-            self.__container._Layout__redraw(rebuild=True)
-
-        sdl3.SDL_SetRenderTarget(self.__renderer, old_target)
-        return texture
+        self.__render_update_mode = 'RESIZE'
+        self.__frame_update()
 
 
 if __name__ == "__main__":
