@@ -57,7 +57,7 @@ class Layout(UI):
                 continue
             ui._UI__dirty = True
 
-    def __redraw(self, rebuild: bool = False) -> None:
+    def __redraw(self, rebuild: str = None) -> None:
         """..."""
         if not self._Add__uis:
             return
@@ -70,7 +70,7 @@ class Layout(UI):
             # mro = str(type(ui).__mro__)
             # if 'layout.box.Box' in mro:
             if isinstance(ui, Layout):
-                if rebuild:
+                if rebuild == 'REBUILD':
                     ui._Box__debug_color = self.__color(ui == self._Add__uis[-1])
                     if self._app and self._app._Frame__view_layout:
                         ui._Box__draw()

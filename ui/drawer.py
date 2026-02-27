@@ -214,6 +214,8 @@ class Drawer(object):
             sdl3.SDL_PIXELFORMAT_RGBA8888,
             sdl3.SDL_TEXTUREACCESS_TARGET,
             w, h)
+        
+        sdl3.SDL_SetTextureScaleMode(texture, sdl3.SDL_SCALEMODE_LINEAR)
 
         old_target = sdl3.SDL_GetRenderTarget(self.__renderer)
         sdl3.SDL_SetRenderTarget(self.__renderer, texture)
