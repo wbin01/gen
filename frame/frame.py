@@ -38,6 +38,14 @@ class Frame(UI):
         if sdl3.SDL_Init(sdl3.SDL_INIT_VIDEO) < 0: # X SDL_INIT_EVERYTHING
             print('SDL3 init error:', sdl3.SDL_GetError())
             sys.exit(1) # X SDL_SetHint(sdl3.SDL_HINT_RENDER_DRIVER, b'vulkan')
+        
+        # Display
+        # num_displays =  sdl3.SDL_GetDisplayID
+
+        # for i in range(num_displays):
+        #     display_id = sdl3.SDL_GetDisplayID(i)
+        #     rect = sdl3.SDL_GetDisplayBounds(display_id)
+        #     print(f"Display {i}: x={rect.x}, y={rect.y}, w={rect.w}, h={rect.h}")
 
         # Frame
         self.__frame = sdl3.SDL_CreateWindow(
@@ -45,6 +53,7 @@ class Frame(UI):
                 sdl3.SDL_WINDOW_BORDERLESS |   # SDL_WINDOW_TOOLTIP
                 sdl3.SDL_WINDOW_TRANSPARENT |  # SDL_WINDOW_POPUP
                 sdl3.SDL_WINDOW_RESIZABLE))    # SDL_WINDOW_UTILITY
+                # SDL_WINDOW_OPENGL
 
         if not self.__frame:
             print('Frame error:', sdl3.SDL_GetError())
@@ -110,6 +119,9 @@ class Frame(UI):
         }
         self.__last_resize_cursor_on_hover = 'NONE'
         self.__hovered_ui = self.__container
+    
+    def _hit_test(self, window, area, data):
+        return sdl3.SDL_HITTEST_DRAGGABLE
     
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}()'
@@ -309,7 +321,9 @@ class Frame(UI):
                             self.__frame_update_resize_settings()
                         else:
                             self.__cursor_update_shape('DRAG')
-                            self.__frame_update_drag_settings()
+                            # self.__frame_update_drag_settings()
+                            callback = sdl3.SDL_HitTest(self._hit_test)
+                            sdl3.SDL_SetWindowHitTest(self.__frame, callback, None)
 
                 elif event.type == sdl3.SDL_EVENT_MOUSE_BUTTON_UP:
                     if event.button.button == sdl3.SDL_BUTTON_LEFT:
@@ -321,8 +335,8 @@ class Frame(UI):
                 elif event.type == sdl3.SDL_EVENT_MOUSE_MOTION:
                     if self.__resize_area != ResizeArea.NONE:
                         self.__frame_start_resize()
-                    elif self.__dragging:
-                        self.__frame_start_drag()
+                    # elif self.__dragging:
+                    #     self.__frame_start_drag()
 
                     if resize_area == ResizeArea.NONE:
                         hovered = self.__container._Layout__hit_test(mx, my)
@@ -432,20 +446,17 @@ class Frame(UI):
             self.__render_update('BACKGROUND')
             self.__dragging_count += 1
         
-        if hasattr(sdl3, 'SDL_StartWindowMove'):
-            sdl3.SDL_StartWindowMove(self.__frame)
-        else:
-            mx = c_float()
-            my = c_float()
-            sdl3.SDL_GetGlobalMouseState(mx, my)
+        mx = c_float()
+        my = c_float()
+        sdl3.SDL_GetGlobalMouseState(mx, my)
 
-            new_x = int(mx.value - self.__drag_offset_x)
-            new_y = int(my.value - self.__drag_offset_y)
+        new_x = int(mx.value - self.__drag_offset_x)
+        new_y = int(my.value - self.__drag_offset_y)
 
-            sdl3.SDL_SetWindowPosition(self.__frame, new_x, new_y)
-            self.x = new_x
-            self.y = new_y
-        
+        sdl3.SDL_SetWindowPosition(self.__frame, new_x, new_y)
+        self.x = new_x
+        self.y = new_y
+
         self.__log = f'MOVING: {new_x}x{new_y}'
 
     def __frame_start_resize(self) -> None:
@@ -608,6 +619,13 @@ class Frame(UI):
             self.__container._Layout__invalidate()
             self.__container._Box__update()
             self.__container._Layout__redraw(rebuild='RESIZE')
+        
+        # print(self.__render_count)
+        # if self.__render_count > 50:
+        #     print('GO')
+        #     sdl3.SDL_SetWindowPosition(self.__frame, 2500, 100)
+        # print(sdl3.__file__)
+        # print(inspect.getfile(sdl3))
 
         sdl3.SDL_RenderPresent(self.__renderer)
         sdl3.SDL_Delay(10)
