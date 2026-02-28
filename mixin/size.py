@@ -6,8 +6,11 @@ class Size(object):
         super().__init__(*args, **kwargs)
         self.__width = 100
         self.__height = 30
-        self.__base_width = 100
+        self.__base_width = 60
         self.__base_height = 30
+
+        self.__min_width = 50
+        self.__min_height = 30
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}()'

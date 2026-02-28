@@ -70,8 +70,8 @@ class Layout(UI):
             # mro = str(type(ui).__mro__)
             # if 'layout.box.Box' in mro:
             if isinstance(ui, Layout):
-                if rebuild == 'REBUILD':
-                    ui._Box__debug_color = self.__color(ui == self._Add__uis[-1])
+                if rebuild == 'REBUILD' and not ui._Box__first:
+                    ui._Box__debug_color = self.__color(ui==self._Add__uis[-1])
                     if self._app and self._app._Frame__view_layout:
                         ui._Box__draw()
                 ui._Layout__redraw(rebuild)

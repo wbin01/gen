@@ -94,6 +94,9 @@ class Button(Cell):
             tx = x + (self.width // 2) - (text.width // 2)
             ty = y + (self.height // 2) - (text.height // 2)
 
+            self._Size__min_width = text.width + pad
+            self._Size__min_height = text.height + pad
+
         self._Cell__drawer.rect(
             x, y, self.width, self.height, border, radius)
 

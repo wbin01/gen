@@ -118,12 +118,11 @@ class Frame(UI):
     def __hit_test(self, window, area, data):
         x = area.contents.x
         y = area.contents.y
+        border = self.__resize_border
 
         # w = c_int()
         # h = c_int()
         # sdl3.SDL_GetWindowSize(self.__frame, w, h)
-
-        # border = 8
 
         # # CANTOS
         # if x < border and y < border:
@@ -146,7 +145,7 @@ class Frame(UI):
         #     return sdl3.SDL_HITTEST_RESIZE_RIGHT
 
         # DRAG
-        if y < 40:
+        if border < y < 40:
             return sdl3.SDL_HITTEST_DRAGGABLE
 
         return sdl3.SDL_HITTEST_NORMAL
@@ -360,7 +359,6 @@ class Frame(UI):
                             self.__frame_stop_resize()
 
                 elif event.type == sdl3.SDL_EVENT_MOUSE_MOTION:
-                    print('MOT')
                     if self.__resize_area != ResizeArea.NONE:
                         self.__frame_start_resize()
 
