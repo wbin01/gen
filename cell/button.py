@@ -30,6 +30,10 @@ class Button(Cell):
 
         self.__texture_normal = None
         self.__texture_hover = None
+    
+    @property
+    def text(self):
+        return self.__text
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}(text="{self.__text}")'
@@ -40,10 +44,10 @@ class Button(Cell):
     def __draw(self, rebuild: str = None):
         if rebuild == 'REBUILD':
             self.__texture_normal = self._Cell__drawer.build_texture(
-                int(self.width), int(self.height), self.__render, 'NORMAL')
+                int(self.width), int(self.height), self.__draw_ui, 'NORMAL')
             
             self.__texture_hover = self._Cell__drawer.build_texture(
-                int(self.width), int(self.height), self.__render, 'HOVER')
+                int(self.width), int(self.height), self.__draw_ui, 'HOVER')
             
             self.__resise_w = 0
             self.__resise_h = 0
@@ -68,7 +72,7 @@ class Button(Cell):
             self.__texture_normal,
             int(self._x), int(self._y), int(self.width), int(self.height))
     
-    def __render(self, state: str = 'NORMAL'):
+    def __draw_ui(self, state: str = 'NORMAL'):
         # state = self._UI__state.name
 
         text = self.style[state]['text']

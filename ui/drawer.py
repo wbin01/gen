@@ -208,7 +208,7 @@ class Drawer(object):
 
         return texture
     
-    def build_texture(self, w, h, draw, draw_state) -> None:
+    def build_texture(self, w, h, draw, state = None) -> None:
         texture = sdl3.SDL_CreateTexture(
             self.__renderer,
             sdl3.SDL_PIXELFORMAT_RGBA8888,
@@ -223,7 +223,10 @@ class Drawer(object):
         sdl3.SDL_SetRenderDrawColor(self.__renderer, 0, 0, 0, 0)
         sdl3.SDL_RenderClear(self.__renderer)
 
-        draw(draw_state)
+        if state:
+            draw(state)
+        else:
+            draw()
 
         sdl3.SDL_SetRenderTarget(self.__renderer, old_target)
         
