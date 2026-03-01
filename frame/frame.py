@@ -76,7 +76,7 @@ class Frame(UI):
 
         # Control Frame
         self.__running = True
-        self.__render_update_mode = 'RESIZE'
+        self.__render_mode = 'NORMAL'
         self.__render_needs_updating = True
         self.__render_count = 0
         self.__frame_base_texture = None
@@ -319,6 +319,7 @@ class Frame(UI):
                                     self.__frame, self.__cursor_hit, None)
                             else:
                                 self.__resize_settings()
+                                self.__render_mode = 'RESIZE'
                         else:
                             sdl3.SDL_SetWindowHitTest(
                                 self.__frame, self.__cursor_hit, None)
@@ -331,22 +332,18 @@ class Frame(UI):
                 elif event.type == sdl3.SDL_EVENT_MOUSE_MOTION:
                     if not self.__resize_wm:
                         if self.__resize_area != ResizeArea.NONE:
+                            self.__render_needs_updating = True
                             self.__resize_start()
 
-                        if resize_area == ResizeArea.NONE:
+                        elif resize_area == ResizeArea.NONE:
                             hovered = self.__container._Layout__hit_test(mx, my)
                             if hovered and hovered != self.__hovered_ui:
                                 self.__hovered_ui._UI__set_state('NORMAL')
                                 self.__hovered_ui = hovered
                                 self.__hovered_ui._UI__set_state('HOVER')
 
-                                self.__render_update_mode = 'HOVER'
+                                self.__render_mode = 'HOVER'
                                 self.__render_needs_updating = True
-
-                        if resize_area != ResizeArea.NONE:
-                            self.__hovered_ui._UI__set_state('NORMAL')
-                            self.__render_update_mode = 'HOVER'
-                            self.__render_needs_updating = True
                 
                 if self.__logging and self.__log:
                     print(self.__log, self.__render_count)
@@ -391,43 +388,32 @@ class Frame(UI):
         self.__render_needs_updating = False
         self.__render_count += 1
 
-        if self.__render_update_mode == 'RESIZE':
-            if self.__resizing or self.__resizing_end <= 3:
-                if not self.__resizing and not self.__resizing_first:
-                    if self.__resizing_end > 2:
-                        self.__resizing_end -= 1
-                        self.__render_needs_updating = True
-                    
-                    if self.__resizing_end < 2:
-                        self.__resizing_end = 3
-                
-                if self.__resizing_first:
-                    self.__resizing_first = False
-
-                if not self.__resizing and self.__resizing_end:
-                    # self.__queue_list = self.__container._Layout__queue_list()
-                    # self.__container._Layout__queue_list_clear()
-                    self.__draw('FRAME')
-
-        self.__render_update_mode = 'RESIZE'
-        self.__render_update()
-    
-    def __render_update(self, mode: str = 'NORMAL') -> None:
         sdl3.SDL_SetRenderDrawColor(self.__renderer, 0,0,0,0)
         sdl3.SDL_RenderClear(self.__renderer)
+
+        if self.__render_mode == 'RESIZE':
+            if self.__resizing:
+                sdl3.SDL_RenderTexture(
+                    self.__renderer, self.__frame_base_texture, None, None)
+                self.__container._Layout__invalidate()
+                self.__container._Box__update()
+                self.__container._Layout__redraw(rebuild='RESIZE')
+
+            if not self.__resizing:
+                # self.__queue_list = self.__container._Layout__queue_list()
+                # self.__container._Layout__queue_list_clear()
+                self.__draw('FRAME')
+                sdl3.SDL_RenderTexture(
+                    self.__renderer, self.__frame_base_texture, None, None)
+                self.__container._Layout__invalidate()
+                self.__container._Box__update()
+                self.__container._Layout__redraw('REBUILD')
         
-        if mode == 'NORMAL' and not self.__resizing:
+        if self.__render_mode == 'HOVER' and not self.__resizing:
             sdl3.SDL_RenderTexture(
                 self.__renderer, self.__frame_texture, None, None)
             self.__container._Box__update()
             self.__container._Layout__redraw()
-        
-        elif self.__resizing:
-            sdl3.SDL_RenderTexture(
-                self.__renderer, self.__frame_base_texture, None, None)
-            self.__container._Layout__invalidate()
-            self.__container._Box__update()
-            self.__container._Layout__redraw(rebuild='RESIZE')
 
         sdl3.SDL_RenderPresent(self.__renderer)
         sdl3.SDL_Delay(10)
