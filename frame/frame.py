@@ -70,7 +70,6 @@ class Frame(UI):
         self.__container._UI__app = self
         self.__container._Box__drawer = self.__drawer
         self.__queue_list = []
-        self.__queue_process = False
 
         # Control Frame
         self.__running = True
@@ -82,8 +81,6 @@ class Frame(UI):
 
         # Control Frame - resize
         self.__resizing = False
-        self.__resizing_end = 3
-        self.__resizing_first = True
         self.__resize_area = ResizeArea.NONE
         self.__resize_border = 8
         self.__resize_wm = False
@@ -483,7 +480,6 @@ class Frame(UI):
         self.__resize_area = ResizeArea.NONE
         self.__cursor_update_shape('NONE')
         self.__resizing = False
-        self.__resizing_end = 3
 
 
 if __name__ == "__main__":
