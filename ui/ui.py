@@ -10,7 +10,7 @@ class UI(object):
         self.__app = None
         self.__parent = None
         self.__dirty = True
-        self.__state = State.NORMAL
+        self.__state = State.DEFAULT
         self.__visible = True
     
     def __repr__(self) -> str:
@@ -57,8 +57,8 @@ class UI(object):
                 self.__state = State.HOVER
                 # self.__hover_signal.emit()
 
-            if state == 'NORMAL':
-                self.__state = State.NORMAL
+            if state == 'DEFAULT':
+                self.__state = State.DEFAULT
                 # self.__leave_signal.emit()
 
         self._UI__dirty = 'HOVER'

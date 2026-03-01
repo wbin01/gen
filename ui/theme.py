@@ -4,7 +4,7 @@ class Theme:
     classes = {}
 
     frame = {
-        'NORMAL': {
+        'DEFAULT': {
             'text': (200, 200, 200, 255),
             'background': (20, 20, 20, 240),
             'border': (55, 55, 55, 200),
@@ -26,7 +26,7 @@ class Theme:
         }
     
     button = {
-        'NORMAL': {
+        'DEFAULT': {
             'text': (200, 200, 200, 255),
             'background': (40, 40, 40, 250),
             'border': (80, 80, 80, 255),

@@ -46,9 +46,9 @@ class Button(Cell):
     def __draw(self, rebuild: str = None):
         if rebuild == 'REBUILD' or self.__tmp_resize == 50:
             # self.__tmp_resize = 0
-            self._UI__set_state('NORMAL')
+            self._UI__set_state('DEFAULT')
             self.__texture_normal = self._Cell__drawer.build_texture(
-                int(self.width), int(self.height), self.__draw_ui, 'NORMAL')
+                int(self.width), int(self.height), self.__draw_ui, 'DEFAULT')
             
             self.__texture_hover = self._Cell__drawer.build_texture(
                 int(self.width), int(self.height), self.__draw_ui, 'HOVER')
@@ -80,12 +80,12 @@ class Button(Cell):
             self.__texture_normal,
             int(self._x), int(self._y), int(self.width), int(self.height))
     
-    def __draw_ui(self, state: str = 'NORMAL'):
+    def __draw_ui(self, state: str = 'DEFAULT'):
         text = self.style[state]['text']
         background = self.style[state]['background']
         border = self.style[state]['border']
 
-        state = 'NORMAL'
+        state = 'DEFAULT'
         
         radius = self.style[state]['radius']
         font = self.style[state]['font']
