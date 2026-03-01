@@ -119,11 +119,13 @@ class Layout(UI):
             if not ui.visible: continue
             if not ui._UI__dirty: continue
 
-            getattr(ui, f'_{ui.__class__.__name__}__draw')(rebuild='REBUILD')
+            getattr(ui, f'_{ui.__class__.__name__}__draw')('REBUILD')
             ui._UI__dirty = False
 
             if (time.perf_counter() - start) * 50 > budget_ms:
                 break
+        
+        return True if not queue_list else False
     
     @classmethod
     def __color(cls, reset: bool) -> tuple:

@@ -31,7 +31,8 @@ class Button(Cell):
         self.__texture_normal = None
         self.__texture_hover = None
 
-        self.__tmp_resize = 0
+        self.__texture_w = 0
+        self.__texture_h = 0
     
     @property
     def text(self):
@@ -43,21 +44,22 @@ class Button(Cell):
     def __str__(self) -> str:
         return f'{self.__class__.__name__}("{self.__text}")'
 
-    def __draw(self, rebuild: str = None):
-        if rebuild == 'REBUILD' or self.__tmp_resize == 50:
-            # self.__tmp_resize = 0
+    def __draw(self, mode: str = None):
+        if mode == 'REBUILD':
             self._UI__set_state('DEFAULT')
+            self.__texture_w = int(self.width)
+            self.__texture_h = int(self.height)
+
             self.__texture_normal = self._Cell__drawer.build_texture(
-                int(self.width), int(self.height), self.__draw_ui, 'DEFAULT')
+                self.__texture_w, self.__texture_h, self.__draw_ui, 'DEFAULT')
             
             self.__texture_hover = self._Cell__drawer.build_texture(
-                int(self.width), int(self.height), self.__draw_ui, 'HOVER')
+                self.__texture_w, self.__texture_h, self.__draw_ui, 'HOVER')
             
             self.__resise_w = 0
             self.__resise_h = 0
         
-        elif rebuild == 'RESIZE':
-            # self.__tmp_resize += 1
+        elif mode == 'RESIZE':
             if not self.__resise_h:
                 self.__resise_w = int(self.width)
                 self.__resise_h = int(self.height)
