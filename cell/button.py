@@ -43,6 +43,7 @@ class Button(Cell):
 
     def __draw(self, rebuild: str = None):
         if rebuild == 'REBUILD':
+            self._UI__set_state('NORMAL')
             self.__texture_normal = self._Cell__drawer.build_texture(
                 int(self.width), int(self.height), self.__draw_ui, 'NORMAL')
             
@@ -73,8 +74,6 @@ class Button(Cell):
             int(self._x), int(self._y), int(self.width), int(self.height))
     
     def __draw_ui(self, state: str = 'NORMAL'):
-        # state = self._UI__state.name
-
         text = self.style[state]['text']
         background = self.style[state]['background']
         border = self.style[state]['border']

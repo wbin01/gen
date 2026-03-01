@@ -281,6 +281,35 @@ class Frame(UI):
         sdl3.SDL_DestroyWindow(self.__frame)
         # sdl3.SDL_DestroySurface(self.__font_surface)
         sdl3.SDL_Quit()
+    
+    def __draw(self, mode: str = 'FRAME') -> None:
+        w = h = c_int()
+        sdl3.SDL_GetWindowSize(self.__frame, w, h)
+
+        if mode == 'FRAME':
+            self.__frame_texture = self.__drawer.build_texture(
+                self.width, self.height, self.__draw_ui, mode)
+        
+        elif mode == 'FRAME_BASE':
+            self.__frame_base_texture = self.__drawer.build_texture(
+                self.width, self.height, self.__draw_ui, mode)
+
+    def __draw_ui(self, mode) -> None:
+        self.__drawer.rect(
+            x=0, y=0, w=self.width, h=self.height,
+            color=self.__style.frame['NORMAL']['border'],
+            r=self.__style.frame['NORMAL']['radius'])
+
+        self.__drawer.rect(
+            x=1, y=1, w=self.width - 2, h=self.height - 2,
+            color=self.__style.frame['NORMAL']['background'],
+            r=self.__style.frame['NORMAL']['radius'])
+
+        if mode == 'FRAME':
+            if self.__container._Add__uis:
+                self.__container._Layout__invalidate()
+                self.__container._Box__update()
+                self.__container._Layout__redraw(rebuild='REBUILD')
 
     def __event_loop(self) -> None:
         while self.__running:
@@ -349,43 +378,14 @@ class Frame(UI):
                                 self.__render_needs_updating = True
             
             if self.__queue_list:
-                print('Queue itens:', len(self.__queue_list))
-                done = self.__container._Layout__redraw_queue(self.__queue_list)
-                self.__render_mode = 'HOVER'
+                # print('Queue itens:', len(self.__queue_list))
+                self.__container._Layout__redraw_queue(self.__queue_list)
+                self.__render_mode = 'QUEUE'
                 self.__render_needs_updating = True
                     
             if self.__render_needs_updating:
                 self.__render()
                 self.__render_count += 1
-    
-    def __draw(self, mode: str = 'FRAME') -> None:
-        w = h = c_int()
-        sdl3.SDL_GetWindowSize(self.__frame, w, h)
-
-        if mode == 'FRAME':
-            self.__frame_texture = self.__drawer.build_texture(
-                self.width, self.height, self.__draw_ui, mode)
-        
-        elif mode == 'FRAME_BASE':
-            self.__frame_base_texture = self.__drawer.build_texture(
-                self.width, self.height, self.__draw_ui, mode)
-
-    def __draw_ui(self, mode) -> None:
-        self.__drawer.rect(
-            x=0, y=0, w=self.width, h=self.height,
-            color=self.__style.frame['NORMAL']['border'],
-            r=self.__style.frame['NORMAL']['radius'])
-
-        self.__drawer.rect(
-            x=1, y=1, w=self.width, h=self.height,
-            color=self.__style.frame['NORMAL']['background'],
-            r=self.__style.frame['NORMAL']['radius'])
-
-        if mode == 'FRAME':
-            if self.__container._Add__uis:
-                self.__container._Layout__invalidate()
-                self.__container._Box__update()
-                self.__container._Layout__redraw(rebuild='REBUILD')
     
     def __render(self) -> None:
         self.__render_needs_updating = False
@@ -415,7 +415,8 @@ class Frame(UI):
                 self.__container._Layout__queue_list_clear()
                 
         
-        if not self.__resizing and self.__render_mode in ('HOVER', 'NORMAL'):
+        if not self.__resizing and self.__render_mode in (
+                'HOVER', 'NORMAL', 'QUEUE'):
             sdl3.SDL_RenderTexture(
                 self.__renderer, self.__frame_texture, None, None)
             self.__container._Box__update()
