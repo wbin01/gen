@@ -26,8 +26,6 @@ class Frame(UI):
         self.__y = y
         self.__width = width
         self.__height = height
-        self.__logging = False
-        self.__log = None
         self.__view_layout = False
 
         sdl3.SDL_SetHint(
@@ -319,7 +317,6 @@ class Frame(UI):
                                     self.__frame, self.__cursor_hit, None)
                             else:
                                 self.__resize_settings()
-                                self.__render_mode = 'RESIZE'
                         else:
                             sdl3.SDL_SetWindowHitTest(
                                 self.__frame, self.__cursor_hit, None)
@@ -328,25 +325,28 @@ class Frame(UI):
                     if event.button.button == sdl3.SDL_BUTTON_LEFT:
                         if self.__resizing:
                             self.__resize_stop()
+                            self.__render_mode = 'RESIZE'
+                            self.__render_needs_updating = True
 
                 elif event.type == sdl3.SDL_EVENT_MOUSE_MOTION:
                     if not self.__resize_wm:
                         if self.__resize_area != ResizeArea.NONE:
+                            self.__render_mode = 'RESIZE'
                             self.__render_needs_updating = True
                             self.__resize_start()
 
-                        elif resize_area == ResizeArea.NONE:
-                            hovered = self.__container._Layout__hit_test(mx, my)
-                            if hovered and hovered != self.__hovered_ui:
+                        if resize_area == ResizeArea.NONE:
+                            hv = None
+                            if not self.__resizing:
+                                hv = self.__container._Layout__hit_test(mx, my)
+                            
+                            if hv and hv != self.__hovered_ui:
                                 self.__hovered_ui._UI__set_state('NORMAL')
-                                self.__hovered_ui = hovered
+                                self.__hovered_ui = hv
                                 self.__hovered_ui._UI__set_state('HOVER')
 
                                 self.__render_mode = 'HOVER'
                                 self.__render_needs_updating = True
-                
-                if self.__logging and self.__log:
-                    print(self.__log, self.__render_count)
             
             if self.__queue_list:
                 print(self.__queue_list)
@@ -387,7 +387,8 @@ class Frame(UI):
     def __render(self) -> None:
         self.__render_needs_updating = False
         self.__render_count += 1
-
+        print('render', self.__render_count)
+        
         sdl3.SDL_SetRenderDrawColor(self.__renderer, 0,0,0,0)
         sdl3.SDL_RenderClear(self.__renderer)
 
@@ -409,7 +410,7 @@ class Frame(UI):
                 self.__container._Box__update()
                 self.__container._Layout__redraw('REBUILD')
         
-        if self.__render_mode == 'HOVER' and not self.__resizing:
+        if not self.__resizing and self.__render_mode in ('HOVER', 'NORMAL'):
             sdl3.SDL_RenderTexture(
                 self.__renderer, self.__frame_texture, None, None)
             self.__container._Box__update()
@@ -471,17 +472,12 @@ class Frame(UI):
         self.height = h
         self.x = x
         self.y = y
-
-        self.__render_needs_updating = True
-        self.__log = f'RESIZING: {w}x{h}'
     
     def __resize_stop(self) -> None:
         self.__resize_area = ResizeArea.NONE
         self.__cursor_update_shape('NONE')
         self.__resizing = False
         self.__resizing_end = 3
-        self.__render_needs_updating = True
-        self.__log = None
 
 
 if __name__ == "__main__":
