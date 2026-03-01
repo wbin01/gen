@@ -349,7 +349,10 @@ class Frame(UI):
                                 self.__render_needs_updating = True
             
             if self.__queue_list:
-                print(self.__queue_list)
+                print('Queue itens:', len(self.__queue_list))
+                done = self.__container._Layout__redraw_queue(self.__queue_list)
+                self.__render_mode = 'HOVER'
+                self.__render_needs_updating = True
                     
             if self.__render_needs_updating:
                 self.__render()
@@ -401,14 +404,16 @@ class Frame(UI):
                 self.__container._Layout__redraw(rebuild='RESIZE')
 
             if not self.__resizing:
-                # self.__queue_list = self.__container._Layout__queue_list()
-                # self.__container._Layout__queue_list_clear()
                 self.__draw('FRAME')
                 sdl3.SDL_RenderTexture(
                     self.__renderer, self.__frame_base_texture, None, None)
                 self.__container._Layout__invalidate()
                 self.__container._Box__update()
-                self.__container._Layout__redraw('REBUILD')
+                # self.__container._Layout__redraw('REBUILD')
+
+                self.__queue_list = self.__container._Layout__queue_list()
+                self.__container._Layout__queue_list_clear()
+                
         
         if not self.__resizing and self.__render_mode in ('HOVER', 'NORMAL'):
             sdl3.SDL_RenderTexture(
