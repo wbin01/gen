@@ -43,27 +43,25 @@ class UI(object):
             return True
         return False
     
-    def __set_state(self, state: State | str) -> None:
-        if state == 'RELEASED':
-            if self.__state == State.PRESSED:
-                self.__state = State.HOVER
-                # self.__click_signal.emit()
-            else:
-                # self.__released_signal.emit()
-                pass
+    def __set_state(self, event: str) -> None:
+        if event == 'RELEASED':
+            self.__state = State.HOVER
+            # self.__click_signal.emit()
+            # self.__released_signal.emit()
 
-        elif self.__state != state:
-            if state == 'HOVER':
-                self.__state = State.HOVER
-                # self.__hover_signal.emit()
+        elif event == 'HOVER':
+            self.__state = State.HOVER
+            # self.__hover_signal.emit()
+        
+        elif event == 'PRESSED':
+            self.__state = State.PRESSED
+            # self.__pressed_signal.emit()
 
-            if state == 'DEFAULT':
-                self.__state = State.DEFAULT
-                # self.__leave_signal.emit()
+        else:  # if event == 'DEFAULT':
+            self.__state = State.DEFAULT
+            # self.__leave_signal.emit()
 
         self._UI__dirty = 'HOVER'
-        # if hasattr(self._parent, '_Layout__invalidate'):
-        #     self._parent._Layout__invalidate()
 
         def inv(ui):
             if hasattr(ui, '_parent') and ui._parent:

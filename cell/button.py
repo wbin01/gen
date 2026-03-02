@@ -25,8 +25,9 @@ class Button(Cell):
         self.__resise_w = 0
         self.__resise_h = 0
 
-        self.__texture_normal = None
+        self.__texture_default = None
         self.__texture_hover = None
+        self.__texture_pressed = None
         self.__texture_w = 0
         self.__texture_h = 0
     
@@ -46,11 +47,14 @@ class Button(Cell):
             self.__texture_w = int(self.width)
             self.__texture_h = int(self.height)
 
-            self.__texture_normal = self._Cell__drawer.build_texture(
+            self.__texture_default = self._Cell__drawer.build_texture(
                 self.__texture_w, self.__texture_h, self.__draw_ui, 'DEFAULT')
             
             self.__texture_hover = self._Cell__drawer.build_texture(
                 self.__texture_w, self.__texture_h, self.__draw_ui, 'HOVER')
+            
+            self.__texture_pressed = self._Cell__drawer.build_texture(
+                self.__texture_w, self.__texture_h, self.__draw_ui, 'PRESSED')
             
             self.__resise_w = 0
             self.__resise_h = 0
@@ -64,19 +68,24 @@ class Button(Cell):
             #     self.__resise_w = int(self.width)
 
             self._Cell__drawer.set_texture(
-                self.__texture_normal,
+                self.__texture_default,
                 int(self._x), int(self._y), self.__resise_w, self.__resise_h)
             return
+        
+        if self._UI__state.name == 'DEFAULT':
+            self._Cell__drawer.set_texture(
+                self.__texture_default,
+                int(self._x), int(self._y), int(self.width), int(self.height))
 
-        if self._UI__state.name == 'HOVER':
+        elif self._UI__state.name == 'HOVER':
             self._Cell__drawer.set_texture(
                 self.__texture_hover,
                 int(self._x), int(self._y), int(self.width), int(self.height))
-            return
-
-        self._Cell__drawer.set_texture(
-            self.__texture_normal,
-            int(self._x), int(self._y), int(self.width), int(self.height))
+        
+        elif self._UI__state.name == 'PRESSED':
+            self._Cell__drawer.set_texture(
+                self.__texture_pressed,
+                int(self._x), int(self._y), int(self.width), int(self.height))
     
     def __draw_ui(self, state: str = 'DEFAULT'):
         text = self.style[state]['text']

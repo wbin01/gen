@@ -18,7 +18,7 @@ class Theme:
             'background': (40, 40, 40, 255),
             'border': (80, 80, 80, 255),
             },
-        'CLICKED': {
+        'PRESSED': {
             'text': (200, 200, 200, 255),
             'background': (40, 40, 40, 255),
             'border': (80, 80, 80, 255),
@@ -40,7 +40,7 @@ class Theme:
             'background': (50, 50, 50, 255),
             'border': (60, 100, 150, 255),
             },
-        'CLICKED': {
+        'PRESSED': {
             'text': (200, 200, 200, 255),
             'background': (60, 100, 150, 50),
             'border': (80, 80, 80, 255),
@@ -58,7 +58,7 @@ class Theme:
             'background': (50, 50, 50, 255),
             'border': (60, 100, 150, 255),
             },
-        'CLICKED': {
+        'PRESSED': {
             'background': (60, 100, 150, 50),
             'border': (80, 80, 80, 255),
             },

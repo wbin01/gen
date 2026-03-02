@@ -2,13 +2,16 @@
 from enum import Enum
 
 
-class State(Enum):
+class Event(Enum):
     """..."""
-    DEFAULT = 'DEFAULT'
-    HOVER = 'HOVER'
     PRESSED = 'PRESSED'
-    DISABLED = 'DISABLED'
-    CHECKED = 'CHECKED'
+    RELEASED = 'RELEASED'
+    LEAVE = 'LEAVE'
+    ENTER = 'ENTER'
+    MOVE = 'MOVE'
+
+    CLICKED = 'CLICKED'
+    HOVER = 'HOVER'
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}()'

@@ -345,8 +345,14 @@ class Frame(UI):
                             else:
                                 self.__resize_settings()
                         else:
-                            sdl3.SDL_SetWindowHitTest(
-                                self.__frame, self.__cursor_hit, None)
+                            ui = self.__container._Layout__hit_test(mx, my)
+                            if ui:
+                                ui._UI__set_state('PRESSED')
+                                self.__render_mode = 'PRESSED'
+                                self.__render_needs_updating = True
+                            else:
+                                sdl3.SDL_SetWindowHitTest(
+                                    self.__frame, self.__cursor_hit, None)
 
                 elif event.type == sdl3.SDL_EVENT_MOUSE_BUTTON_UP:
                     if event.button.button == sdl3.SDL_BUTTON_LEFT:
@@ -354,6 +360,12 @@ class Frame(UI):
                             self.__resize_stop()
                             self.__render_mode = 'RESIZE'
                             self.__render_needs_updating = True
+                        else:
+                            ui = self.__container._Layout__hit_test(mx, my)
+                            if ui:
+                                ui._UI__set_state('RELEASED')
+                                self.__render_mode = 'HOVER'
+                                self.__render_needs_updating = True
 
                 elif event.type == sdl3.SDL_EVENT_MOUSE_MOTION:
                     if not self.__resize_wm:
@@ -414,11 +426,11 @@ class Frame(UI):
                 self.__container._Layout__queue_list_clear()
 
         if not self.__resizing and self.__render_mode in (
-                'HOVER', 'DEFAULT', 'QUEUE'):
+                'HOVER', 'PRESSED', 'DEFAULT', 'QUEUE'):
             sdl3.SDL_RenderTexture(
                 self.__renderer, self.__frame_texture, None, None)
             self.__container._Box__update()
-            self.__container._Layout__redraw()
+            self.__container._Layout__redraw(self.__render_mode)
 
         sdl3.SDL_RenderPresent(self.__renderer)
         sdl3.SDL_Delay(10)
