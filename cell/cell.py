@@ -16,7 +16,7 @@ class Cell(Margin, Pos, Size, UI):
         """..."""
         super().__init__(*args, **kwargs)
         self.__drawer = None
-        self.__fill = Fill.X
+        self.__fill = Fill.XY
         self.__style_class = style_class
         
         class_name = self.__class__.__name__
@@ -25,30 +25,30 @@ class Cell(Margin, Pos, Size, UI):
         
         theme = None
         if hasattr(Theme, class_name):
-            if class_name not in ('ui', 'cell'):
-                theme = getattr(Theme, class_name)
+            theme = getattr(Theme, class_name)
 
-            state_theme = None
+        state_theme = None
+        if style_class:
             if isinstance(style_class, StyleClass):
                 state_theme = Theme.classes[style_class.value]
+            else:
+                if style_class in Theme.classes:
+                    state_theme = Theme.classes[style_class]
+                else:
+                    Theme.classes[style_class] = theme
+                    state_theme = Theme.classes[style_class]
 
-            elif style_class in Theme.classes:
-                theme = Theme.classes[style_class]
+        theme = copy.deepcopy(theme)
+        if theme and state_theme:
+            for state in ('BASE', 'HOVER', 'PRESSED'):
+                for key in (
+                        'font-color', 'background-color', 'border-color'):
+                    if key in theme[state]:
+                        theme[state][key] = state_theme[state][key]
             
-            elif style_class not in Theme.classes:
-                Theme.classes[style_class] = copy.deepcopy(theme)
-                theme = Theme.classes[style_class]
-            
-            if theme and state_theme:
-                for state in ('BASE', 'HOVER', 'PRESSED'):
-                    for key in (
-                            'font-color', 'background-color', 'border-color'):
-                        if key in theme[state]:
-                            theme[state][key] = state_theme[state][key]
-                
-                state_id = style_class.value + str(id(self))
-                Theme.classes[state_id] = copy.deepcopy(theme)
-                theme = Theme.classes[state_id]
+            state_id = style_class.value + str(id(self))
+            Theme.classes[state_id] = copy.deepcopy(theme)
+            theme = Theme.classes[state_id]
         
         self.__style = theme
 

@@ -4,7 +4,9 @@ from enum import Enum
 
 class StyleClass(Enum):
     """..."""
+    CHECKED = 'CHECKED'
     DEFAULT = 'DEFAULT'
+    DISABLED = 'DISABLED'
     ERROR = 'ERROR'
     SUCCESS = 'SUCCESS'
     WARNING = 'WARNING'

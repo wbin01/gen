@@ -5,6 +5,7 @@ import ctypes
 import sdl3
 
 from .cell import Cell
+from ..flag import Fill
 from ..ui import FontRender
 
 
@@ -16,6 +17,7 @@ class Button(Cell):
         """..."""
         super().__init__(*args, **kwargs)
         self._UI__base_class = 'Button'
+        self.fill = Fill.X
 
         self.__text = text
         self.width = width
