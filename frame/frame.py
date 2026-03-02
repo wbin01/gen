@@ -307,7 +307,7 @@ class Frame(UI):
             if self.__container._Add__uis:
                 self.__container._Layout__invalidate()
                 self.__container._Box__update()
-                self.__container._Layout__redraw(rebuild='REBUILD')
+                self.__container._Layout__redraw('REBUILD')
 
     def __event_loop(self) -> None:
         while self.__running:
@@ -399,7 +399,7 @@ class Frame(UI):
                     self.__renderer, self.__frame_base_texture, None, None)
                 self.__container._Layout__invalidate()
                 self.__container._Box__update()
-                self.__container._Layout__redraw(rebuild='RESIZE')
+                self.__container._Layout__redraw('RESIZE')
 
             if not self.__resizing:
                 self.__resizing_count = 0

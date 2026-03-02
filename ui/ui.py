@@ -6,7 +6,7 @@ class UI(object):
     """..."""
     def __init__(self, *args, **kwargs) -> None:
         """..."""
-        self.base_class = 'UI'
+        self.__base_class = 'UI'
         self.__app = None
         self.__parent = None
         self.__dirty = True

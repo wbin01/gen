@@ -82,7 +82,7 @@ class Layout(UI):
                 continue
             ui._UI__dirty = True
 
-    def __redraw(self, rebuild: str = None) -> None:
+    def __redraw(self, mode: str = None) -> None:
         if not self._Add__uis:
             return
         
@@ -91,17 +91,15 @@ class Layout(UI):
             if not ui._UI__dirty:
                 continue
 
-            # mro = str(type(ui).__mro__)
-            # if 'layout.box.Box' in mro:
-            if isinstance(ui, Layout):
-                if rebuild == 'REBUILD' and not ui._Box__first:
+            if isinstance(ui, Layout):  # str(type(ui).__mro__)
+                if mode == 'REBUILD' and not ui._Box__first:
                     ui._Box__debug_color = self.__color(ui==self._Add__uis[-1])
                     if self._app and self._app._Frame__view_layout:
                         ui._Box__draw()
-                ui._Layout__redraw(rebuild)
+                ui._Layout__redraw(mode)
                 continue
-
-            getattr(ui, f'_{ui.__class__.__name__}__draw')(rebuild)
+            
+            getattr(ui, f'_{ui._UI__base_class}__draw')(mode)
             ui._UI__dirty = False
 
         self._UI__dirty = False

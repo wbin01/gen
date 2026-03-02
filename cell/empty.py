@@ -8,31 +8,25 @@ from .cell import Cell
 from ..ui import FontRender, Theme
 
 
-class Button(Cell):
+class Empty(Cell):
     """..."""
     def __init__(
-            self, text: str = '', width: int = 100, height: int = 32,
-            elided: bool = False, *args, **kwargs) -> None:
+            self, width: int = 100, height: int = 32, *args, **kwargs) -> None:
         """..."""
         super().__init__(*args, **kwargs)
-        self._UI__base_class = 'Button'
+        self._UI__base_class = 'Empty'
 
-        self.__text = text
         self.width = width
         self.height = height
-        self.__elided = elided
 
         self.__resise_w = 0
         self.__resise_h = 0
 
         self.__texture_normal = None
         self.__texture_hover = None
+
         self.__texture_w = 0
         self.__texture_h = 0
-    
-    @property
-    def text(self):
-        return self.__text
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}(text="{self.__text}")'
@@ -79,38 +73,18 @@ class Button(Cell):
             int(self._x), int(self._y), int(self.width), int(self.height))
     
     def __draw_ui(self, state: str = 'DEFAULT'):
-        text = self.style[state]['text']
         background = self.style[state]['background']
         border = self.style[state]['border']
 
         state = 'DEFAULT'
-        
+
         radius = self.style[state]['radius']
-        font = self.style[state]['font']
-        font_size = self.style[state]['font-size']
         pad = self.style[state]['padding'] * 2
 
         x = y = 0
-
-        if self.__text:
-            text = FontRender(
-                self.__text, text, font, font_size,
-                self.width if self.__elided else None, pad)
-            if self.width < text.width + pad: self.width = text.width + pad
-            if self.height < text.height + pad: self.height = text.height + pad
-
-            tx = x + (self.width // 2) - (text.width // 2)
-            ty = y + (self.height // 2) - (text.height // 2)
-
-            self._Size__min_width = text.width + pad
-            self._Size__min_height = text.height + pad
-
         self._Cell__drawer.rect(
             x, y, self.width, self.height, border, radius)
 
         self._Cell__drawer.rect(
             x + 1, y + 1, self.width - 2,self.height - 2,
             background, radius - 1)
-
-        if self.__text:
-            self._Cell__drawer.text(tx, ty, text)

@@ -42,7 +42,24 @@ class Theme:
             },
         'CLICKED': {
             'text': (200, 200, 200, 255),
-            'background': (40, 40, 40, 255),
+            'background': (60, 100, 150, 50),
+            'border': (80, 80, 80, 255),
+            },
+        }
+    
+    empty = {
+        'DEFAULT': {
+            'background': (40, 40, 40, 250),
+            'border': (80, 80, 80, 255),
+            'radius': 6,
+            'padding': 10
+            },
+        'HOVER': {
+            'background': (50, 50, 50, 255),
+            'border': (60, 100, 150, 255),
+            },
+        'CLICKED': {
+            'background': (60, 100, 150, 50),
             'border': (80, 80, 80, 255),
             },
         }
