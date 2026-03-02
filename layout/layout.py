@@ -7,12 +7,7 @@ from ..ui import UI
 
 class Layout(UI):
     """Organizes the positioning of the elements."""
-    __alpha = 240
-    __debug_colors = (
-        (93, 93, 62, __alpha),  (58, 78, 59, __alpha),   (52, 51, 63, __alpha),
-        (88, 78, 84, __alpha),  (68, 47, 58, __alpha),   (99, 61, 61, __alpha),
-        (119, 139,80, __alpha), (92, 114, 113, __alpha), (67, 67, 67, __alpha))
-    __debug_color_index = 0
+    __debug_color_index = 50
     __instances = 0
 
     def __init__(self, *args, **kwargs) -> None:
@@ -91,11 +86,14 @@ class Layout(UI):
             if not ui._UI__dirty:
                 continue
 
-            if isinstance(ui, Layout):  # str(type(ui).__mro__)
-                if mode == 'REBUILD' and not ui._Box__first:
-                    ui._Box__debug_color = self.__color(ui==self._Add__uis[-1])
+            if isinstance(ui, Layout):
+                if mode == 'REBUILD':
+                    if ui == ui._parent._Add__uis[0]: self.__color(True)
+
+                    ui._Box__debug_color = self.__color()
                     if self._app and self._app._Frame__view_layout:
                         ui._Box__draw()
+                
                 ui._Layout__redraw(mode)
                 continue
             
@@ -126,9 +124,11 @@ class Layout(UI):
         return True if not queue_list else False
     
     @classmethod
-    def __color(cls, reset: bool) -> tuple:
-        cls.__debug_color_index += 1
-        if cls.__debug_color_index == 9: cls.__debug_color_index = 0
+    def __color(cls, reset: bool = False) -> tuple:
+        if reset:cls.__debug_color_index = 50
+        if cls.__debug_color_index == 160: cls.__debug_color_index = 50
 
-        if reset: cls.__debug_color_index = 0
-        return cls.__debug_colors[cls.__debug_color_index]
+        num = cls.__debug_color_index
+        cls.__debug_color_index += 10
+
+        return num, num, num, 255
