@@ -81,13 +81,11 @@ class Empty(Cell):
                 int(self._x), int(self._y), int(self.width), int(self.height))
     
     def __draw_ui(self, state: str = 'BASE'):
-        background = self.style[state]['background']
-        border = self.style[state]['border']
+        background = self.style[state]['background-color']
+        border = self.style[state]['border-color']
 
         state = 'BASE'
-
         radius = self.style[state]['radius']
-        pad = self.style[state]['padding'] * 2
 
         x = y = 0
         self._Cell__drawer.rect(

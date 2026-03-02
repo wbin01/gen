@@ -194,11 +194,16 @@ class Drawer(object):
         # enhancer = ImageEnhance.Color(blurred)
         # blurred = enhancer.enhance(0.8)
 
-        data = blurred.tobytes() # SDL_PIXELFORMAT_RGBA8888 370546692 SDL_PIXELFORMAT_BGRA8888
+        data = blurred.tobytes()
+        # SDL_PIXELFORMAT_RGBA8888
+        # 370546692
+        # SDL_PIXELFORMAT_BGRA8888
+        # SDL_PIXELFORMAT_ARGB8888
 
         texture = sdl3.SDL_CreateTexture(
             self.__renderer,
-            sdl3.SDL_PIXELFORMAT_ARGB8888, sdl3.SDL_TEXTUREACCESS_STATIC,
+            sdl3.SDL_PIXELFORMAT_RGBA32,
+            sdl3.SDL_TEXTUREACCESS_STATIC,
             blurred.width, blurred.height)
 
         sdl3.SDL_UpdateTexture(texture, None, data, blurred.width * 4)
@@ -211,7 +216,7 @@ class Drawer(object):
     def build_texture(self, w, h, draw, state = None) -> None:
         texture = sdl3.SDL_CreateTexture(
             self.__renderer,
-            sdl3.SDL_PIXELFORMAT_RGBA8888,
+            sdl3.SDL_PIXELFORMAT_RGBA32,
             sdl3.SDL_TEXTUREACCESS_TARGET,
             w, h)
         

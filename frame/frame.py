@@ -295,12 +295,12 @@ class Frame(UI):
     def __draw_ui(self, mode) -> None:
         self.__drawer.rect(
             x=0, y=0, w=self.width, h=self.height,
-            color=self.__style.Frame['BASE']['border'],
+            color=self.__style.Frame['BASE']['border-color'],
             r=self.__style.Frame['BASE']['radius'])
 
         self.__drawer.rect(
             x=1, y=1, w=self.width - 2, h=self.height - 2,
-            color=self.__style.Frame['BASE']['background'],
+            color=self.__style.Frame['BASE']['background-color'],
             r=self.__style.Frame['BASE']['radius'])
 
         if mode == 'FRAME':
@@ -493,11 +493,6 @@ class Frame(UI):
         self.__resize_area = ResizeArea.NONE
         self.__cursor_update_shape('NONE')
         self.__resizing = False
-
-
-if __name__ == "__main__":
-    app = Frame()
-    sys.exit(app.run())
 
 # SDL_RENDERER_DRIVER=vulkan python -O main.py
 # SDL_VIDEODRIVER=x11 SDL_RENDERER_DRIVER=vulkan python -O frame.py

@@ -88,9 +88,9 @@ class Button(Cell):
                 int(self._x), int(self._y), int(self.width), int(self.height))
     
     def __draw_ui(self, state: str = 'BASE'):
-        text = self.style[state]['text']
-        background = self.style[state]['background']
-        border = self.style[state]['border']
+        text = self.style[state]['font-color']
+        background = self.style[state]['background-color']
+        border = self.style[state]['border-color']
 
         state = 'BASE'
         

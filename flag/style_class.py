@@ -5,10 +5,9 @@ from enum import Enum
 class StyleClass(Enum):
     """..."""
     DEFAULT = 'DEFAULT'
-    SUCCESS = 'SUCCESS'
     ERROR = 'ERROR'
+    SUCCESS = 'SUCCESS'
     WARNING = 'WARNING'
-    INFO = 'INFO'
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}()'
