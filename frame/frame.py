@@ -73,7 +73,7 @@ class Frame(UI):
 
         # Control Frame
         self.__running = True
-        self.__render_mode = 'DEFAULT'
+        self.__render_mode = 'BASE'
         self.__render_needs_updating = True
         self.__render_count = 0
         self.__frame_base_texture = None
@@ -295,13 +295,13 @@ class Frame(UI):
     def __draw_ui(self, mode) -> None:
         self.__drawer.rect(
             x=0, y=0, w=self.width, h=self.height,
-            color=self.__style.frame['DEFAULT']['border'],
-            r=self.__style.frame['DEFAULT']['radius'])
+            color=self.__style.frame['BASE']['border'],
+            r=self.__style.frame['BASE']['radius'])
 
         self.__drawer.rect(
             x=1, y=1, w=self.width - 2, h=self.height - 2,
-            color=self.__style.frame['DEFAULT']['background'],
-            r=self.__style.frame['DEFAULT']['radius'])
+            color=self.__style.frame['BASE']['background'],
+            r=self.__style.frame['BASE']['radius'])
 
         if mode == 'FRAME':
             if self.__container._Add__uis:
@@ -380,7 +380,7 @@ class Frame(UI):
                                 hv = self.__container._Layout__hit_test(mx, my)
                             
                             if hv and hv != self.__hovered_ui:
-                                self.__hovered_ui._UI__set_state('DEFAULT')
+                                self.__hovered_ui._UI__set_state('BASE')
                                 self.__hovered_ui = hv
                                 self.__hovered_ui._UI__set_state('HOVER')
 
@@ -426,7 +426,7 @@ class Frame(UI):
                 self.__container._Layout__queue_list_clear()
 
         if not self.__resizing and self.__render_mode in (
-                'HOVER', 'PRESSED', 'DEFAULT', 'QUEUE'):
+                'HOVER', 'PRESSED', 'BASE', 'QUEUE'):
             sdl3.SDL_RenderTexture(
                 self.__renderer, self.__frame_texture, None, None)
             self.__container._Box__update()

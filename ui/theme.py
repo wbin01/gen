@@ -4,7 +4,7 @@ class Theme:
     classes = {}
 
     frame = {
-        'DEFAULT': {
+        'BASE': {
             'text': (200, 200, 200, 255),
             'background': (20, 20, 20, 240),
             'border': (55, 55, 55, 200),
@@ -13,20 +13,10 @@ class Theme:
             'font-size': 12,
             'padding': 10
             },
-        'HOVER': {
-            'text': (200, 200, 200, 255),
-            'background': (40, 40, 40, 255),
-            'border': (80, 80, 80, 255),
-            },
-        'PRESSED': {
-            'text': (200, 200, 200, 255),
-            'background': (40, 40, 40, 255),
-            'border': (80, 80, 80, 255),
-            },
         }
     
     button = {
-        'DEFAULT': {
+        'BASE': {
             'text': (200, 200, 200, 255),
             'background': (40, 40, 40, 250),
             'border': (80, 80, 80, 255),
@@ -43,12 +33,12 @@ class Theme:
         'PRESSED': {
             'text': (200, 200, 200, 255),
             'background': (60, 100, 150, 50),
-            'border': (80, 80, 80, 255),
+            'border': (60, 100, 150, 255),
             },
         }
     
     empty = {
-        'DEFAULT': {
+        'BASE': {
             'background': (40, 40, 40, 250),
             'border': (80, 80, 80, 255),
             'radius': 6,
@@ -60,6 +50,6 @@ class Theme:
             },
         'PRESSED': {
             'background': (60, 100, 150, 50),
-            'border': (80, 80, 80, 255),
+            'border': (60, 100, 150, 255),
             },
         }

@@ -4,7 +4,7 @@ from enum import Enum
 
 class State(Enum):
     """..."""
-    DEFAULT = 'DEFAULT'
+    BASE = 'BASE'
     HOVER = 'HOVER'
     PRESSED = 'PRESSED'
     DISABLED = 'DISABLED'

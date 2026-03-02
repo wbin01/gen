@@ -43,12 +43,12 @@ class Button(Cell):
 
     def __draw(self, mode: str = None):
         if mode == 'REBUILD':
-            self._UI__set_state('DEFAULT')
+            self._UI__set_state('BASE')
             self.__texture_w = int(self.width)
             self.__texture_h = int(self.height)
 
             self.__texture_default = self._Cell__drawer.build_texture(
-                self.__texture_w, self.__texture_h, self.__draw_ui, 'DEFAULT')
+                self.__texture_w, self.__texture_h, self.__draw_ui, 'BASE')
             
             self.__texture_hover = self._Cell__drawer.build_texture(
                 self.__texture_w, self.__texture_h, self.__draw_ui, 'HOVER')
@@ -72,7 +72,7 @@ class Button(Cell):
                 int(self._x), int(self._y), self.__resise_w, self.__resise_h)
             return
         
-        if self._UI__state.name == 'DEFAULT':
+        if self._UI__state.name == 'BASE':
             self._Cell__drawer.set_texture(
                 self.__texture_default,
                 int(self._x), int(self._y), int(self.width), int(self.height))
@@ -87,12 +87,12 @@ class Button(Cell):
                 self.__texture_pressed,
                 int(self._x), int(self._y), int(self.width), int(self.height))
     
-    def __draw_ui(self, state: str = 'DEFAULT'):
+    def __draw_ui(self, state: str = 'BASE'):
         text = self.style[state]['text']
         background = self.style[state]['background']
         border = self.style[state]['border']
 
-        state = 'DEFAULT'
+        state = 'BASE'
         
         radius = self.style[state]['radius']
         font = self.style[state]['font']

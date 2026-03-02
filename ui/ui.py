@@ -10,7 +10,7 @@ class UI(object):
         self.__app = None
         self.__parent = None
         self.__dirty = True
-        self.__state = State.DEFAULT
+        self.__state = State.BASE
         self.__visible = True
     
     def __repr__(self) -> str:
@@ -57,8 +57,8 @@ class UI(object):
             self.__state = State.PRESSED
             # self.__pressed_signal.emit()
 
-        else:  # if event == 'DEFAULT':
-            self.__state = State.DEFAULT
+        else:  # if event == 'BASE':
+            self.__state = State.BASE
             # self.__leave_signal.emit()
 
         self._UI__dirty = 'HOVER'
