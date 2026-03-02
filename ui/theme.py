@@ -1,9 +1,27 @@
 #!/usr/bin/env python3
 
 class Theme:
-    classes = {}
+    classes = {
+        'DEFAULT': {
+            'BASE': {
+                'text': (200, 200, 200, 255),
+                'background': (66, 66, 86, 255),
+                'border': (60, 100, 150, 255),
+                },
+            'HOVER': {
+                'text': (200, 200, 200, 255),
+                'background': (66, 66, 86, 255),
+                'border': (60, 100, 150, 255),
+                },
+            'PRESSED': {
+                'text': (200, 200, 200, 255),
+                'background': (50, 90, 140, 255),
+                'border': (60, 100, 150, 255),
+                },
+            }
+    }
 
-    frame = {
+    Frame = {
         'BASE': {
             'text': (200, 200, 200, 255),
             'background': (20, 20, 20, 240),
@@ -15,10 +33,10 @@ class Theme:
             },
         }
     
-    button = {
+    Button = {
         'BASE': {
             'text': (200, 200, 200, 255),
-            'background': (40, 40, 40, 250),
+            'background': (40, 40, 40, 255),
             'border': (80, 80, 80, 255),
             'radius': 6,
             'font': 'DejaVuSans.ttf',
@@ -32,14 +50,14 @@ class Theme:
             },
         'PRESSED': {
             'text': (200, 200, 200, 255),
-            'background': (60, 100, 150, 50),
+            'background': (60, 100, 150, 255),
             'border': (60, 100, 150, 255),
             },
         }
     
-    empty = {
+    Empty = {
         'BASE': {
-            'background': (40, 40, 40, 250),
+            'background': (40, 40, 40, 255),
             'border': (80, 80, 80, 255),
             'radius': 6,
             'padding': 10
@@ -49,7 +67,7 @@ class Theme:
             'border': (60, 100, 150, 255),
             },
         'PRESSED': {
-            'background': (60, 100, 150, 50),
+            'background': (60, 100, 150, 255),
             'border': (60, 100, 150, 255),
             },
         }

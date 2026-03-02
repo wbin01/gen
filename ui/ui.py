@@ -20,6 +20,11 @@ class UI(object):
         return self.__class__.__name__
     
     @property
+    def _base_class(self) -> bool:
+        """..."""
+        return self.__base_class
+    
+    @property
     def visible(self) -> bool:
         """..."""
         return self.__visible

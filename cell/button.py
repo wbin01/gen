@@ -5,7 +5,7 @@ import ctypes
 import sdl3
 
 from .cell import Cell
-from ..ui import FontRender, Theme
+from ..ui import FontRender
 
 
 class Button(Cell):

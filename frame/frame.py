@@ -295,13 +295,13 @@ class Frame(UI):
     def __draw_ui(self, mode) -> None:
         self.__drawer.rect(
             x=0, y=0, w=self.width, h=self.height,
-            color=self.__style.frame['BASE']['border'],
-            r=self.__style.frame['BASE']['radius'])
+            color=self.__style.Frame['BASE']['border'],
+            r=self.__style.Frame['BASE']['radius'])
 
         self.__drawer.rect(
             x=1, y=1, w=self.width - 2, h=self.height - 2,
-            color=self.__style.frame['BASE']['background'],
-            r=self.__style.frame['BASE']['radius'])
+            color=self.__style.Frame['BASE']['background'],
+            r=self.__style.Frame['BASE']['radius'])
 
         if mode == 'FRAME':
             if self.__container._Add__uis:
