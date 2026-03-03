@@ -13,7 +13,7 @@ class Button(Cell):
     """..."""
     def __init__(
             self, text: str = '', width: int = 100, height: int = 32,
-            elided: bool = False, fill: Fill = Fill.X,
+            elided: bool = True, fill: Fill = Fill.X,
             *args, **kwargs) -> None:
         """..."""
         super().__init__(fill=fill, *args, **kwargs)
@@ -91,29 +91,24 @@ class Button(Cell):
                 int(self._x), int(self._y), int(self.width), int(self.height))
     
     def __draw_ui(self, state: str = 'BASE'):
-        text = self.style[state]['font-color']
-        background = self.style[state]['background-color']
-        border = self.style[state]['border-color']
-
-        state = 'BASE'
-        
-        radius = self.style[state]['radius']
+        font_color = self.style[state]['font-color']
+        bg_color = self.style[state]['background-color']
+        bd_color = self.style[state]['border-color']
+        rad = self.style[state]['radius']
         font = self.style[state]['font']
         font_size = self.style[state]['font-size']
         pad = self.style[state]['padding'] * 2
-
         x = y = 0
 
         if self.__text:
             text = FontRender(
-                self.__text, text, font, font_size,
+                self.__text, font_color, font, font_size,
                 int(self.width) - pad if self.__elided else None, pad)
             if self.width < text.width + pad: self.width = text.width + pad
             if self.height < text.height + pad: self.height = text.height + pad
 
             tx = x + (self.width // 2) - (text.width // 2)
             ty = y + (self.height // 2) - (text.height // 2)
-
             if not self.__elided:
                 minw = text.width + pad
                 if self._Size__min_width < minw: self._Size__min_width = minw
@@ -121,12 +116,8 @@ class Button(Cell):
                 minh = text.height + pad
                 if self._Size__min_height < minh: self._Size__min_height = minh
 
+        self._Cell__drawer.rect(x, y, self.width, self.height, bd_color, rad)
         self._Cell__drawer.rect(
-            x, y, self.width, self.height, border, radius)
-
-        self._Cell__drawer.rect(
-            x + 1, y + 1, self.width - 2,self.height - 2,
-            background, radius - 1)
-
+            x + 1, y + 1, self.width - 2,self.height - 2, bg_color, rad - 1)
         if self.__text:
             self._Cell__drawer.text(tx, ty, text)

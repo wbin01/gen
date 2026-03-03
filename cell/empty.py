@@ -81,16 +81,11 @@ class Empty(Cell):
                 int(self._x), int(self._y), int(self.width), int(self.height))
     
     def __draw_ui(self, state: str = 'BASE'):
-        background = self.style[state]['background-color']
-        border = self.style[state]['border-color']
-
-        state = 'BASE'
-        radius = self.style[state]['radius']
+        bg_color = self.style[state]['background-color']
+        bd_color = self.style[state]['border-color']
+        rad = self.style[state]['radius']
 
         x = y = 0
+        self._Cell__drawer.rect(x, y, self.width, self.height, bd_color, rad)
         self._Cell__drawer.rect(
-            x, y, self.width, self.height, border, radius)
-
-        self._Cell__drawer.rect(
-            x + 1, y + 1, self.width - 2,self.height - 2,
-            background, radius - 1)
+            x + 1, y + 1, self.width - 2,self.height - 2, bg_color, rad - 1)
