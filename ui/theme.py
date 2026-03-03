@@ -7,6 +7,7 @@ class Theme:
             'border': 1,
             'border-color': (55, 55, 55, 200),
             'radius': 8,
+            'accent-color': (60, 100, 150, 255),
             },
         }
     

@@ -3,6 +3,7 @@ from .layout import Layout
 from ..cell import Cell, ColExpander, RowExpander
 from ..flag import Align, Fill
 from ..mixin import Add, Margin, Pos, Size
+from ..ui import Theme
 
 
 class Box(Margin, Pos, Size, Add, Layout):
@@ -55,7 +56,8 @@ class Box(Margin, Pos, Size, Add, Layout):
         self.__first = False
         self.__orientation = 'VERTICAL'
         self._UI__dirty = True
-        self.__debug_color = (93, 93, 62, 255)
+
+        self.__texture_hover = None
     
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}()'
@@ -382,10 +384,18 @@ class Box(Margin, Pos, Size, Add, Layout):
             if isinstance(ui, Layout):
                 self.__update_align(ui)
 
-    def __draw(self) -> None:
-        if not self._Box__first:
+    def __draw(self, mode: str = None) -> None:
+        if not self._Box__first and mode == 'REBUILD':
             self._Layout__drawer.rect(
                 self._x - self.margin[3], self._y - self.margin[0],
                 self.width + self.margin[3] + self.margin[1],
                 self.height + self.margin[0] + self.margin[2],
-                self.__debug_color, 4)
+                Theme.Frame['BASE']['accent-color'],
+                Theme.Frame['BASE']['radius'])
+            
+            self._Layout__drawer.rect(
+                self._x - self.margin[3] + 1, self._y - self.margin[0] + 1,
+                self.width + self.margin[3] + self.margin[1] - 2,
+                self.height + self.margin[0] + self.margin[2] - 2,
+                Theme.Frame['BASE']['background-color'],
+                Theme.Frame['BASE']['radius'])

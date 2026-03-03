@@ -7,7 +7,6 @@ from ..ui import UI
 
 class Layout(UI):
     """Organizes the positioning of the elements."""
-    __debug_color_index = 50
     __instances = 0
 
     def __init__(self, *args, **kwargs) -> None:
@@ -87,12 +86,8 @@ class Layout(UI):
                 continue
 
             if isinstance(ui, Layout):
-                if mode == 'REBUILD':
-                    if ui == ui._parent._Add__uis[0]: self.__color(True)
-
-                    ui._Box__debug_color = self.__color()
-                    if self._app and self._app._Frame__view_layout:
-                        ui._Box__draw()
+                if self._app and self._app._Frame__view_layout:
+                    ui._Box__draw(mode)
                 
                 ui._Layout__redraw(mode)
                 continue
@@ -122,13 +117,3 @@ class Layout(UI):
                 break
         
         return True if not queue_list else False
-    
-    @classmethod
-    def __color(cls, reset: bool = False) -> tuple:
-        if reset:cls.__debug_color_index = 50
-        if cls.__debug_color_index == 160: cls.__debug_color_index = 50
-
-        num = cls.__debug_color_index
-        cls.__debug_color_index += 10
-
-        return num, num, num, 255

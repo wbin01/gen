@@ -43,7 +43,7 @@ class Button(Cell):
     def __str__(self) -> str:
         return f'{self.__class__.__name__}("{self.__text}")'
 
-    def __draw(self, mode: str = None):
+    def __draw(self, mode: str = None) -> None:
         if mode == 'REBUILD':
             self._UI__set_state('BASE')
             self.__texture_w = int(self.width)
