@@ -69,24 +69,28 @@ class Frame(UI):
         self.__container._UI__parent = self
         self.__container._UI__app = self
         self.__container._Box__drawer = self.__drawer
+
+        # Loop
+        self.__running = True
         self.__queue_list = []
 
-        # Control Frame
-        self.__running = True
+        # Render
         self.__render_mode = 'BASE'
         self.__render_needs_updating = True
         self.__render_count = 0
+
+        # Frame
         self.__frame_base_texture = None
         self.__frame_texture = None
 
-        # Control Frame - resize
+        # Frame - resize
         self.__resizing = False
         self.__resizing_count = 0
         self.__resize_area = ResizeArea.NONE
         self.__resize_border = 8
         self.__resize_wm = False
 
-        # Control Cursor
+        # Cursor
         self.__cursor = {
             'TOP': sdl3.SDL_CreateSystemCursor(8),
             'BOTTOM': sdl3.SDL_CreateSystemCursor(8),
@@ -100,10 +104,11 @@ class Frame(UI):
             'DRAG': sdl3.SDL_CreateSystemCursor(9),
         }
         self.__last_resize_cursor_on_hover = 'NONE'
-        self.__hovered_ui = self.__container
-
         self.__cursor_hit = sdl3.SDL_HitTest(self.__cursor_hit_test)
         sdl3.SDL_SetWindowHitTest(self.__frame, self.__cursor_hit, None)
+
+        # Cell
+        self.__hovered_ui = self.__container
     
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}()'
@@ -186,13 +191,14 @@ class Frame(UI):
     def __cursor_hit_test(self, window, area, data):
         x = area.contents.x
         y = area.contents.y
+
+        w = c_int()
+        h = c_int()
+        sdl3.SDL_GetWindowSize(self.__frame, w, h)
+
         border = self.__resize_border
-
+        
         if self.__resize_wm:
-            w = c_int()
-            h = c_int()
-            sdl3.SDL_GetWindowSize(self.__frame, w, h)
-
             # Corners
             if x < border and y < border:
                 return sdl3.SDL_HITTEST_RESIZE_TOPLEFT
@@ -214,7 +220,7 @@ class Frame(UI):
                 return sdl3.SDL_HITTEST_RESIZE_RIGHT
 
         # DRAG
-        if border < y < 40:
+        if border < x < w.value - border and border < y < 40:
             return sdl3.SDL_HITTEST_DRAGGABLE
 
         return sdl3.SDL_HITTEST_NORMAL
