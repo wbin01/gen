@@ -38,10 +38,10 @@ class Frame(UI):
         # Frame
         self.__frame = sdl3.SDL_CreateWindow(
             self.__title.encode('utf-8'), self.__width, self.__height, (
-                sdl3.SDL_WINDOW_BORDERLESS |   # SDL_WINDOW_TOOLTIP
-                sdl3.SDL_WINDOW_TRANSPARENT |  # SDL_WINDOW_POPUP
-                sdl3.SDL_WINDOW_RESIZABLE))    # SDL_WINDOW_UTILITY
-                # SDL_WINDOW_OPENGL
+                sdl3.SDL_WINDOW_OPENGL | sdl3.SDL_WINDOW_BORDERLESS |
+                sdl3.SDL_WINDOW_TRANSPARENT | sdl3.SDL_WINDOW_RESIZABLE))
+                # SDL_WINDOW_OPENGL SDL_WINDOW_TOOLTIP
+                # SDL_WINDOW_POPUP SDL_WINDOW_UTILITY
 
         if not self.__frame:
             print('Frame error:', sdl3.SDL_GetError())
@@ -322,72 +322,14 @@ class Frame(UI):
             my = c_float()
             sdl3.SDL_GetMouseState(mx, my)
 
-            while sdl3.SDL_PollEvent(event):
-                if resize_area.value != self.__last_resize_cursor_on_hover:
-                    self.__cursor_update_shape(resize_area.value)
-                    self.__last_resize_cursor_on_hover = resize_area.value
+            if sdl3.SDL_WaitEventTimeout(event, 16):
+                if event.type != 0:
+                    self.__handle_events(event, resize_area, mx, my)
 
-                if event.type == sdl3.SDL_EVENT_QUIT:
-                    self.__running = False
-                
-                if event.type == sdl3.SDL_EVENT_KEY_DOWN:
-                    if event.key.keysym.sym == sdl3.SDLK_ESCAPE:
-                        self.__running = False
-                
-                if event.type == sdl3.SDL_EVENT_MOUSE_BUTTON_DOWN:
-                    if event.button.button == sdl3.SDL_BUTTON_LEFT:
-                        self.__resize_area = resize_area
-                        if self.__resize_area != ResizeArea.NONE:
-                            self.__cursor_update_shape(self.__resize_area.value)
-                            if self.__resize_wm:
-                                sdl3.SDL_SetWindowHitTest(
-                                    self.__frame, self.__cursor_hit, None)
-                            else:
-                                self.__resize_settings()
-                        else:
-                            ui = self.__container._Layout__hit_test(mx, my)
-                            if ui:
-                                ui._UI__set_state('PRESSED')
-                                self.__render_mode = 'PRESSED'
-                                self.__render_needs_updating = True
-                            else:
-                                sdl3.SDL_SetWindowHitTest(
-                                    self.__frame, self.__cursor_hit, None)
+                    while sdl3.SDL_PollEvent(event):
+                        self.__handle_events(event, resize_area, mx, my)
 
-                elif event.type == sdl3.SDL_EVENT_MOUSE_BUTTON_UP:
-                    if event.button.button == sdl3.SDL_BUTTON_LEFT:
-                        if self.__resizing:
-                            self.__resize_stop()
-                            self.__render_mode = 'RESIZE'
-                            self.__render_needs_updating = True
-                        else:
-                            ui = self.__container._Layout__hit_test(mx, my)
-                            if ui:
-                                ui._UI__set_state('RELEASED')
-                                self.__render_mode = 'HOVER'
-                                self.__render_needs_updating = True
-
-                elif event.type == sdl3.SDL_EVENT_MOUSE_MOTION:
-                    if not self.__resize_wm:
-                        if self.__resize_area != ResizeArea.NONE:
-                            self.__render_mode = 'RESIZE'
-                            self.__render_needs_updating = True
-                            self.__resize_start()
-
-                        if resize_area == ResizeArea.NONE:
-                            hv = None
-                            if not self.__resizing:
-                                hv = self.__container._Layout__hit_test(mx, my)
-                            
-                            if hv and hv != self.__hovered_ui:
-                                self.__hovered_ui._UI__set_state('BASE')
-                                self.__hovered_ui = hv
-                                self.__hovered_ui._UI__set_state('HOVER')
-
-                                self.__render_mode = 'HOVER'
-                                self.__render_needs_updating = True
-
-            if self.__queue_list:  # print('Queue:', len(self.__queue_list))
+            if self.__queue_list:
                 self.__container._Layout__redraw_queue(self.__queue_list)
                 self.__render_mode = 'QUEUE'
                 self.__render_needs_updating = True
@@ -395,6 +337,71 @@ class Frame(UI):
             if self.__render_needs_updating:
                 self.__render()
                 self.__render_count += 1
+    
+    def __handle_events(self, event, resize_area, mx, my) -> None:
+        if resize_area.value != self.__last_resize_cursor_on_hover:
+            self.__cursor_update_shape(resize_area.value)
+            self.__last_resize_cursor_on_hover = resize_area.value
+
+        if event.type == sdl3.SDL_EVENT_QUIT:
+            self.__running = False
+        
+        if event.type == sdl3.SDL_EVENT_KEY_DOWN:
+            if event.key.keysym.sym == sdl3.SDLK_ESCAPE:
+                self.__running = False
+        
+        if event.type == sdl3.SDL_EVENT_MOUSE_BUTTON_DOWN:
+            if event.button.button == sdl3.SDL_BUTTON_LEFT:
+                self.__resize_area = resize_area
+                if self.__resize_area != ResizeArea.NONE:
+                    self.__cursor_update_shape(self.__resize_area.value)
+                    if self.__resize_wm:
+                        sdl3.SDL_SetWindowHitTest(
+                            self.__frame, self.__cursor_hit, None)
+                    else:
+                        self.__resize_settings()
+                else:
+                    ui = self.__container._Layout__hit_test(mx, my)
+                    if ui:
+                        ui._UI__set_state('PRESSED')
+                        self.__render_mode = 'PRESSED'
+                        self.__render_needs_updating = True
+                    else:
+                        sdl3.SDL_SetWindowHitTest(
+                            self.__frame, self.__cursor_hit, None)
+
+        elif event.type == sdl3.SDL_EVENT_MOUSE_BUTTON_UP:
+            if event.button.button == sdl3.SDL_BUTTON_LEFT:
+                if self.__resizing:
+                    self.__resize_stop()
+                    self.__render_mode = 'RESIZE'
+                    self.__render_needs_updating = True
+                else:
+                    ui = self.__container._Layout__hit_test(mx, my)
+                    if ui:
+                        ui._UI__set_state('RELEASED')
+                        self.__render_mode = 'HOVER'
+                        self.__render_needs_updating = True
+
+        elif event.type == sdl3.SDL_EVENT_MOUSE_MOTION:
+            if not self.__resize_wm:
+                if self.__resize_area != ResizeArea.NONE:
+                    self.__render_mode = 'RESIZE'
+                    self.__render_needs_updating = True
+                    self.__resize_start()
+
+                if resize_area == ResizeArea.NONE:
+                    hv = None
+                    if not self.__resizing:
+                        hv = self.__container._Layout__hit_test(mx, my)
+                    
+                    if hv and hv != self.__hovered_ui:
+                        self.__hovered_ui._UI__set_state('BASE')
+                        self.__hovered_ui = hv
+                        self.__hovered_ui._UI__set_state('HOVER')
+
+                        self.__render_mode = 'HOVER'
+                        self.__render_needs_updating = True
     
     def __render(self) -> None:
         self.__render_needs_updating = False
@@ -433,7 +440,7 @@ class Frame(UI):
             self.__container._Layout__redraw(self.__render_mode)
 
         sdl3.SDL_RenderPresent(self.__renderer)
-        sdl3.SDL_Delay(10)
+        sdl3.SDL_Delay(16)
     
     def __resize_settings(self) -> None:
         self.__resizing = True
