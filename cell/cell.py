@@ -12,11 +12,13 @@ from ..flag import StyleClass
 
 class Cell(Margin, Pos, Size, UI):
     """..."""
-    def __init__(self, style_class: str = None, *args, **kwargs) -> None:
+    def __init__(
+            self, style_class: str = None, fill: Fill = Fill.XY,
+            *args, **kwargs) -> None:
         """..."""
         super().__init__(*args, **kwargs)
         self.__drawer = None
-        self.__fill = Fill.XY
+        self.__fill = fill
         self.__style_class = style_class
         
         class_name = self.__class__.__name__

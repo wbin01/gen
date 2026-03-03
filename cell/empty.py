@@ -29,10 +29,10 @@ class Empty(Cell):
         self.__texture_h = 0
 
     def __repr__(self) -> str:
-        return f'{self.__class__.__name__}(text="{self.__text}")'
+        return f'{self.__class__.__name__}()'
     
     def __str__(self) -> str:
-        return f'{self.__class__.__name__}("{self.__text}")'
+        return f'{self.__class__.__name__}()'
 
     def __draw(self, mode: str = None):
         if mode == 'REBUILD':

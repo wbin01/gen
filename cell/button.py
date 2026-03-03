@@ -13,11 +13,12 @@ class Button(Cell):
     """..."""
     def __init__(
             self, text: str = '', width: int = 100, height: int = 32,
-            elided: bool = False, *args, **kwargs) -> None:
+            elided: bool = False, fill: Fill = Fill.X,
+            *args, **kwargs) -> None:
         """..."""
-        super().__init__(*args, **kwargs)
+        super().__init__(fill=fill, *args, **kwargs)
         self._UI__base_class = 'Button'
-        self.fill = Fill.X
+        self.fill = fill
 
         self.__text = text
         self.width = width
@@ -106,15 +107,19 @@ class Button(Cell):
         if self.__text:
             text = FontRender(
                 self.__text, text, font, font_size,
-                self.width if self.__elided else None, pad)
+                int(self.width) - pad if self.__elided else None, pad)
             if self.width < text.width + pad: self.width = text.width + pad
             if self.height < text.height + pad: self.height = text.height + pad
 
             tx = x + (self.width // 2) - (text.width // 2)
             ty = y + (self.height // 2) - (text.height // 2)
 
-            self._Size__min_width = text.width + pad
-            self._Size__min_height = text.height + pad
+            if not self.__elided:
+                minw = text.width + pad
+                if self._Size__min_width < minw: self._Size__min_width = minw
+                
+                minh = text.height + pad
+                if self._Size__min_height < minh: self._Size__min_height = minh
 
         self._Cell__drawer.rect(
             x, y, self.width, self.height, border, radius)

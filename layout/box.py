@@ -303,11 +303,16 @@ class Box(Margin, Pos, Size, Add, Layout):
             min_width = 0
             horizontal, width, last = [], 0, len(layout._Add__uis) - 1
             for num, ui in enumerate(layout._Add__uis):
-                if isinstance(ui, Cell) and not ui.visible: continue
+                if isinstance(ui, Cell):
+                    if not ui.visible: continue
 
-                if isinstance(ui, Cell) and ui._Size__width < ui._Size__min_width:
+                if ui._Size__width < ui._Size__min_width:
                     ui._Size__width = ui._Size__min_width
-                
+                    print(ui._Size__min_width)
+
+                if ui.fill.value in (Fill.NONE, Fill.Y):  # Fixed width
+                    ui._Size__width = ui._Size__base_width
+
                 if hasattr(ui, 'fill'):
                     if ui.fill in (Fill.X, Fill.XY): horizontal.append(ui)
                 
