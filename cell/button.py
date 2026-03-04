@@ -20,77 +20,77 @@ class Button(Cell):
         self._base_class = 'Button'
         self.fill = fill
 
-        self.__text = text
+        self._text = text
         self.width = width
         self.height = height
-        self.__elided = elided
+        self._elided = elided
 
-        self.__resise_w = 0
-        self.__resise_h = 0
+        self._resise_w = 0
+        self._resise_h = 0
 
-        self.__texture_default = None
-        self.__texture_hover = None
-        self.__texture_pressed = None
-        self.__texture_w = 0
-        self.__texture_h = 0
+        self._texture_default = None
+        self._texture_hover = None
+        self._texture_pressed = None
+        self._texture_w = 0
+        self._texture_h = 0
     
     @property
     def text(self):
-        return self.__text
+        return self._text
 
     def __repr__(self) -> str:
-        return f'{self.__class__.__name__}(text="{self.__text}")'
+        return f'{self.__class__.__name__}(text="{self._text}")'
     
     def __str__(self) -> str:
-        return f'{self.__class__.__name__}("{self.__text}")'
+        return f'{self.__class__.__name__}("{self._text}")'
 
-    def __draw(self, mode: str = None) -> None:
+    def _draw(self, mode: str = None) -> None:
         if mode == 'REBUILD':
             self._set_state('BASE')
-            self.__texture_w = int(self.width)
-            self.__texture_h = int(self.height)
+            self._texture_w = int(self.width)
+            self._texture_h = int(self.height)
 
-            self.__texture_default = self._drawer.build_texture(
-                self.__texture_w, self.__texture_h, self.__draw_ui, 'BASE')
+            self._texture_default = self._drawer.build_texture(
+                self._texture_w, self._texture_h, self._draw_ui, 'BASE')
             
-            self.__texture_hover = self._drawer.build_texture(
-                self.__texture_w, self.__texture_h, self.__draw_ui, 'HOVER')
+            self._texture_hover = self._drawer.build_texture(
+                self._texture_w, self._texture_h, self._draw_ui, 'HOVER')
             
-            self.__texture_pressed = self._drawer.build_texture(
-                self.__texture_w, self.__texture_h, self.__draw_ui, 'PRESSED')
+            self._texture_pressed = self._drawer.build_texture(
+                self._texture_w, self._texture_h, self._draw_ui, 'PRESSED')
             
-            self.__resise_w = 0
-            self.__resise_h = 0
+            self._resise_w = 0
+            self._resise_h = 0
         
         elif mode == 'RESIZE':
-            if not self.__resise_h:
-                self.__resise_w = int(self.width)
-                self.__resise_h = int(self.height)
+            if not self._resise_h:
+                self._resise_w = int(self.width)
+                self._resise_h = int(self.height)
             
             # if self.fill.value == 'X':
-            #     self.__resise_w = int(self.width)
+            #     self._resise_w = int(self.width)
 
             self._drawer.set_texture(
-                self.__texture_default,
-                int(self._x), int(self._y), self.__resise_w, self.__resise_h)
+                self._texture_default,
+                int(self._x), int(self._y), self._resise_w, self._resise_h)
             return
         
         if self._state.name == 'BASE':
             self._drawer.set_texture(
-                self.__texture_default,
+                self._texture_default,
                 int(self._x), int(self._y), int(self.width), int(self.height))
 
         elif self._state.name == 'HOVER':
             self._drawer.set_texture(
-                self.__texture_hover,
+                self._texture_hover,
                 int(self._x), int(self._y), int(self.width), int(self.height))
         
         elif self._state.name == 'PRESSED':
             self._drawer.set_texture(
-                self.__texture_pressed,
+                self._texture_pressed,
                 int(self._x), int(self._y), int(self.width), int(self.height))
     
-    def __draw_ui(self, state: str = 'BASE'):
+    def _draw_ui(self, state: str = 'BASE'):
         font_color = self.style[state]['font-color']
         bg_color = self.style[state]['background-color']
         bd_color = self.style[state]['border-color']
@@ -100,16 +100,16 @@ class Button(Cell):
         pad = self.style[state]['padding'] * 2
         x = y = 0
 
-        if self.__text:
+        if self._text:
             text = FontRender(
-                self.__text, font_color, font, font_size,
-                int(self.width) - pad if self.__elided else None, pad)
+                self._text, font_color, font, font_size,
+                int(self.width) - pad if self._elided else None, pad)
             if self.width < text.width + pad: self.width = text.width + pad
             if self.height < text.height + pad: self.height = text.height + pad
 
             tx = x + (self.width // 2) - (text.width // 2)
             ty = y + (self.height // 2) - (text.height // 2)
-            if not self.__elided:
+            if not self._elided:
                 minw = text.width + pad
                 if self._Size__min_width < minw: self._Size__min_width = minw
                 
@@ -119,5 +119,5 @@ class Button(Cell):
         self._drawer.rect(x, y, self.width, self.height, bd_color, rad)
         self._drawer.rect(
             x + 1, y + 1, self.width - 2,self.height - 2, bg_color, rad - 1)
-        if self.__text:
+        if self._text:
             self._drawer.text(tx, ty, text)

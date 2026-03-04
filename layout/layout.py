@@ -92,7 +92,7 @@ class Layout(UI):
                 ui._redraw(mode)
                 continue
             
-            getattr(ui, f'_{ui._base_class}__draw')(mode)
+            ui._draw(mode)
             ui._dirty = False
 
         self._dirty = False
@@ -110,7 +110,7 @@ class Layout(UI):
             if not ui.visible: continue
             if not ui._dirty: continue
 
-            getattr(ui, f'_{ui.__class__.__name__}__draw')('REBUILD')
+            ui._draw('REBUILD')
             ui._dirty = False
 
             if (time.perf_counter() - start) * 50 > budget_ms:

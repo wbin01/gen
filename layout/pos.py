@@ -40,7 +40,7 @@ class Pos(Add, Layout):
                 ui._redraw()
                 continue
 
-            getattr(ui, f'_{ui.__class__.__name__}__draw')()
+            ui._draw()
             ui._dirty = False
 
         self._dirty = False
