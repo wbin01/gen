@@ -174,11 +174,9 @@ class Frame(UI):
         self._y = int(y)
         sdl3.SDL_SetWindowPosition(self._frame, self._x, self._y)
     
-    def add(self, cell: Cell | Box, fill=None) -> Cell | Box:
-        name = f'_{cell.__class__.__name__}'
-        setattr(cell, name + '__drawer', self._drawer)
-
-        return self._container.add(cell)
+    def add(self, ui: Cell | Box, fill=None) -> Cell | Box:
+        ui._drawer = self._drawer
+        return self._container.add(ui)
         
     def run(self) -> int:
         self._draw('FRAME_BASE')
@@ -395,19 +393,22 @@ class Frame(UI):
                     self._render_mode = 'RESIZE'
                     self._render_needs_updating = True
                     self._resize_start()
+            
+            if self._hovered_ui._active_move:
+                self._hovered_ui._set_state('MOVE')
 
-                if resize_area == ResizeArea.NONE:
-                    hv = None
-                    if not self._resizing:
-                        hv = self._container._hit_test(mx, my)
-                    
-                    if hv and hv != self._hovered_ui:
-                        self._hovered_ui._set_state('BASE')
-                        self._hovered_ui = hv
-                        self._hovered_ui._set_state('HOVER')
+            if resize_area == ResizeArea.NONE:
+                ui = None
+                if not self._resizing:
+                    ui = self._container._hit_test(mx, my)
+                
+                if ui and ui != self._hovered_ui:
+                    self._hovered_ui._set_state('LEAVE')
+                    self._hovered_ui = ui
+                    self._hovered_ui._set_state('ENTER')
 
-                        self._render_mode = 'HOVER'
-                        self._render_needs_updating = True
+                    self._render_mode = 'HOVER'
+                    self._render_needs_updating = True
     
     def _render(self) -> None:
         self._render_needs_updating = False

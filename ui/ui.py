@@ -13,6 +13,7 @@ class UI(object):
         self._dirty = True
         self._state = State.BASE
         self._visible = True
+        self._active_move = False
 
         self.enter = Signal()
         self.leave = Signal()
@@ -25,6 +26,15 @@ class UI(object):
 
     def __str__(self) -> str:
         return self.__class__.__name__
+    
+    @property
+    def active_move(self) -> bool:
+        """..."""
+        return self._active_move
+    
+    @active_move.setter
+    def active_move(self, active_move: bool) -> None:
+        self._active_move = active_move
     
     @property
     def visible(self) -> bool:
@@ -56,17 +66,27 @@ class UI(object):
         return False
     
     def _set_state(self, event: str) -> None:
-        if event == 'RELEASED':
+        if event == 'ENTER':
             self._state = State.HOVER
+            self.enter.emit(self)
 
-        elif event == 'HOVER':
-            self._state = State.HOVER
-        
         elif event == 'PRESSED':
             self._state = State.PRESSED
             self.pressed.emit(self)
-
-        else:  # if event == 'BASE':
+        
+        elif event == 'RELEASED':
+            self._state = State.HOVER
+            self.released.emit(self)
+        
+        elif event == 'MOVE':
+            self._state = State.HOVER
+            self.move.emit(self)
+        
+        elif event == 'LEAVE':
+            self._state = State.BASE
+            self.leave.emit(self)
+        
+        else:  # BASE
             self._state = State.BASE
 
         self._dirty = 'HOVER'
