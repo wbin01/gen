@@ -158,9 +158,9 @@ class Box(Margin, Pos, Size, Add, Layout):
             ui._Pos__y = ui_y + ui.margin[0]
 
             if self._orientation == 'VERTICAL':  # Prepare next position
-                ui_y += ui.height + ui._Margin__margin_y + self._spacing
+                ui_y += ui.height + ui._margin_y + self._spacing
             elif self._orientation == 'HORIZONTAL':
-                ui_x += ui.width + ui._Margin__margin_x + self._spacing
+                ui_x += ui.width + ui._margin_x + self._spacing
             
             if isinstance(ui, Layout):
                 ui._update() #  Repeat for all
@@ -236,7 +236,7 @@ class Box(Margin, Pos, Size, Add, Layout):
                 if not ui._dirty: continue
 
                 if ui.fill in (Fill.X, Fill.XY):
-                    ui._Size__width = total_width - ui._Margin__margin_x
+                    ui._Size__width = total_width - ui._margin_x
                 
                 if isinstance(ui, Cell):
                     if ui._Size__width < ui._Size__min_width:
@@ -251,8 +251,8 @@ class Box(Margin, Pos, Size, Add, Layout):
                         dt = (total_width - ui.width)
                         ui.margin = ui.margin[0], ui.margin[1],ui.margin[2], dt
                 
-                if min_width < ui._Size__width + ui._Margin__margin_x:
-                    min_width = ui._Size__width + ui._Margin__margin_x
+                if min_width < ui._Size__width + ui._margin_x:
+                    min_width = ui._Size__width + ui._margin_x
             
             if layout._Size__width < min_width:
                 layout._Size__width = min_width
@@ -269,7 +269,7 @@ class Box(Margin, Pos, Size, Add, Layout):
                 if hasattr(ui, 'fill'):  # Collects cells that expand
                     if ui.fill in (Fill.Y, Fill.XY): vertical.append(ui)
                 
-                height += ui.height + ui._Margin__margin_y  # Save height
+                height += ui.height + ui._margin_y  # Save height
                 min_height += ui._Size__height
                 if num != last:
                     height += layout.spacing
@@ -294,7 +294,7 @@ class Box(Margin, Pos, Size, Add, Layout):
                 if isinstance(ui, Cell) and not ui.visible: continue
 
                 if ui.fill in (Fill.Y, Fill.XY):
-                    ui._Size__height = total_height - ui._Margin__margin_y
+                    ui._Size__height = total_height - ui._margin_y
                     if ui._Size__height < ui._Size__min_height:
                         ui._Size__height = ui._Size__min_height
 
@@ -308,8 +308,8 @@ class Box(Margin, Pos, Size, Add, Layout):
                         ui.margin = dt, ui.margin[1], ui.margin[2],ui.margin[3]
                 
                 if isinstance(ui, Cell):
-                    if min_height < ui.height + ui._Margin__margin_y:
-                        min_height = ui.height + ui._Margin__margin_y
+                    if min_height < ui.height + ui._margin_y:
+                        min_height = ui.height + ui._margin_y
 
             if layout._Size__height < min_height:
                 layout._Size__height = min_height
@@ -331,7 +331,7 @@ class Box(Margin, Pos, Size, Add, Layout):
                 if hasattr(ui, 'fill'):
                     if ui.fill in (Fill.X, Fill.XY): horizontal.append(ui)
                 
-                width += ui.width + ui._Margin__margin_x
+                width += ui.width + ui._margin_x
                 min_width += ui._Size__min_width
                 if num != last:
                     width += layout.spacing
@@ -379,26 +379,26 @@ class Box(Margin, Pos, Size, Add, Layout):
 
             if layout._orientation == 'VERTICAL':  # Set width height
                 if layout.fill in (Fill.X, Fill.XY):
-                    w = ui._Size__width + ui._Margin__margin_x
+                    w = ui._Size__width + ui._margin_x
                     if w > layout.width:
                         layout._Size__width = w
                         layout._Size__base_width = w
 
                 if layout.fill in (Fill.Y, Fill.XY):
-                    h = ui._Size__base_height + ui._Margin__margin_y
+                    h = ui._Size__base_height + ui._margin_y
                     if num != last: h += layout.spacing
                     layout._Size__height += h
                     layout._Size__base_height += h
 
             elif layout._orientation == 'HORIZONTAL':
                 if layout.fill in (Fill.X, Fill.XY):
-                    w = ui._Size__base_width + ui._Margin__margin_x
+                    w = ui._Size__base_width + ui._margin_x
                     if num != last: w += layout.spacing
                     layout._Size__width += w
                     layout._Size__base_width += w
                 
                 if layout.fill in (Fill.Y, Fill.XY):
-                    h = ui._Size__height + ui._Margin__margin_y
+                    h = ui._Size__height + ui._margin_y
                     if h > layout.height:
                         layout._Size__height = h
                         layout._Size__base_height = h

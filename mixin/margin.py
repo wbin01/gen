@@ -4,11 +4,11 @@
 class Margin(object):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
-        self.__margin = (0, 0, 0, 0)
-        self.__base_margin = (0, 0, 0, 0)
+        self._margin = (0, 0, 0, 0)
+        self._base_margin = (0, 0, 0, 0)
         
-        self.__margin_x = 0
-        self.__margin_y = 0
+        self._margin_x = 0
+        self._margin_y = 0
     
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}()'
@@ -35,7 +35,7 @@ class Margin(object):
             A tuple of integers.
         
         """
-        return self.__margin
+        return self._margin
     
     @margin.setter
     def margin(self, margin: tuple | int) -> None:
@@ -44,12 +44,12 @@ class Margin(object):
                 'The value must be an "int" or a "tuple" of integers.')
         
         if isinstance(margin, int):
-            self.__margin_x = margin * 2
-            self.__margin_y = margin * 2
-            self.__margin = margin, margin, margin, margin
-            self.__base_margin = self.__margin
+            self._margin_x = margin * 2
+            self._margin_y = margin * 2
+            self._margin = margin, margin, margin, margin
+            self._base_margin = self._margin
         else:
-            self.__margin_x = margin[1] + margin[3]
-            self.__margin_y = margin[0] + margin[2]
-            self.__margin = margin
-            self.__base_margin = margin
+            self._margin_x = margin[1] + margin[3]
+            self._margin_y = margin[0] + margin[2]
+            self._margin = margin
+            self._base_margin = margin
