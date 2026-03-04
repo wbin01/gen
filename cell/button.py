@@ -50,13 +50,13 @@ class Button(Cell):
             self.__texture_w = int(self.width)
             self.__texture_h = int(self.height)
 
-            self.__texture_default = self._Cell__drawer.build_texture(
+            self.__texture_default = self._drawer.build_texture(
                 self.__texture_w, self.__texture_h, self.__draw_ui, 'BASE')
             
-            self.__texture_hover = self._Cell__drawer.build_texture(
+            self.__texture_hover = self._drawer.build_texture(
                 self.__texture_w, self.__texture_h, self.__draw_ui, 'HOVER')
             
-            self.__texture_pressed = self._Cell__drawer.build_texture(
+            self.__texture_pressed = self._drawer.build_texture(
                 self.__texture_w, self.__texture_h, self.__draw_ui, 'PRESSED')
             
             self.__resise_w = 0
@@ -70,23 +70,23 @@ class Button(Cell):
             # if self.fill.value == 'X':
             #     self.__resise_w = int(self.width)
 
-            self._Cell__drawer.set_texture(
+            self._drawer.set_texture(
                 self.__texture_default,
                 int(self._x), int(self._y), self.__resise_w, self.__resise_h)
             return
         
         if self._state.name == 'BASE':
-            self._Cell__drawer.set_texture(
+            self._drawer.set_texture(
                 self.__texture_default,
                 int(self._x), int(self._y), int(self.width), int(self.height))
 
         elif self._state.name == 'HOVER':
-            self._Cell__drawer.set_texture(
+            self._drawer.set_texture(
                 self.__texture_hover,
                 int(self._x), int(self._y), int(self.width), int(self.height))
         
         elif self._state.name == 'PRESSED':
-            self._Cell__drawer.set_texture(
+            self._drawer.set_texture(
                 self.__texture_pressed,
                 int(self._x), int(self._y), int(self.width), int(self.height))
     
@@ -116,8 +116,8 @@ class Button(Cell):
                 minh = text.height + pad
                 if self._Size__min_height < minh: self._Size__min_height = minh
 
-        self._Cell__drawer.rect(x, y, self.width, self.height, bd_color, rad)
-        self._Cell__drawer.rect(
+        self._drawer.rect(x, y, self.width, self.height, bd_color, rad)
+        self._drawer.rect(
             x + 1, y + 1, self.width - 2,self.height - 2, bg_color, rad - 1)
         if self.__text:
-            self._Cell__drawer.text(tx, ty, text)
+            self._drawer.text(tx, ty, text)

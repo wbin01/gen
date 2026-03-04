@@ -40,7 +40,7 @@ class Layout(UI):
                 continue
 
             if isinstance(ui, Cell):  # or isinstance(ui, Layout):
-                hit_ui = ui._Cell__hit_test(x, y)
+                hit_ui = ui._hit_test(x, y)
                 if hit_ui:
                     return hit_ui
         

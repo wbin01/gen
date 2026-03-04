@@ -17,9 +17,9 @@ class Cell(Margin, Pos, Size, UI):
             *args, **kwargs) -> None:
         """..."""
         super().__init__(*args, **kwargs)
-        self.__drawer = None
-        self.__fill = fill
-        self.__style_class = style_class
+        self._drawer = None
+        self._fill = fill
+        self._style_class = style_class
         
         class_name = self.__class__.__name__
         if not hasattr(Theme, class_name):
@@ -52,7 +52,7 @@ class Cell(Margin, Pos, Size, UI):
             Theme.classes[state_id] = copy.deepcopy(theme)
             theme = Theme.classes[state_id]
         
-        self.__style = theme
+        self._style = theme
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}()'
@@ -63,21 +63,21 @@ class Cell(Margin, Pos, Size, UI):
     @property
     def fill(self) -> Fill:
         """..."""
-        return self.__fill
+        return self._fill
     
     @fill.setter
     def fill(self, fill: Fill) -> None:
-        self.__fill = fill
+        self._fill = fill
     
     @property
     def style(self) -> dict:
-        return self.__style
+        return self._style
     
     @style.setter
     def style(self, style: dict) -> None:
-        self.__style = style
+        self._style = style
     
-    def __hit_test(self, x: int, y: int) -> UI | None:
+    def _hit_test(self, x: int, y: int) -> UI | None:
         if not self.visible:
             return None
 
