@@ -389,14 +389,14 @@ class Box(Margin, Pos, Size, Add, Layout):
 
     def _draw(self, mode: str = None) -> None:
         if not self._first and mode == 'REBUILD':
-            self._Layout__drawer.rect(
+            self._drawer.rect(
                 self._x - self.margin[3], self._y - self.margin[0],
                 self.width + self.margin[3] + self.margin[1],
                 self.height + self.margin[0] + self.margin[2],
                 Theme.Frame['BASE']['accent-color'],
                 Theme.Frame['BASE']['radius'])
             
-            self._Layout__drawer.rect(
+            self._drawer.rect(
                 self._x - self.margin[3] + 1, self._y - self.margin[0] + 1,
                 self.width + self.margin[3] + self.margin[1] - 2,
                 self.height + self.margin[0] + self.margin[2] - 2,

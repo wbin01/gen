@@ -311,9 +311,9 @@ class Frame(UI):
 
         if mode == 'FRAME':
             if self.__container._Add__uis:
-                self.__container._Layout__invalidate()
+                self.__container._invalidate()
                 self.__container._update()
-                self.__container._Layout__redraw('REBUILD')
+                self.__container._redraw('REBUILD')
 
     def __event_loop(self) -> None:
         while self.__running:
@@ -336,7 +336,7 @@ class Frame(UI):
                         self.__handle_events(event, resize_area, mx, my)
 
             if self.__queue_list:
-                self.__container._Layout__redraw_queue(self.__queue_list)
+                self.__container._redraw_queue(self.__queue_list)
                 self.__render_mode = 'QUEUE'
                 self.__render_needs_updating = True
 
@@ -367,7 +367,7 @@ class Frame(UI):
                     else:
                         self.__resize_settings()
                 else:
-                    ui = self.__container._Layout__hit_test(mx, my)
+                    ui = self.__container._hit_test(mx, my)
                     if ui:
                         ui._set_state('PRESSED')
                         self.__render_mode = 'PRESSED'
@@ -383,7 +383,7 @@ class Frame(UI):
                     self.__render_mode = 'RESIZE'
                     self.__render_needs_updating = True
                 else:
-                    ui = self.__container._Layout__hit_test(mx, my)
+                    ui = self.__container._hit_test(mx, my)
                     if ui:
                         ui._set_state('RELEASED')
                         self.__render_mode = 'HOVER'
@@ -399,7 +399,7 @@ class Frame(UI):
                 if resize_area == ResizeArea.NONE:
                     hv = None
                     if not self.__resizing:
-                        hv = self.__container._Layout__hit_test(mx, my)
+                        hv = self.__container._hit_test(mx, my)
                     
                     if hv and hv != self.__hovered_ui:
                         self.__hovered_ui._set_state('BASE')
@@ -422,28 +422,28 @@ class Frame(UI):
                 self.__resizing_count += 1
                 sdl3.SDL_RenderTexture(
                     self.__renderer, self.__frame_base_texture, None, None)
-                self.__container._Layout__invalidate()
+                self.__container._invalidate()
                 self.__container._update()
-                self.__container._Layout__redraw('RESIZE')
+                self.__container._redraw('RESIZE')
 
             if not self.__resizing:
                 self.__resizing_count = 0
                 self.__draw('FRAME')
                 sdl3.SDL_RenderTexture(
                     self.__renderer, self.__frame_base_texture, None, None)
-                self.__container._Layout__invalidate()
+                self.__container._invalidate()
                 self.__container._update()
-                # self.__container._Layout__redraw('REBUILD')
+                # self.__container._redraw('REBUILD')
 
-                self.__queue_list = self.__container._Layout__queue_list()
-                self.__container._Layout__queue_list_clear()
+                self.__queue_list = self.__container._queue_list()
+                self.__container._queue_list_clear()
 
         if not self.__resizing and self.__render_mode in (
                 'HOVER', 'PRESSED', 'BASE', 'QUEUE'):
             sdl3.SDL_RenderTexture(
                 self.__renderer, self.__frame_texture, None, None)
             self.__container._update()
-            self.__container._Layout__redraw(self.__render_mode)
+            self.__container._redraw(self.__render_mode)
 
         sdl3.SDL_RenderPresent(self.__renderer)
         sdl3.SDL_Delay(16)
