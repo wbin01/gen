@@ -7,7 +7,7 @@ class Row(Box):
     def __init__(self, *args, **kwargs) -> None:
         """..."""
         super().__init__(*args, **kwargs)
-        self._Box__orientation = 'HORIZONTAL'
+        self._orientation = 'HORIZONTAL'
     
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}()'

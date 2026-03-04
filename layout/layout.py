@@ -87,7 +87,7 @@ class Layout(UI):
 
             if isinstance(ui, Layout):
                 if self._app and self._app._Frame__view_layout:
-                    ui._Box__draw(mode)
+                    ui._draw(mode)
                 
                 ui._Layout__redraw(mode)
                 continue

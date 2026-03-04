@@ -36,8 +36,8 @@ class Pos(Add, Layout):
             if num_color == 9: num_color = -1
 
             if isinstance(ui, Layout):
-                ui._Box__debug_color_index = num_color
-                ui._Box__redraw()
+                ui._debug_color_index = num_color
+                ui._redraw()
                 continue
 
             getattr(ui, f'_{ui.__class__.__name__}__draw')()

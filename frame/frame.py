@@ -65,10 +65,10 @@ class Frame(UI):
 
         # Container
         self.__container = Col()
-        self.__container._Box__first = True
+        self.__container._first = True
         self.__container._parent = self
         self.__container._app = self
-        self.__container._Box__drawer = self.__drawer
+        self.__container._drawer = self.__drawer
 
         # Loop
         self.__running = True
@@ -312,7 +312,7 @@ class Frame(UI):
         if mode == 'FRAME':
             if self.__container._Add__uis:
                 self.__container._Layout__invalidate()
-                self.__container._Box__update()
+                self.__container._update()
                 self.__container._Layout__redraw('REBUILD')
 
     def __event_loop(self) -> None:
@@ -423,7 +423,7 @@ class Frame(UI):
                 sdl3.SDL_RenderTexture(
                     self.__renderer, self.__frame_base_texture, None, None)
                 self.__container._Layout__invalidate()
-                self.__container._Box__update()
+                self.__container._update()
                 self.__container._Layout__redraw('RESIZE')
 
             if not self.__resizing:
@@ -432,7 +432,7 @@ class Frame(UI):
                 sdl3.SDL_RenderTexture(
                     self.__renderer, self.__frame_base_texture, None, None)
                 self.__container._Layout__invalidate()
-                self.__container._Box__update()
+                self.__container._update()
                 # self.__container._Layout__redraw('REBUILD')
 
                 self.__queue_list = self.__container._Layout__queue_list()
@@ -442,7 +442,7 @@ class Frame(UI):
                 'HOVER', 'PRESSED', 'BASE', 'QUEUE'):
             sdl3.SDL_RenderTexture(
                 self.__renderer, self.__frame_texture, None, None)
-            self.__container._Box__update()
+            self.__container._update()
             self.__container._Layout__redraw(self.__render_mode)
 
         sdl3.SDL_RenderPresent(self.__renderer)
