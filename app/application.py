@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-from ..mixin import Pos, Size
+from ..mixin import Size
 from ..frame import Frame
 
-class Application(Pos, Size):
+class Application(Size):
     """..."""
     def __init__(self, frame, *args, **kwargs) -> None:
         """..."""

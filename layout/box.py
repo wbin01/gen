@@ -2,11 +2,11 @@
 from .layout import Layout
 from ..cell import Cell, ColExpander, RowExpander
 from ..flag import Align, Fill
-from ..mixin import Add, Margin, Pos, Size
+from ..mixin import Add, Margin, Size
 from ..ui import Theme
 
 
-class Box(Margin, Pos, Size, Add, Layout):
+class Box(Margin, Size, Add, Layout):
     """Organizes the positioning of the elements."""
     def __init__(
             self,
@@ -56,6 +56,9 @@ class Box(Margin, Pos, Size, Add, Layout):
         self._first = False
         self._orientation = 'VERTICAL'
         self._dirty = True
+
+        self._x = 0
+        self._y = 0
     
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}()'
@@ -154,8 +157,8 @@ class Box(Margin, Pos, Size, Add, Layout):
             if not ui.visible: continue
             if not ui._dirty: continue
 
-            ui._Pos__x = ui_x + ui.margin[3]  # Set current position
-            ui._Pos__y = ui_y + ui.margin[0]
+            ui._x = ui_x + ui.margin[3]  # Set current position
+            ui._y = ui_y + ui.margin[0]
 
             if self._orientation == 'VERTICAL':  # Prepare next position
                 ui_y += ui.height + ui._margin_y + self._spacing

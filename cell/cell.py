@@ -5,12 +5,12 @@ import ctypes
 import sdl3
 
 from ..flag import Fill
-from ..mixin import Margin, Pos, Size
+from ..mixin import Margin, Size
 from ..ui import UI, Theme
 from ..flag import StyleClass
 
 
-class Cell(Margin, Pos, Size, UI):
+class Cell(Margin, Size, UI):
     """..."""
     def __init__(
             self, style_class: str = None, fill: Fill = Fill.XY,
@@ -20,6 +20,9 @@ class Cell(Margin, Pos, Size, UI):
         self._drawer = None
         self._fill = fill
         self._style_class = style_class
+
+        self._x = 0
+        self._y = 0
         
         class_name = self.__class__.__name__
         if not hasattr(Theme, class_name):
