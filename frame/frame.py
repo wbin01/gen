@@ -310,7 +310,7 @@ class Frame(UI):
             r=self._style.Frame['BASE']['radius'])
 
         if mode == 'FRAME':
-            if self._container._Add__uis:
+            if self._container._uis:
                 self._container._invalidate()
                 self._container._update()
                 self._container._redraw('REBUILD')

@@ -33,7 +33,7 @@ class Layout(UI):
         if not self._rect_contains(self, x, y):
             return None
 
-        for ui in self._Add__uis:
+        for ui in self._uis:
             if isinstance(ui, Layout):
                 hit_ui =  ui._hit_test(x, y)
                 if hit_ui: return hit_ui
@@ -48,7 +48,7 @@ class Layout(UI):
     
     def _invalidate(self) -> None:
         self._dirty = True
-        for ui in self._Add__uis:
+        for ui in self._uis:
             if isinstance(ui, Layout):
                 ui._invalidate()
                 continue
@@ -57,7 +57,7 @@ class Layout(UI):
     def _queue_list(self) -> list:
         self._dirty = True
 
-        for ui in self._Add__uis:
+        for ui in self._uis:
             if isinstance(ui, Layout):
                 self._queue.extend(ui._queue_list())
                 continue
@@ -71,16 +71,16 @@ class Layout(UI):
     def _queue_list_clear(self) -> list:
         self._queue = []
 
-        for ui in self._Add__uis:
+        for ui in self._uis:
             if isinstance(ui, Layout):
                 ui._queue_list_clear()
                 continue
 
     def _redraw(self, mode: str = None) -> None:
-        if not self._Add__uis:
+        if not self._uis:
             return
         
-        for ui in self._Add__uis:
+        for ui in self._uis:
             if not ui.visible: continue
             if not ui._dirty:
                 continue

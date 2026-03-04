@@ -66,12 +66,6 @@ class FontRender(object):
     def update(self) -> None:
         """..."""
         self._text_to_bytes()
-
-    def __repr__(self) -> str:
-        return f'{self.__class__.__name__}()'
-
-    def __str__(self) -> str:
-        return self.__class__.__name__
     
     def _text_to_bytes(self) -> None:
         

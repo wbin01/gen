@@ -28,7 +28,7 @@ class Pos(Add, Layout):
         if self._app and self._app._debug: self.__draw()
 
         num_color = -1
-        for ui in self._Add__uis:
+        for ui in self._uis:
             if isinstance(ui, Cell) and not ui.visible: continue
             if not ui._dirty: continue
 

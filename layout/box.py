@@ -141,7 +141,7 @@ class Box(Margin, Pos, Size, Add, Layout):
         if self._dirty == 'HOVER':
             return
         
-        if not self._Add__uis:
+        if not self._uis:
             return
         
         if self._first:
@@ -150,7 +150,7 @@ class Box(Margin, Pos, Size, Add, Layout):
             self._update_fill(self)
         
         ui_x, ui_y = self._x, self._y  # Reset
-        for ui in self._Add__uis:
+        for ui in self._uis:
             if not ui.visible: continue
             if not ui._dirty: continue
 
@@ -166,59 +166,59 @@ class Box(Margin, Pos, Size, Add, Layout):
                 ui._update() #  Repeat for all
     
     def _update_align(self, layout: Box) -> None:
-        if not layout._Add__uis:
+        if not layout._uis:
             return
         
         if layout._orientation == 'VERTICAL':
             if layout.align == Align.START:
-                if isinstance(layout._Add__uis[0], ColExpander):
-                    del(layout._Add__uis[0])
+                if isinstance(layout._uis[0], ColExpander):
+                    del(layout._uis[0])
                 
-                if isinstance(layout._Add__uis[-1], ColExpander):
-                    del(layout._Add__uis[-1])
+                if isinstance(layout._uis[-1], ColExpander):
+                    del(layout._uis[-1])
             
             elif layout.align == Align.END:
-                if isinstance(layout._Add__uis[-1], ColExpander):
-                    del(layout._Add__uis[-1])
+                if isinstance(layout._uis[-1], ColExpander):
+                    del(layout._uis[-1])
                 
-                if not isinstance(layout._Add__uis[0], ColExpander):
-                    layout._Add__uis.insert(0, ColExpander())
+                if not isinstance(layout._uis[0], ColExpander):
+                    layout._uis.insert(0, ColExpander())
             
             elif layout.align == Align.CENTER:
-                if not isinstance(layout._Add__uis[0], ColExpander):
-                    layout._Add__uis.insert(0, ColExpander())
+                if not isinstance(layout._uis[0], ColExpander):
+                    layout._uis.insert(0, ColExpander())
 
-                if not isinstance(layout._Add__uis[-1], ColExpander):
-                    layout._Add__uis.insert(
-                        len(layout._Add__uis), ColExpander())
+                if not isinstance(layout._uis[-1], ColExpander):
+                    layout._uis.insert(
+                        len(layout._uis), ColExpander())
         
         elif layout._orientation == 'HORIZONTAL':
             if layout.align == Align.START:
-                if isinstance(layout._Add__uis[0], RowExpander):
-                    del(layout._Add__uis[0])
+                if isinstance(layout._uis[0], RowExpander):
+                    del(layout._uis[0])
             
             elif layout.align == Align.END:
-                if isinstance(layout._Add__uis[-1], RowExpander):
-                    del(layout._Add__uis[-1])
+                if isinstance(layout._uis[-1], RowExpander):
+                    del(layout._uis[-1])
                 
-                if not isinstance(layout._Add__uis[0], RowExpander):
-                    layout._Add__uis.insert(0, RowExpander())
+                if not isinstance(layout._uis[0], RowExpander):
+                    layout._uis.insert(0, RowExpander())
             
             elif layout.align == Align.CENTER:
-                if not isinstance(layout._Add__uis[0], RowExpander):
-                    layout._Add__uis.insert(0, RowExpander())
+                if not isinstance(layout._uis[0], RowExpander):
+                    layout._uis.insert(0, RowExpander())
 
-                if not isinstance(layout._Add__uis[-1], RowExpander):
-                    layout._Add__uis.insert(
-                        len(layout._Add__uis), RowExpander())
+                if not isinstance(layout._uis[-1], RowExpander):
+                    layout._uis.insert(
+                        len(layout._uis), RowExpander())
         
-        for ui in layout._Add__uis:
+        for ui in layout._uis:
             if isinstance(ui, Layout):
                 self._update_align(ui)
     
     def _update_fill(self, layout: Box) -> None:
         # Updates the fill of layouts and cells.
-        if not layout._Add__uis:
+        if not layout._uis:
             return
         
         if layout._first:
@@ -231,7 +231,7 @@ class Box(Margin, Pos, Size, Add, Layout):
         if layout._orientation == 'VERTICAL':
             # Width
             min_width = 0
-            for ui in layout._Add__uis:  # Fill: Width equal to the layout
+            for ui in layout._uis:  # Fill: Width equal to the layout
                 if not ui.visible: continue
                 if not ui._dirty: continue
 
@@ -259,8 +259,8 @@ class Box(Margin, Pos, Size, Add, Layout):
             
             # Height
             min_height = 0
-            vertical, height, last = [], 0, len(layout._Add__uis) - 1
-            for num, ui in enumerate(layout._Add__uis):
+            vertical, height, last = [], 0, len(layout._uis) - 1
+            for num, ui in enumerate(layout._uis):
                 if isinstance(ui, Cell) and not ui.visible: continue
 
                 if isinstance(ui, Cell) and ui.height < ui._Size__min_height:
@@ -290,7 +290,7 @@ class Box(Margin, Pos, Size, Add, Layout):
         elif layout._orientation == 'HORIZONTAL':
             # Height
             min_height = 0
-            for ui in layout._Add__uis:
+            for ui in layout._uis:
                 if isinstance(ui, Cell) and not ui.visible: continue
 
                 if ui.fill in (Fill.Y, Fill.XY):
@@ -316,8 +316,8 @@ class Box(Margin, Pos, Size, Add, Layout):
         
             # Width
             min_width = 0
-            horizontal, width, last = [], 0, len(layout._Add__uis) - 1
-            for num, ui in enumerate(layout._Add__uis):
+            horizontal, width, last = [], 0, len(layout._uis) - 1
+            for num, ui in enumerate(layout._uis):
                 if isinstance(ui, Cell):
                     if not ui.visible: continue
 
@@ -349,14 +349,14 @@ class Box(Margin, Pos, Size, Add, Layout):
             if layout._Size__width < min_width:
                 layout._Size__width = min_width
 
-        for ui in layout._Add__uis:
+        for ui in layout._uis:
             if isinstance(ui, Layout):
                 self._update_fill(ui)
 
     def _update_size(self, layout: Box) -> None:
         # Make sure the layout size are compatible with the number 
         # of stacked cells.
-        if not layout._Add__uis:
+        if not layout._uis:
             return
         
         layout._Size__width = layout._Size__base_width
@@ -369,8 +369,8 @@ class Box(Margin, Pos, Size, Add, Layout):
             layout._Size__height = 0
             layout._Size__base_height = 0
         
-        last = len(layout._Add__uis) - 1  # To remove last extra 'spacing'
-        for num, ui in enumerate(layout._Add__uis):
+        last = len(layout._uis) - 1  # To remove last extra 'spacing'
+        for num, ui in enumerate(layout._uis):
             if not ui.visible: continue
             if not ui._dirty: continue
 

@@ -4,7 +4,7 @@
 class Add(object):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
-        self.__uis = []
+        self._uis = []
     
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}()'
@@ -14,9 +14,9 @@ class Add(object):
 
     def add(self, ui: UI) -> UI:
         """..."""
-        return self.__add(ui)
+        return self._add(ui)
 
-    def __add(self, ui: UI) -> UI:
+    def _add(self, ui: UI) -> UI:
         if isinstance(ui, type):
             ui = ui()
 
@@ -24,7 +24,7 @@ class Add(object):
         if 'layout.layout.Layout' not in mro and 'cell.cell.Cell' not in mro:
             raise TypeError('Layout only accepts Cell or Layout.')
         
-        self.__uis.append(ui)
+        self._uis.append(ui)
         ui._parent = self
         ui._app = self._app
 
