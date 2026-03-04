@@ -15,57 +15,57 @@ class FontRender(object):
             padding: int = 20,
             *args, **kwargs) -> None:
         """..."""
-        self.__text = text
-        self.__color = color
-        self.__font = font
-        self.__size = size
-        self.__width_to_elided = width_to_elided
-        self.__pad = padding
+        self._text = text
+        self._color = color
+        self._font = font
+        self._size = size
+        self._width_to_elided = width_to_elided
+        self._pad = padding
 
-        self.__bytes = None
-        self.__width = None
-        self.__height = None
-        self.__text_to_bytes()
+        self._bytes = None
+        self._width = None
+        self._height = None
+        self._text_to_bytes()
     
     def __repr__(self) -> str:
-        return f'{self.__class__.__name__}({self.__text!r})'
+        return f'{self.__class__.__name__}({self._text!r})'
 
     def __str__(self) -> str:
-        return self.__text
+        return self._text
     
     @property
     def text(self) -> str:
         """..."""
-        return self.__text
+        return self._text
     
     @text.setter
     def text(self, text: str) -> None:
-        self.__text = text
+        self._text = text
     
     @property
     def height(self) -> int:
         """..."""
-        return self.__height
+        return self._height
     
     @height.setter
     def height(self, height: int) -> None:
-        self.__height = height
+        self._height = height
     
     @property
     def width(self) -> int:
-        return self.__width
+        return self._width
     
     @width.setter
     def width(self, width: int) -> None:
-        self.__width = width
-
+        self._width = width
+    
     @property
-    def _bytes(self) -> bytes:
-        return self.__bytes
+    def to_bytes(self) -> bytes:
+        return self._bytes
     
     def update(self) -> None:
         """..."""
-        self.__text_to_bytes()
+        self._text_to_bytes()
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}()'
@@ -73,21 +73,21 @@ class FontRender(object):
     def __str__(self) -> str:
         return self.__class__.__name__
     
-    def __text_to_bytes(self) -> None:
+    def _text_to_bytes(self) -> None:
         
-        font = ImageFont.truetype(self.__font, self.__size)
+        font = ImageFont.truetype(self._font, self._size)
 
-        bbox = font.getbbox(self.__text)
+        bbox = font.getbbox(self._text)
         w = bbox[2] - bbox[0]
         h = bbox[3] - bbox[1]
 
-        if self.__width_to_elided and w + self.__pad > self.__width_to_elided:
-            w = self.__width_to_elided - self.__pad
+        if self._width_to_elided and w + self._pad > self._width_to_elided:
+            w = self._width_to_elided - self._pad
 
         raster = Image.new('RGBA', (w, h), (0, 0, 0, 0))
         draw = ImageDraw.Draw(raster)
         draw.text(
-            (-bbox[0], -bbox[1]), self.__text, font=font, fill=self.__color)
+            (-bbox[0], -bbox[1]), self._text, font=font, fill=self._color)
 
-        self.__bytes = raster.tobytes()
-        self.__width, self.__height = raster.size
+        self._bytes = raster.tobytes()
+        self._width, self._height = raster.size

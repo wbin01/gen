@@ -27,6 +27,15 @@ class UI(object):
         return self.__class__.__name__
     
     @property
+    def visible(self) -> bool:
+        """..."""
+        return self._visible
+    
+    @visible.setter
+    def visible(self, visible: bool) -> None:
+        self._visible = visible
+    
+    @property
     def app(self) -> UI:
         return self._app
     
@@ -38,15 +47,6 @@ class UI(object):
     @property
     def parent(self) -> UI:
         return self._parent
-    
-    @property
-    def visible(self) -> bool:
-        """..."""
-        return self._visible
-    
-    @visible.setter
-    def visible(self, visible: bool) -> None:
-        self._visible = visible
     
     def _rect_contains(self, ui: UI, x: int, y: int) -> bool:
         ui_x, ui_y = int(ui._x), int(ui._y)

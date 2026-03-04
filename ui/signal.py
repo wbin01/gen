@@ -3,13 +3,13 @@
 
 class Signal:
     def __init__(self):
-        self.__slots = []
+        self._slots = []
 
     def connect(self, func):
         """..."""
-        self.__slots.append(func)
+        self._slots.append(func)
 
     def emit(self, *args, **kwargs):
         """..."""
-        for func in self.__slots:
+        for func in self._slots:
             func(*args, **kwargs)
