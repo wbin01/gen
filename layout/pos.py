@@ -25,7 +25,7 @@ class Pos(Add, Layout):
     
     def __redraw(self) -> None:
         """..."""
-        if self._app and self._app._Frame__debug: self.__draw()
+        if self._app and self._app._debug: self.__draw()
 
         num_color = -1
         for ui in self._Add__uis:

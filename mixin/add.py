@@ -29,7 +29,7 @@ class Add(object):
         ui._app = self._app
 
         if 'cell.cell.Cell' in mro:
-            ui._Cell__drawer = self._app._Frame__drawer
+            ui._Cell__drawer = self._app._drawer
         elif 'layout.layout.Layout' in mro:
-            ui._drawer = self._app._Frame__drawer
+            ui._drawer = self._app._drawer
         return ui
