@@ -111,10 +111,10 @@ class Button(Cell):
             ty = y + (self.height // 2) - (text.height // 2)
             if not self._elided:
                 minw = text.width + pad
-                if self._Size__min_width < minw: self._Size__min_width = minw
+                if self._min_width < minw: self._min_width = minw
                 
                 minh = text.height + pad
-                if self._Size__min_height < minh: self._Size__min_height = minh
+                if self._min_height < minh: self._min_height = minh
 
         self._drawer.rect(x, y, self.width, self.height, bd_color, rad)
         self._drawer.rect(
