@@ -412,7 +412,7 @@ class Frame(UI):
     def __render(self) -> None:
         self.__render_needs_updating = False
         self.__render_count += 1
-        print('render', self.__render_count)
+        # print('render', self.__render_count)
         
         sdl3.SDL_SetRenderDrawColor(self.__renderer, 0,0,0,0)
         sdl3.SDL_RenderClear(self.__renderer)

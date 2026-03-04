@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 from ..flag import State
+from ..ui import Signal
 
 
 class UI(object):
@@ -12,7 +13,13 @@ class UI(object):
         self.__dirty = True
         self.__state = State.BASE
         self.__visible = True
-    
+
+        self.enter = Signal()
+        self.leave = Signal()
+        self.pressed = Signal()
+        self.released = Signal()
+        self.move = Signal()
+
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}()'
 
@@ -51,16 +58,13 @@ class UI(object):
     def __set_state(self, event: str) -> None:
         if event == 'RELEASED':
             self.__state = State.HOVER
-            # self.__click_signal.emit()
-            # self.__released_signal.emit()
 
         elif event == 'HOVER':
             self.__state = State.HOVER
-            # self.__hover_signal.emit()
         
         elif event == 'PRESSED':
             self.__state = State.PRESSED
-            # self.__pressed_signal.emit()
+            self.pressed.emit(self)
 
         else:  # if event == 'BASE':
             self.__state = State.BASE
