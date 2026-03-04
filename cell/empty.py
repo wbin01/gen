@@ -14,7 +14,7 @@ class Empty(Cell):
             self, width: int = 100, height: int = 32, *args, **kwargs) -> None:
         """..."""
         super().__init__(*args, **kwargs)
-        self._UI__base_class = 'Empty'
+        self._base_class = 'Empty'
 
         self.width = width
         self.height = height
@@ -36,7 +36,7 @@ class Empty(Cell):
 
     def __draw(self, mode: str = None):
         if mode == 'REBUILD':
-            self._UI__set_state('BASE')
+            self._set_state('BASE')
             self.__texture_w = int(self.width)
             self.__texture_h = int(self.height)
 
@@ -65,17 +65,17 @@ class Empty(Cell):
                 int(self._x), int(self._y), self.__resise_w, self.__resise_h)
             return
 
-        if self._UI__state.name == 'BASE':
+        if self._state.name == 'BASE':
             self._Cell__drawer.set_texture(
                 self.__texture_default,
                 int(self._x), int(self._y), int(self.width), int(self.height))
 
-        elif self._UI__state.name == 'HOVER':
+        elif self._state.name == 'HOVER':
             self._Cell__drawer.set_texture(
                 self.__texture_hover,
                 int(self._x), int(self._y), int(self.width), int(self.height))
         
-        elif self._UI__state.name == 'PRESSED':
+        elif self._state.name == 'PRESSED':
             self._Cell__drawer.set_texture(
                 self.__texture_pressed,
                 int(self._x), int(self._y), int(self.width), int(self.height))

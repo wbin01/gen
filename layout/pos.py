@@ -30,7 +30,7 @@ class Pos(Add, Layout):
         num_color = -1
         for ui in self._Add__uis:
             if isinstance(ui, Cell) and not ui.visible: continue
-            if not ui._UI__dirty: continue
+            if not ui._dirty: continue
 
             num_color += 1
             if num_color == 9: num_color = -1
@@ -41,6 +41,6 @@ class Pos(Add, Layout):
                 continue
 
             getattr(ui, f'_{ui.__class__.__name__}__draw')()
-            ui._UI__dirty = False
+            ui._dirty = False
 
-        self._UI__dirty = False
+        self._dirty = False

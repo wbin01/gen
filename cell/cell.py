@@ -81,7 +81,7 @@ class Cell(Margin, Pos, Size, UI):
         if not self.visible:
             return None
 
-        if self._UI__rect_contains(self, x, y):
+        if self._rect_contains(self, x, y):
             return self
         
         return None

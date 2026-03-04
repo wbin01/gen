@@ -25,8 +25,8 @@ class Add(object):
             raise TypeError('Layout only accepts Cell or Layout.')
         
         self.__uis.append(ui)
-        ui._UI__parent = self
-        ui._UI__app = self._app
+        ui._parent = self
+        ui._app = self._app
 
         if 'cell.cell.Cell' in mro:
             ui._Cell__drawer = self._app._Frame__drawer

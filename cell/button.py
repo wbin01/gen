@@ -17,7 +17,7 @@ class Button(Cell):
             *args, **kwargs) -> None:
         """..."""
         super().__init__(fill=fill, *args, **kwargs)
-        self._UI__base_class = 'Button'
+        self._base_class = 'Button'
         self.fill = fill
 
         self.__text = text
@@ -46,7 +46,7 @@ class Button(Cell):
 
     def __draw(self, mode: str = None) -> None:
         if mode == 'REBUILD':
-            self._UI__set_state('BASE')
+            self._set_state('BASE')
             self.__texture_w = int(self.width)
             self.__texture_h = int(self.height)
 
@@ -75,17 +75,17 @@ class Button(Cell):
                 int(self._x), int(self._y), self.__resise_w, self.__resise_h)
             return
         
-        if self._UI__state.name == 'BASE':
+        if self._state.name == 'BASE':
             self._Cell__drawer.set_texture(
                 self.__texture_default,
                 int(self._x), int(self._y), int(self.width), int(self.height))
 
-        elif self._UI__state.name == 'HOVER':
+        elif self._state.name == 'HOVER':
             self._Cell__drawer.set_texture(
                 self.__texture_hover,
                 int(self._x), int(self._y), int(self.width), int(self.height))
         
-        elif self._UI__state.name == 'PRESSED':
+        elif self._state.name == 'PRESSED':
             self._Cell__drawer.set_texture(
                 self.__texture_pressed,
                 int(self._x), int(self._y), int(self.width), int(self.height))

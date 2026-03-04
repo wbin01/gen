@@ -30,7 +30,7 @@ class Layout(UI):
         if not self.visible:
             return None
 
-        if not self._UI__rect_contains(self, x, y):
+        if not self._rect_contains(self, x, y):
             return None
 
         for ui in self._Add__uis:
@@ -47,7 +47,7 @@ class Layout(UI):
         return self
     
     def __queue_list(self) -> list:
-        self._UI__dirty = True
+        self._dirty = True
 
         for ui in self._Add__uis:
             if isinstance(ui, Layout):
@@ -55,7 +55,7 @@ class Layout(UI):
                 continue
 
             if ui not in self.__queue:
-                ui._UI__dirty = True
+                ui._dirty = True
                 self.__queue.append(ui)
         
         return self.__queue
@@ -69,12 +69,12 @@ class Layout(UI):
                 continue
 
     def __invalidate(self) -> None:
-        self._UI__dirty = True
+        self._dirty = True
         for ui in self._Add__uis:
             if isinstance(ui, Layout):
                 ui._Layout__invalidate()
                 continue
-            ui._UI__dirty = True
+            ui._dirty = True
 
     def __redraw(self, mode: str = None) -> None:
         if not self._Add__uis:
@@ -82,7 +82,7 @@ class Layout(UI):
         
         for ui in self._Add__uis:
             if not ui.visible: continue
-            if not ui._UI__dirty:
+            if not ui._dirty:
                 continue
 
             if isinstance(ui, Layout):
@@ -92,10 +92,10 @@ class Layout(UI):
                 ui._Layout__redraw(mode)
                 continue
             
-            getattr(ui, f'_{ui._UI__base_class}__draw')(mode)
-            ui._UI__dirty = False
+            getattr(ui, f'_{ui._base_class}__draw')(mode)
+            ui._dirty = False
 
-        self._UI__dirty = False
+        self._dirty = False
     
     def __redraw_queue(
             self, queue_list: list, budget_ms: float = 3.0) -> None:
@@ -108,10 +108,10 @@ class Layout(UI):
             ui = queue_list.pop(0)
 
             if not ui.visible: continue
-            if not ui._UI__dirty: continue
+            if not ui._dirty: continue
 
             getattr(ui, f'_{ui.__class__.__name__}__draw')('REBUILD')
-            ui._UI__dirty = False
+            ui._dirty = False
 
             if (time.perf_counter() - start) * 50 > budget_ms:
                 break

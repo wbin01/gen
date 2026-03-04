@@ -66,8 +66,8 @@ class Frame(UI):
         # Container
         self.__container = Col()
         self.__container._Box__first = True
-        self.__container._UI__parent = self
-        self.__container._UI__app = self
+        self.__container._parent = self
+        self.__container._app = self
         self.__container._Box__drawer = self.__drawer
 
         # Loop
@@ -369,7 +369,7 @@ class Frame(UI):
                 else:
                     ui = self.__container._Layout__hit_test(mx, my)
                     if ui:
-                        ui._UI__set_state('PRESSED')
+                        ui._set_state('PRESSED')
                         self.__render_mode = 'PRESSED'
                         self.__render_needs_updating = True
                     else:
@@ -385,7 +385,7 @@ class Frame(UI):
                 else:
                     ui = self.__container._Layout__hit_test(mx, my)
                     if ui:
-                        ui._UI__set_state('RELEASED')
+                        ui._set_state('RELEASED')
                         self.__render_mode = 'HOVER'
                         self.__render_needs_updating = True
 
@@ -402,9 +402,9 @@ class Frame(UI):
                         hv = self.__container._Layout__hit_test(mx, my)
                     
                     if hv and hv != self.__hovered_ui:
-                        self.__hovered_ui._UI__set_state('BASE')
+                        self.__hovered_ui._set_state('BASE')
                         self.__hovered_ui = hv
-                        self.__hovered_ui._UI__set_state('HOVER')
+                        self.__hovered_ui._set_state('HOVER')
 
                         self.__render_mode = 'HOVER'
                         self.__render_needs_updating = True

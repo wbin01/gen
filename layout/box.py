@@ -55,7 +55,7 @@ class Box(Margin, Pos, Size, Add, Layout):
         self.__fill = fill
         self.__first = False
         self.__orientation = 'VERTICAL'
-        self._UI__dirty = True
+        self._dirty = True
 
         self.__texture_hover = None
     
@@ -124,7 +124,7 @@ class Box(Margin, Pos, Size, Add, Layout):
         if self.__orientation == 'POSITION':
             return
         
-        if self._UI__dirty == 'HOVER':
+        if self._dirty == 'HOVER':
             return
         
         if not self._Add__uis:
@@ -138,7 +138,7 @@ class Box(Margin, Pos, Size, Add, Layout):
         ui_x, ui_y = self._x, self._y  # Reset
         for ui in self._Add__uis:
             if not ui.visible: continue
-            if not ui._UI__dirty: continue
+            if not ui._dirty: continue
 
             ui._Pos__x = ui_x + ui.margin[3]  # Set current position
             ui._Pos__y = ui_y + ui.margin[0]
@@ -170,7 +170,7 @@ class Box(Margin, Pos, Size, Add, Layout):
         last = len(layout._Add__uis) - 1  # To remove last extra 'spacing'
         for num, ui in enumerate(layout._Add__uis):
             if not ui.visible: continue
-            if not ui._UI__dirty: continue
+            if not ui._dirty: continue
 
             if isinstance(ui, Layout):
                 self.__update_size(ui)
@@ -218,7 +218,7 @@ class Box(Margin, Pos, Size, Add, Layout):
             min_width = 0
             for ui in layout._Add__uis:  # Fill: Width equal to the layout
                 if not ui.visible: continue
-                if not ui._UI__dirty: continue
+                if not ui._dirty: continue
 
                 if ui.fill in (Fill.X, Fill.XY):
                     ui._Size__width = total_width - ui._Margin__margin_x
