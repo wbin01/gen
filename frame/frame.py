@@ -75,7 +75,7 @@ class Frame(UI):
         self._queue_list = []
 
         # Render
-        self._render_mode = 'BASE'
+        self._render_mode = 'UNIT'
         self._render_needs_updating = True
         self._render_count = 0
 
@@ -335,7 +335,7 @@ class Frame(UI):
 
             if self._queue_list:
                 self._container._redraw_queue(self._queue_list)
-                self._render_mode = 'QUEUE'
+                self._render_mode = 'UNIT'
                 self._render_needs_updating = True
 
             if self._render_needs_updating:
@@ -362,7 +362,7 @@ class Frame(UI):
                     item = self._container._hit_test(mx, my)
                     if item:
                         item._set_state('PRESSED')
-                        self._render_mode = 'PRESSED'
+                        self._render_mode = 'UNIT'
                         self._render_needs_updating = True
                     else:
                         drag = sdl3.SDL_SetWindowHitTest(
@@ -380,7 +380,7 @@ class Frame(UI):
                 item = self._container._hit_test(mx, my)
                 if item:
                     item._set_state('RIGHT_PRESSED')
-                    self._render_mode = 'PRESSED'
+                    self._render_mode = 'UNIT'
                     self._render_needs_updating = True
                 else:
                     sdl3.SDL_SetWindowHitTest(
@@ -396,14 +396,14 @@ class Frame(UI):
                     item = self._container._hit_test(mx, my)
                     if item:
                         item._set_state('RELEASED')
-                        self._render_mode = 'HOVER'
+                        self._render_mode = 'UNIT'
                         self._render_needs_updating = True
             
             elif event.button.button == sdl3.SDL_BUTTON_RIGHT:
                 item = self._container._hit_test(mx, my)
                 if item:
                     item._set_state('RIGHT_RELEASED')
-                    self._render_mode = 'HOVER'
+                    self._render_mode = 'UNIT'
                     self._render_needs_updating = True
 
         elif event.type == sdl3.SDL_EVENT_MOUSE_MOTION:
@@ -426,7 +426,7 @@ class Frame(UI):
                     self._hovered_ui = ui
                     self._hovered_ui._set_state('ENTER')
 
-                    self._render_mode = 'HOVER'
+                    self._render_mode = 'UNIT'
                     self._render_needs_updating = True
     
     def _render(self) -> None:
@@ -458,8 +458,7 @@ class Frame(UI):
                 self._queue_list = self._container._queue_list()
                 self._container._queue_list_clear()
 
-        if not self._resizing and self._render_mode in (
-                'HOVER', 'PRESSED', 'BASE', 'QUEUE'):
+        if not self._resizing and self._render_mode == 'UNIT':
             sdl3.SDL_RenderTexture(
                 self._renderer , self._frame_texture, None, None)
             self._container._update()

@@ -65,17 +65,17 @@ class Empty(Cell):
                 int(self._x), int(self._y), self._resise_w, self._resise_h)
             return
 
-        if self._state.name == 'BASE':
+        if self._state.value == 'BASE':
             self._drawer.set_texture(
                 self._texture_default,
                 int(self._x), int(self._y), int(self.width), int(self.height))
 
-        elif self._state.name == 'HOVER':
+        elif self._state.value == 'HOVER':
             self._drawer.set_texture(
                 self._texture_hover,
                 int(self._x), int(self._y), int(self.width), int(self.height))
         
-        elif self._state.name == 'PRESSED':
+        elif self._state.value == 'PRESSED':
             self._drawer.set_texture(
                 self._texture_pressed,
                 int(self._x), int(self._y), int(self.width), int(self.height))
