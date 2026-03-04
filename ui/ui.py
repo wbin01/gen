@@ -19,6 +19,8 @@ class UI(object):
         self.leave = Signal()
         self.pressed = Signal()
         self.released = Signal()
+        self.right_pressed = Signal()
+        self.right_released = Signal()
         self.move = Signal()
 
     def __repr__(self) -> str:
@@ -70,13 +72,19 @@ class UI(object):
             self._state = State.HOVER
             self.enter.emit(self)
 
-        elif event == 'PRESSED':
+        elif 'PRESSED' in event:
             self._state = State.PRESSED
-            self.pressed.emit(self)
+            if event.startswith('RIGHT'):
+                self.right_pressed.emit(self)
+            else:
+                self.pressed.emit(self)
         
-        elif event == 'RELEASED':
+        elif 'RELEASED' in event:
             self._state = State.HOVER
-            self.released.emit(self)
+            if event.startswith('RIGHT'):
+                self.right_released.emit(self)
+            else:
+                self.released.emit(self)
         
         elif event == 'MOVE':
             self._state = State.HOVER

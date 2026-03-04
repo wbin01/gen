@@ -357,22 +357,34 @@ class Frame(UI):
         if event.type == sdl3.SDL_EVENT_MOUSE_BUTTON_DOWN:
             if event.button.button == sdl3.SDL_BUTTON_LEFT:
                 self._resize_area = resize_area
-                if self._resize_area != ResizeArea.NONE:
+
+                if self._resize_area == ResizeArea.NONE:
+                    item = self._container._hit_test(mx, my)
+                    if item:
+                        item._set_state('PRESSED')
+                        self._render_mode = 'PRESSED'
+                        self._render_needs_updating = True
+                    else:
+                        drag = sdl3.SDL_SetWindowHitTest(
+                            self._frame, self._cursor_hit, None)
+
+                elif self._resize_area != ResizeArea.NONE:
                     self._cursor_update_shape(self._resize_area.value)
                     if self._resize_wm:
                         sdl3.SDL_SetWindowHitTest(
                             self._frame, self._cursor_hit, None)
                     else:
                         self._resize_settings()
+            
+            elif event.button.button == sdl3.SDL_BUTTON_RIGHT:
+                item = self._container._hit_test(mx, my)
+                if item:
+                    item._set_state('RIGHT_PRESSED')
+                    self._render_mode = 'PRESSED'
+                    self._render_needs_updating = True
                 else:
-                    ui = self._container._hit_test(mx, my)
-                    if ui:
-                        ui._set_state('PRESSED')
-                        self._render_mode = 'PRESSED'
-                        self._render_needs_updating = True
-                    else:
-                        sdl3.SDL_SetWindowHitTest(
-                            self._frame, self._cursor_hit, None)
+                    sdl3.SDL_SetWindowHitTest(
+                        self._frame, self._cursor_hit, None)
 
         elif event.type == sdl3.SDL_EVENT_MOUSE_BUTTON_UP:
             if event.button.button == sdl3.SDL_BUTTON_LEFT:
@@ -381,11 +393,18 @@ class Frame(UI):
                     self._render_mode = 'RESIZE'
                     self._render_needs_updating = True
                 else:
-                    ui = self._container._hit_test(mx, my)
-                    if ui:
-                        ui._set_state('RELEASED')
+                    item = self._container._hit_test(mx, my)
+                    if item:
+                        item._set_state('RELEASED')
                         self._render_mode = 'HOVER'
                         self._render_needs_updating = True
+            
+            elif event.button.button == sdl3.SDL_BUTTON_RIGHT:
+                item = self._container._hit_test(mx, my)
+                if item:
+                    item._set_state('RIGHT_RELEASED')
+                    self._render_mode = 'HOVER'
+                    self._render_needs_updating = True
 
         elif event.type == sdl3.SDL_EVENT_MOUSE_MOTION:
             if not self._resize_wm:
