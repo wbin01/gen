@@ -101,11 +101,11 @@ class Layout(UI):
         while queue_list:
             ui = queue_list.pop(0)
 
-            if not ui.visible: continue
-            if not ui._dirty: continue
+            # if not ui.visible: continue
+            # if not ui._dirty: continue
 
             ui._draw('REBUILD')
-            ui._dirty = False
+            # ui._dirty = False
 
             if (time.perf_counter() - start) * 50 > budget_ms:
                 break

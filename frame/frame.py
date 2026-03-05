@@ -78,6 +78,7 @@ class Frame(UI):
         self._render_mode = 'UNIT'
         self._render_needs_updating = True
         self._render_count = 0
+        self._first_render = True
 
         # Frame
         self._frame_base_texture = None
@@ -478,16 +479,17 @@ class Frame(UI):
                     self._renderer , self._frame_base_texture, None, None)
                 self._container._invalidate()
                 self._container._update()
-                # self._container._redraw('REBUILD')
-
                 self._queue_list = self._container._queue_list()
                 self._container._queue_list_clear()
 
         if not self._resizing and self._render_mode == 'UNIT':
-            # self._draw('FRAME')
             sdl3.SDL_RenderTexture(
                 self._renderer, self._frame_texture, None, None)
-            # self._container._invalidate()
+
+            if self._first_render:
+                self._container._invalidate()
+                self._first_render = False
+            
             self._container._update()
             self._container._redraw(self._render_mode)
 

@@ -129,12 +129,10 @@ class Input(Cell):
 
     def _draw(self, mode: str = None) -> None:
         if mode == 'UNIT':
-            print('UNIT')
             self._text.rebuild_texture(self._drawer._renderer)
 
         elif mode == 'REBUILD':
-            print('REBUILD')
-            # self._set_state('BASE')
+            self._set_state('BASE')
             self._texture_w = int(self.width)
             self._texture_h = int(self.height)
 
