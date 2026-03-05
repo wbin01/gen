@@ -18,13 +18,7 @@ class Drawer(object):
     def __init__(self, renderer, *args, **kwargs) -> None:
         self._renderer = renderer
         self._visual_level = 2
-        self._font = ImageFont.truetype('DejaVuSans.ttf', 12)
-        self._font_size = 12
 
-        self._font_hide = 'Hh'
-        bbox = self._font.getbbox(self._font_hide)
-        self._font_rm = bbox[2] - bbox[0]
-        
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}()'
 
@@ -57,17 +51,20 @@ class Drawer(object):
         sdl3.SDL_RenderTexture(self._renderer, texture, None, dst)
     
     def font(self, text, texture, font, size, color) -> tuple:
-        text += self._font_hide
-        bbox = self._font.getbbox(text if text else ' ')
+        font_hide = 'Hh'
+        font_hide_box = font.getbbox(font_hide)
+
+        text += font_hide
+        bbox = font.getbbox(text if text else ' ')
         w = bbox[2] - bbox[0]
         h = bbox[3] - bbox[1]
         if h < size: h = size
-        w -= self._font_rm
+        w -= font_hide_box[2] - font_hide_box[0]
         
         img = Image.new('RGBA', (w, h), (0, 0, 0, 0))
         draw = ImageDraw.Draw(img)
 
-        draw.text((-bbox[0], -bbox[1]), text, font=self._font, fill=color)
+        draw.text((-bbox[0], -bbox[1]), text, font=font, fill=color)
 
         raw_bytes = img.tobytes()
 
@@ -82,16 +79,13 @@ class Drawer(object):
 
         return texture, w, h
     
-    def font_cursor(
-            self, x, y, font_h, cursor_x, color=(255, 255, 255, 255)) -> None:
-        if font_h < self._font_size: font_h = self._font_size
-
+    def font_cursor(self, x, y, size, cursor_x, color) -> None:
         sdl3.SDL_SetRenderDrawColor(
             self._renderer, color[0], color[1], color[2], color[3])
         
         cursor_x = x + cursor_x
         sdl3.SDL_RenderLine(
-            self._renderer, cursor_x, y, cursor_x, y + font_h)
+            self._renderer, cursor_x, y, cursor_x, y + size)
 
     def _rounded_rect_antialiasing(
             self, x: int, y: int, w: int, h: int,

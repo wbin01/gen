@@ -77,7 +77,11 @@ class Input(Cell):
     
     def _get_cursor_x(self):
         left_text = ''.join(self._text_left)
-        return self._text_font.getlength(left_text)
+        # return self._text_font.getlength(left_text)
+
+        bbox = self._text_font.getbbox(left_text)
+        w = bbox[2] - bbox[0]
+        return w
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}(text="{self._text}")'
@@ -92,8 +96,6 @@ class Input(Cell):
             self._text_texture, self._textw, self._texth = self._drawer.font(
                 self._get_text(), self._text_texture,
                 self._text_font, self._text_font_size, self._text_font_color)
-
-            self._textx = self._x + self.style['BASE']['padding']
             self._texty = self._y + (self.height / 2) - (self._texth / 2)
 
         if mode == 'REBUILD':
@@ -113,8 +115,6 @@ class Input(Cell):
             self._text_texture, self._textw, self._texth = self._drawer.font(
                 self._get_text(), self._text_texture,
                 self._text_font, self._text_font_size, self._text_font_color)
-            
-            self._textx = self._x + self.style['BASE']['padding']
             self._texty = self._y + (self.height / 2) - (self._texth / 2)
             
             self._resise_w = 0
@@ -137,6 +137,8 @@ class Input(Cell):
                 self._textx, self._texty, self._textw, self._texth)
             return
         
+        self._textx = self._x + self.style['BASE']['padding']
+
         if self._state.value == 'BASE':
             self._drawer.set_texture(
                 self._texture_default,
@@ -157,7 +159,8 @@ class Input(Cell):
             self._textx, self._texty, self._textw, self._texth)
         
         self._drawer.font_cursor(
-            self._textx, self._texty, self._texth, self._get_cursor_x())
+            self._textx, self._texty, self._text_font_size,
+            self._get_cursor_x(), self._text_font_color)
         
         if mode == 'REBUILD':
             self._dirty = False
