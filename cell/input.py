@@ -34,8 +34,10 @@ class Input(Cell):
         self._text_left = []
         self._text_right = []
 
-        self._text_font = ImageFont.truetype('DejaVuSans.ttf', 12)
-        self._text_font_size = 12
+        self._text_font_size = self.style['BASE']['font-size']
+        self._text_font_color = self.style['BASE']['font-color']
+        self._text_font = ImageFont.truetype(
+            self.style['BASE']['font'], self._text_font_size)
 
         self._text_texture = None
         self._textx = 0
@@ -85,15 +87,14 @@ class Input(Cell):
 
     def _draw(self, mode: str = None) -> None:
         if not self._dirty: return
-        # self._dirty = False
 
         if mode == 'UNIT':
             self._text_texture, self._textw, self._texth = self._drawer.font(
-                self._get_text(), self._text_font, self._text_font_size,
-                self._text_texture)
-            
+                self._get_text(), self._text_texture,
+                self._text_font, self._text_font_size, self._text_font_color)
+
             self._textx = self._x + self.style['BASE']['padding']
-            self._texty = self._y + self.style['BASE']['padding']
+            self._texty = self._y + (self.height / 2) - (self._texth / 2)
 
         if mode == 'REBUILD':
             self._set_state('BASE')
@@ -110,11 +111,11 @@ class Input(Cell):
                 self._texture_w, self._texture_h, self._draw_ui, 'PRESSED')
             
             self._text_texture, self._textw, self._texth = self._drawer.font(
-                self._get_text(), self._text_font, self._text_font_size,
-                self._text_texture)
+                self._get_text(), self._text_texture,
+                self._text_font, self._text_font_size, self._text_font_color)
             
             self._textx = self._x + self.style['BASE']['padding']
-            self._texty = self._y + self.style['BASE']['padding']
+            self._texty = self._y + (self.height / 2) - (self._texth / 2)
             
             self._resise_w = 0
             self._resise_h = 0
@@ -156,19 +157,15 @@ class Input(Cell):
             self._textx, self._texty, self._textw, self._texth)
         
         self._drawer.font_cursor(
-            int(self._x) + 10, int(self._y) + 10, self._texth, self._get_cursor_x())
+            self._textx, self._texty, self._texth, self._get_cursor_x())
         
         if mode == 'REBUILD':
             self._dirty = False
     
     def _draw_ui(self, state: str = 'BASE'):
-        font_color = self.style[state]['font-color']
         bg_color = self.style[state]['background-color']
         bd_color = self.style[state]['border-color']
         rad = self.style[state]['radius']
-        font = self.style[state]['font']
-        font_size = self.style[state]['font-size']
-        pad = self.style[state]['padding'] * 2
         x = y = 0
         self._drawer.rect(x, y, self.width, self.height, bd_color, rad)
         self._drawer.rect(

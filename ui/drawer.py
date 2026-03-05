@@ -56,7 +56,7 @@ class Drawer(object):
         dst = sdl3.SDL_FRect(x, y, text.width, text.height)
         sdl3.SDL_RenderTexture(self._renderer, texture, None, dst)
     
-    def font(self, text, font, size, texture, color=(255,255,255,255)) -> tuple:
+    def font(self, text, texture, font, size, color) -> tuple:
         text += self._font_hide
         bbox = self._font.getbbox(text if text else ' ')
         w = bbox[2] - bbox[0]
@@ -64,7 +64,6 @@ class Drawer(object):
         if h < size: h = size
         w -= self._font_rm
         
-
         img = Image.new('RGBA', (w, h), (0, 0, 0, 0))
         draw = ImageDraw.Draw(img)
 
