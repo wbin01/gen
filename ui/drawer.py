@@ -51,7 +51,7 @@ class Drawer(object):
         sdl3.SDL_RenderTexture(self._renderer, texture, None, dst)
     
     def font(self, text, texture, font, size, color) -> tuple:
-        font_hide = 'Hh'
+        font_hide = 'Hhqg'
         font_hide_box = font.getbbox(font_hide)
 
         text += font_hide

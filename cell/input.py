@@ -1,9 +1,13 @@
 #!/usr/bin/env python3
+import bisect
+
+from PIL import ImageFont
+import sdl3
+
 from .cell import Cell
 from ..flag import Fill
 from ..ui import FontRender
-from PIL import ImageFont
-import sdl3
+
 
 class Input(Cell):
     """..."""
@@ -44,6 +48,9 @@ class Input(Cell):
         self._texty = 0
         self._textw = 0
         self._texth = 0
+
+        self._positions = [0]
+        self._acc = 0
     
     @property
     def text(self):
@@ -52,17 +59,24 @@ class Input(Cell):
     def insert(self, text):
         for char in text:
             self._text_left.append(str(char))
+        
+        self._text = ''.join(self._text_left) + ''.join(self._text_right)
+        self._update_positions()
         self._dirty = True
 
     def backspace(self):
         if self._text_left:
             self._text_left.pop()
             self._dirty = True
+            self._text = ''.join(self._text_left) + ''.join(self._text_right)
+            self._update_positions()
     
     def delete(self):
         if self._text_right:
             self._text_right.pop(0)
             self._dirty = True
+            self._text = ''.join(self._text_left) + ''.join(self._text_right)
+            self._update_positions()
     
     def move_left(self):
         if self._text_left:
@@ -72,38 +86,31 @@ class Input(Cell):
         if self._text_right:
             self._text_left.append(self._text_right.pop(0))
     
-    def _get_text(self):
-        return ''.join(self._text_left) + ''.join(self._text_right)
+    def _click_update_cursor(self, mouse_x) -> None:
+        pos = self._get_cursor_x_from_click(mouse_x)
+        self._text_left  = list(self._text[:pos])
+        self._text_right = list(self._text[pos:])
     
-    def _get_cursor_x(self):
+    def _get_cursor_x(self) -> int:
         left_text = ''.join(self._text_left)
-        # return self._text_font.getlength(left_text)
-
         bbox = self._text_font.getbbox(left_text)
         w = bbox[2] - bbox[0]
         return w
     
-    def _update_cursor(self, mouse_x) -> None:
-        pos = self._cursor_from_mouse_index(mouse_x)
-        text = ''.join(self._text_left) + ''.join(self._text_right)
-        
-        self._text_left  = list(text[:pos])
-        self._text_right = list(text[pos:])
+    def _get_cursor_x_from_click(self, mouse_x) -> int:
+        cursor = bisect.bisect_left(self._positions, mouse_x)
+        return cursor
     
-    def _cursor_from_mouse_index(self, mouse_x):
-        text = ''.join(self._text_left) + ''.join(self._text_right)
-        acc = 0
+    def _update_positions(self):
+        self._positions = [0]
 
-        for i, ch in enumerate(text):
-            bbox = self._text_font.getbbox(ch)
+        for i in range(2, len(self._text) + 2):
+            prefix = self._text[:i]
+
+            bbox = self._text_font.getbbox(prefix)
             w = bbox[2] - bbox[0]
 
-            if mouse_x < acc + w / 2:
-                return i - 1
-
-            acc += w
-
-        return len(text)
+            self._positions.append(w)
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}(text="{self._text}")'
@@ -116,7 +123,7 @@ class Input(Cell):
 
         if mode == 'UNIT':
             self._text_texture, self._textw, self._texth = self._drawer.font(
-                self._get_text(), self._text_texture,
+                self._text, self._text_texture,
                 self._text_font, self._text_font_size, self._text_font_color)
             self._texty = self._y + (self.height / 2) - (self._texth / 2)
 
@@ -135,7 +142,7 @@ class Input(Cell):
                 self._texture_w, self._texture_h, self._draw_ui, 'PRESSED')
             
             self._text_texture, self._textw, self._texth = self._drawer.font(
-                self._get_text(), self._text_texture,
+                self._text, self._text_texture,
                 self._text_font, self._text_font_size, self._text_font_color)
             self._texty = self._y + (self.height / 2) - (self._texth / 2)
             

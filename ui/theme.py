@@ -79,8 +79,8 @@ class Theme:
             'border-color': (80, 80, 80, 255),
             'border': 1,
             'font': 'DejaVuSans.ttf',
-            'font-size': 12,
-            'padding': 10,
+            'font-size': 14,
+            'padding': 8,
             'radius': 6,
             },
         'HOVER': {
@@ -89,8 +89,8 @@ class Theme:
             'border-color': (60, 100, 150, 255),
             'border': 1,
             'font': 'DejaVuSans.ttf',
-            'font-size': 12,
-            'padding': 10,
+            'font-size': 14,
+            'padding': 8,
             'radius': 6,
             },
         'PRESSED': {
@@ -99,8 +99,8 @@ class Theme:
             'border-color': (80, 120, 170, 255),
             'border': 1,
             'font': 'DejaVuSans.ttf',
-            'font-size': 12,
-            'padding': 10,
+            'font-size': 14,
+            'padding': 8,
             'radius': 6,
             },
         }
