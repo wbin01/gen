@@ -439,7 +439,7 @@ class Frame(UI):
         elif event.type == sdl3.SDL_EVENT_TEXT_INPUT:
             if self._input_ui:
                 text = event.text.text.decode('utf-8')
-                self._input_ui._text.insert(text)
+                self._input_ui.insert(text)
                 self._input_ui._set_state('KEY')
                 self._render_mode = 'UNIT'
                 self._render_needs_updating = True
@@ -448,16 +448,16 @@ class Frame(UI):
             key = event.key.key
 
             if key == sdl3.SDLK_BACKSPACE:
-                if self._input_ui: self._input_ui._text.backspace()
+                if self._input_ui: self._input_ui.backspace()
 
             elif key == sdl3.SDLK_DELETE:
-                if self._input_ui: self._input_ui._text.delete()
+                if self._input_ui: self._input_ui.delete()
 
             elif key == sdl3.SDLK_LEFT:
-                if self._input_ui: self._input_ui._text.move_left()
+                if self._input_ui: self._input_ui.move_left()
                 
             elif key == sdl3.SDLK_RIGHT:
-                if self._input_ui: self._input_ui._text.move_right()
+                if self._input_ui: self._input_ui.move_right()
             
             self._input_ui._set_state('KEY')
             self._render_mode = 'UNIT'

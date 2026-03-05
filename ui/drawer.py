@@ -18,6 +18,8 @@ class Drawer(object):
     def __init__(self, renderer, *args, **kwargs) -> None:
         self._renderer = renderer
         self._visual_level = 2
+        self._font = ImageFont.truetype('DejaVuSans.ttf', 12)
+        self._font_size = 12
         
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}()'
@@ -49,6 +51,34 @@ class Drawer(object):
 
         dst = sdl3.SDL_FRect(x, y, text.width, text.height)
         sdl3.SDL_RenderTexture(self._renderer, texture, None, dst)
+    
+    def font(self, text, font, texture, color=(255,255,255,255)) -> tuple:
+        font = font if font else self._font
+        bbox = self._font.getbbox(text if text else " ")
+        w = bbox[2] - bbox[0]
+        h = bbox[3] - bbox[1]
+
+        img = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+        draw = ImageDraw.Draw(img)
+
+        draw.text((-bbox[0], -bbox[1]), text, font=self._font, fill=color)
+
+        raw_bytes = img.tobytes()
+
+        surface = sdl3.SDL_CreateSurfaceFrom(
+            w, h,
+            sdl3.SDL_PIXELFORMAT_RGBA32,
+            raw_bytes,
+            w * 4
+        )
+
+        if texture:
+            sdl3.SDL_DestroyTexture(texture)
+
+        texture = sdl3.SDL_CreateTextureFromSurface(self._renderer, surface)
+        sdl3.SDL_DestroySurface(surface)
+
+        return texture, w, h
 
     def _rounded_rect_antialiasing(
             self, x: int, y: int, w: int, h: int,

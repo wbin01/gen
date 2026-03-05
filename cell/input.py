@@ -1,112 +1,24 @@
 #!/usr/bin/env python3
-import copy
-import ctypes
-
-from PIL import Image, ImageDraw, ImageFont
-import sdl3
-
 from .cell import Cell
-from ..ui import FontRender, Theme
 from ..flag import Fill
-
-
-class TextInput:
-    def __init__(self, font_path, font_size, parent):
-        self.parent = parent
-        self.left = []
-        self.right = []
-
-        self.font = ImageFont.truetype(font_path, font_size)
-        self.font_size = font_size
-
-        self.texture = None
-        self.width = 0
-        self.height = 0
-
-        self.parent._dirty = True
-    
-    def insert(self, text):
-        for char in text:
-            self.left.append(str(char))
-        self.parent._dirty = True
-
-    def backspace(self):
-        if self.left:
-            self.left.pop()
-            self.parent._dirty = True
-    
-    def delete(self):
-        if self.right:
-            self.right.pop(0)
-            self.parent._dirty = True
-    
-    def move_left(self):
-        if self.left:
-            self.right.insert(0, self.left.pop())
-
-    def move_right(self):
-        if self.right:
-            self.left.append(self.right.pop(0))
-    
-    def get_text(self):
-        return ''.join(self.left) + ''.join(self.right)
-    
-    def get_cursor_x(self):
-        left_text = ''.join(self.left)
-        return self.font.getlength(left_text)
-    
-    """
-    cursor_x = x + input.get_cursor_x()
-    sdl3.SDL_RenderLine(renderer,
-                        cursor_x, y,
-                        cursor_x, y + input.height)
-    """
-    
-    def rebuild_texture(self, renderer):
-        # if not self.parent._dirty: return
-
-        text = self.get_text()
-
-        bbox = self.font.getbbox(text if text else " ")
-        w = bbox[2] - bbox[0]
-        h = bbox[3] - bbox[1]
-
-        img = Image.new("RGBA", (w, h), (0, 0, 0, 0))
-        draw = ImageDraw.Draw(img)
-
-        draw.text((-bbox[0], -bbox[1]), text, font=self.font, fill=(255,255,255,255))
-
-        raw_bytes = img.tobytes()
-
-        surface = sdl3.SDL_CreateSurfaceFrom(
-            w, h,
-            sdl3.SDL_PIXELFORMAT_RGBA32,
-            raw_bytes,
-            w * 4
-        )
-
-        if self.texture:
-            sdl3.SDL_DestroyTexture(self.texture)
-
-        self.texture = sdl3.SDL_CreateTextureFromSurface(renderer, surface)
-        sdl3.SDL_DestroySurface(surface)
-
-        self.width = w
-        self.height = h
-        # self.parent._dirty = False
-
+from ..ui import FontRender
+from PIL import Image, ImageDraw, ImageFont
 
 class Input(Cell):
     """..."""
     def __init__(
-            self, width: int = 100, height: int = 32, fill: Fill = Fill.X,
+            self, text: str = '', width: int = 100, height: int = 32,
+            elided: bool = True, fill: Fill = Fill.X,
             *args, **kwargs) -> None:
         """..."""
         super().__init__(fill=fill, *args, **kwargs)
-        self._base_class = 'Input'
+        self._base_class = 'Button'
+        self.fill = fill
 
+        self._text = text
         self.width = width
         self.height = height
+        self._elided = elided
 
         self._resise_w = 0
         self._resise_h = 0
@@ -117,25 +29,69 @@ class Input(Cell):
         self._texture_w = 0
         self._texture_h = 0
 
-        self._text = TextInput('DejaVuSans.ttf', 12, self)
+        # Input text
+        self._text_left = []
+        self._text_right = []
+
+        self._text_font = ImageFont.truetype('DejaVuSans.ttf', 12)
+        self._text_font_size = 12
+
+        self._text_texture = None
+        self._textw = 0
+        self._texth = 0
+    
+    @property
+    def text(self):
+        return self._text
+    
+    def insert(self, text):
+        for char in text:
+            self._text_left.append(str(char))
         self._dirty = True
 
+    def backspace(self):
+        if self._text_left:
+            self._text_left.pop()
+            self._dirty = True
+    
+    def delete(self):
+        if self._text_right:
+            self._text_right.pop(0)
+            self._dirty = True
+    
+    def move_left(self):
+        if self._text_left:
+            self._text_right.insert(0, self._text_left.pop())
+
+    def move_right(self):
+        if self._text_right:
+            self._text_left.append(self._text_right.pop(0))
+    
+    def _get_text(self):
+        return ''.join(self._text_left) + ''.join(self._text_right)
+    
+    def get_cursor_x(self):
+        left_text = ''.join(self._text_left)
+        return self._text_font.getlength(left_text)
+
     def __repr__(self) -> str:
-        return f'{self.__class__.__name__}()'
+        return f'{self.__class__.__name__}(text="{self._text}")'
     
     def __str__(self) -> str:
-        return f'{self.__class__.__name__}()'
+        return f'{self.__class__.__name__}("{self._text}")'
 
     def _draw(self, mode: str = None) -> None:
-        if mode == 'UNIT':
-            self._text.rebuild_texture(self._drawer._renderer)
+        if not self._dirty: return
+        # self._dirty = False
 
-        elif mode == 'REBUILD':
-            # self._set_state('BASE')
+        if mode == 'UNIT':
+            self._text_texture, self._textw, self._texth = self._drawer.font(
+                self._get_text(), self._text_font, self._text_texture)
+
+        if mode == 'REBUILD':
+            self._set_state('BASE')
             self._texture_w = int(self.width)
             self._texture_h = int(self.height)
-
-            self._text.rebuild_texture(self._drawer._renderer)
 
             self._texture_default = self._drawer.build_texture(
                 self._texture_w, self._texture_h, self._draw_ui, 'BASE')
@@ -145,6 +101,9 @@ class Input(Cell):
             
             self._texture_pressed = self._drawer.build_texture(
                 self._texture_w, self._texture_h, self._draw_ui, 'PRESSED')
+            
+            self._text_texture, self._textw, self._texth = self._drawer.font(
+                self._get_text(), self._text_font, self._text_texture)
             
             self._resise_w = 0
             self._resise_h = 0
@@ -162,10 +121,10 @@ class Input(Cell):
                 int(self._x), int(self._y), self._resise_w, self._resise_h)
             
             self._drawer.set_texture(
-                self._text.texture,
-                int(self._x) + 10, int(self._y) + 10, self._text.width, self._text.height)
+                self._text_texture,
+                int(self._x) + 10, int(self._y) + 10, self._textw, self._texth)
             return
-
+        
         if self._state.value == 'BASE':
             self._drawer.set_texture(
                 self._texture_default,
@@ -182,15 +141,20 @@ class Input(Cell):
                 int(self._x), int(self._y), int(self.width), int(self.height))
         
         self._drawer.set_texture(
-            self._text.texture,
-            int(self._x) + 10, int(self._y) + 10, self._text.width, self._text.height)
-        # self._text._dirty = False
+            self._text_texture,
+            int(self._x) + 10, int(self._y) + 10, self._textw, self._texth)
+        
+        if mode == 'REBUILD':
+            self._dirty = False
     
     def _draw_ui(self, state: str = 'BASE'):
+        font_color = self.style[state]['font-color']
         bg_color = self.style[state]['background-color']
         bd_color = self.style[state]['border-color']
         rad = self.style[state]['radius']
-
+        font = self.style[state]['font']
+        font_size = self.style[state]['font-size']
+        pad = self.style[state]['padding'] * 2
         x = y = 0
         self._drawer.rect(x, y, self.width, self.height, bd_color, rad)
         self._drawer.rect(
