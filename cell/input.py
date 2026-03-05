@@ -2,7 +2,8 @@
 from .cell import Cell
 from ..flag import Fill
 from ..ui import FontRender
-from PIL import Image, ImageDraw, ImageFont
+from PIL import ImageFont
+import sdl3
 
 class Input(Cell):
     """..."""
@@ -37,6 +38,8 @@ class Input(Cell):
         self._text_font_size = 12
 
         self._text_texture = None
+        self._textx = 0
+        self._texty = 0
         self._textw = 0
         self._texth = 0
     
@@ -70,7 +73,7 @@ class Input(Cell):
     def _get_text(self):
         return ''.join(self._text_left) + ''.join(self._text_right)
     
-    def get_cursor_x(self):
+    def _get_cursor_x(self):
         left_text = ''.join(self._text_left)
         return self._text_font.getlength(left_text)
 
@@ -86,7 +89,11 @@ class Input(Cell):
 
         if mode == 'UNIT':
             self._text_texture, self._textw, self._texth = self._drawer.font(
-                self._get_text(), self._text_font, self._text_texture)
+                self._get_text(), self._text_font, self._text_font_size,
+                self._text_texture)
+            
+            self._textx = self._x + self.style['BASE']['padding']
+            self._texty = self._y + self.style['BASE']['padding']
 
         if mode == 'REBUILD':
             self._set_state('BASE')
@@ -103,7 +110,11 @@ class Input(Cell):
                 self._texture_w, self._texture_h, self._draw_ui, 'PRESSED')
             
             self._text_texture, self._textw, self._texth = self._drawer.font(
-                self._get_text(), self._text_font, self._text_texture)
+                self._get_text(), self._text_font, self._text_font_size,
+                self._text_texture)
+            
+            self._textx = self._x + self.style['BASE']['padding']
+            self._texty = self._y + self.style['BASE']['padding']
             
             self._resise_w = 0
             self._resise_h = 0
@@ -122,7 +133,7 @@ class Input(Cell):
             
             self._drawer.set_texture(
                 self._text_texture,
-                int(self._x) + 10, int(self._y) + 10, self._textw, self._texth)
+                self._textx, self._texty, self._textw, self._texth)
             return
         
         if self._state.value == 'BASE':
@@ -142,7 +153,10 @@ class Input(Cell):
         
         self._drawer.set_texture(
             self._text_texture,
-            int(self._x) + 10, int(self._y) + 10, self._textw, self._texth)
+            self._textx, self._texty, self._textw, self._texth)
+        
+        self._drawer.font_cursor(
+            int(self._x) + 10, int(self._y) + 10, self._texth, self._get_cursor_x())
         
         if mode == 'REBUILD':
             self._dirty = False
