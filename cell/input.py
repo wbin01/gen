@@ -49,7 +49,8 @@ class Input(Cell):
         self._textw = 0
         self._texth = 0
 
-        self._positions = [0]
+        self._positions = []
+        self._widths = []
         self._acc = 0
     
     @property
@@ -93,24 +94,35 @@ class Input(Cell):
     
     def _get_cursor_x(self) -> int:
         left_text = ''.join(self._text_left)
-        bbox = self._text_font.getbbox(left_text)
-        w = bbox[2] - bbox[0]
-        return w
+        return self._text_font.getlength(left_text)
     
-    def _get_cursor_x_from_click(self, mouse_x) -> int:
+    def _get_cursor_x_from_click_bkp(self, mouse_x) -> int:
         cursor = bisect.bisect_left(self._positions, mouse_x)
         return cursor
     
+    def _get_cursor_x_from_click(self, mouse_x) -> int:
+        for i, x in enumerate(self._positions):
+            half = x + self._widths[i] // 2
+
+            if mouse_x < half:
+                return i - 1
+
+        end = len(self._positions)
+        if mouse_x > self._text_font.getlength(self._text):
+            end += 1
+
+        return end - 1
+    
     def _update_positions(self):
-        self._positions = [0]
+        self._positions = []
+        self._widths = []
+        x = 0
 
-        for i in range(2, len(self._text) + 2):
-            prefix = self._text[:i]
-
-            bbox = self._text_font.getbbox(prefix)
-            w = bbox[2] - bbox[0]
-
-            self._positions.append(w)
+        for ch in self._text:
+            w = self._text_font.getlength(ch)
+            self._positions.append(x)
+            self._widths.append(w)
+            x += w
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}(text="{self._text}")'
@@ -166,7 +178,7 @@ class Input(Cell):
                 self._textx, self._texty, self._textw, self._texth)
             return
         
-        self._textx = self._x + self.style['BASE']['padding']
+        self._textx = self._x + self.style['BASE']['padding'] + 5
 
         if self._state.value == 'BASE':
             self._drawer.set_texture(
