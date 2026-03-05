@@ -118,7 +118,6 @@ class Input(Cell):
         self._texture_h = 0
 
         self._text = TextInput('DejaVuSans.ttf', 12, self)
-        self._first_rebuild = False
         self._dirty = True
 
     def __repr__(self) -> str:
@@ -132,7 +131,7 @@ class Input(Cell):
             self._text.rebuild_texture(self._drawer._renderer)
 
         elif mode == 'REBUILD':
-            self._set_state('BASE')
+            # self._set_state('BASE')
             self._texture_w = int(self.width)
             self._texture_h = int(self.height)
 
@@ -164,7 +163,7 @@ class Input(Cell):
             
             self._drawer.set_texture(
                 self._text.texture,
-                10, int(self._y) + 10, self._text.width, self._text.height)
+                int(self._x) + 10, int(self._y) + 10, self._text.width, self._text.height)
             return
 
         if self._state.value == 'BASE':
@@ -184,8 +183,8 @@ class Input(Cell):
         
         self._drawer.set_texture(
             self._text.texture,
-            10, int(self._y) + 10, self._text.width, self._text.height)
-        self._text._dirty = False
+            int(self._x) + 10, int(self._y) + 10, self._text.width, self._text.height)
+        # self._text._dirty = False
     
     def _draw_ui(self, state: str = 'BASE'):
         bg_color = self.style[state]['background-color']

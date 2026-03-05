@@ -443,17 +443,25 @@ class Frame(UI):
                 self._input_ui._set_state('KEY')
                 self._render_mode = 'UNIT'
                 self._render_needs_updating = True
-                # self._queue_list.append(self._input_ui)
 
         elif event.type == sdl3.SDL_EVENT_KEY_DOWN:
-            if event.key == sdl3.SDLK_BACKSPACE:
+            key = event.key.key
+
+            if key == sdl3.SDLK_BACKSPACE:
                 if self._input_ui: self._input_ui._text.backspace()
-            elif event.key == sdl3.SDLK_DELETE:
+
+            elif key == sdl3.SDLK_DELETE:
                 if self._input_ui: self._input_ui._text.delete()
-            elif event.key == sdl3.SDLK_LEFT:
+
+            elif key == sdl3.SDLK_LEFT:
                 if self._input_ui: self._input_ui._text.move_left()
-            elif event.key == sdl3.SDLK_RIGHT:
+                
+            elif key == sdl3.SDLK_RIGHT:
                 if self._input_ui: self._input_ui._text.move_right()
+            
+            self._input_ui._set_state('KEY')
+            self._render_mode = 'UNIT'
+            self._render_needs_updating = True
     
     def _render(self) -> None:
         self._render_needs_updating = False
