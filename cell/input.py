@@ -82,6 +82,28 @@ class Input(Cell):
         bbox = self._text_font.getbbox(left_text)
         w = bbox[2] - bbox[0]
         return w
+    
+    def _update_cursor(self, mouse_x) -> None:
+        pos = self._cursor_from_mouse_index(mouse_x)
+        text = ''.join(self._text_left) + ''.join(self._text_right)
+        
+        self._text_left  = list(text[:pos])
+        self._text_right = list(text[pos:])
+    
+    def _cursor_from_mouse_index(self, mouse_x):
+        text = ''.join(self._text_left) + ''.join(self._text_right)
+        acc = 0
+
+        for i, ch in enumerate(text):
+            bbox = self._text_font.getbbox(ch)
+            w = bbox[2] - bbox[0]
+
+            if mouse_x < acc + w / 2:
+                return i - 1
+
+            acc += w
+
+        return len(text)
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}(text="{self._text}")'

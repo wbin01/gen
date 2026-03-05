@@ -371,6 +371,7 @@ class Frame(UI):
                         if item.__class__.__name__ == 'Input':
                             self._input_ui = item
                             sdl3.SDL_StartTextInput(self._frame)  # sdl3.SDL_StopTextInput()
+                            self._input_ui._update_cursor(mx.value)
                     else:
                         drag = sdl3.SDL_SetWindowHitTest(
                             self._frame, self._cursor_hit, None)
