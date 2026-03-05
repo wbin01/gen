@@ -1,9 +1,4 @@
 #!/usr/bin/env python3
-import copy
-import ctypes
-
-import sdl3
-
 from .cell import Cell
 from ..flag import Fill
 from ..ui import FontRender
@@ -45,6 +40,9 @@ class Button(Cell):
         return f'{self.__class__.__name__}("{self._text}")'
 
     def _draw(self, mode: str = None) -> None:
+        if not self._dirty: return
+        self._dirty = False
+
         if mode == 'REBUILD':
             self._set_state('BASE')
             self._texture_w = int(self.width)

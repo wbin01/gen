@@ -5,15 +5,16 @@ import ctypes
 import sdl3
 
 from .cell import Cell
-from ..ui import FontRender, Theme
-
+from ..flag import Fill
 
 class Empty(Cell):
     """..."""
     def __init__(
-            self, width: int = 100, height: int = 32, *args, **kwargs) -> None:
+            self, width: int = 100, height: int = 32, fill: Fill = Fill.X,
+            *args, **kwargs) -> None:
         """..."""
-        super().__init__(*args, **kwargs)
+        super().__init__(fill=fill, *args, **kwargs)
+
         self._base_class = 'Empty'
 
         self.width = width
@@ -35,6 +36,9 @@ class Empty(Cell):
         return f'{self.__class__.__name__}()'
 
     def _draw(self, mode: str = None):
+        if not self._dirty: return
+        self._dirty = False
+
         if mode == 'REBUILD':
             self._set_state('BASE')
             self._texture_w = int(self.width)

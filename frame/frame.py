@@ -109,6 +109,7 @@ class Frame(UI):
 
         # Cell
         self._hovered_ui = self._container
+        self._input_ui = None
     
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}()'
@@ -351,7 +352,8 @@ class Frame(UI):
             self._running = False
         
         if event.type == sdl3.SDL_EVENT_KEY_DOWN:
-            if event.key.keysym.sym == sdl3.SDLK_ESCAPE:
+            # if event.key.keysym.sym == sdl3.SDLK_ESCAPE:
+            if event.key.key == sdl3.SDLK_ESCAPE:
                 self._running = False
         
         if event.type == sdl3.SDL_EVENT_MOUSE_BUTTON_DOWN:
@@ -364,6 +366,10 @@ class Frame(UI):
                         item._set_state('PRESSED')
                         self._render_mode = 'UNIT'
                         self._render_needs_updating = True
+
+                        if item.__class__.__name__ == 'Input':
+                            self._input_ui = item
+                            sdl3.SDL_StartTextInput(self._frame)  # sdl3.SDL_StopTextInput()
                     else:
                         drag = sdl3.SDL_SetWindowHitTest(
                             self._frame, self._cursor_hit, None)
@@ -428,6 +434,25 @@ class Frame(UI):
 
                     self._render_mode = 'UNIT'
                     self._render_needs_updating = True
+        
+        elif event.type == sdl3.SDL_EVENT_TEXT_INPUT:
+            if self._input_ui:
+                text = event.text.text.decode('utf-8')
+                self._input_ui._text.insert(text)
+                self._input_ui._set_state('KEY')
+                self._render_mode = 'UNIT'
+                self._render_needs_updating = True
+                # self._queue_list.append(self._input_ui)
+
+        elif event.type == sdl3.SDL_EVENT_KEY_DOWN:
+            if event.key == sdl3.SDLK_BACKSPACE:
+                if self._input_ui: self._input_ui._text.backspace()
+            elif event.key == sdl3.SDLK_DELETE:
+                if self._input_ui: self._input_ui._text.delete()
+            elif event.key == sdl3.SDLK_LEFT:
+                if self._input_ui: self._input_ui._text.move_left()
+            elif event.key == sdl3.SDLK_RIGHT:
+                if self._input_ui: self._input_ui._text.move_right()
     
     def _render(self) -> None:
         self._render_needs_updating = False
@@ -459,8 +484,10 @@ class Frame(UI):
                 self._container._queue_list_clear()
 
         if not self._resizing and self._render_mode == 'UNIT':
+            # self._draw('FRAME')
             sdl3.SDL_RenderTexture(
-                self._renderer , self._frame_texture, None, None)
+                self._renderer, self._frame_texture, None, None)
+            # self._container._invalidate()
             self._container._update()
             self._container._redraw(self._render_mode)
 

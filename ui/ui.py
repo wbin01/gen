@@ -93,6 +93,9 @@ class UI(object):
         elif event == 'LEAVE':
             self._state = State.BASE
             self.leave.emit(self)
+
+        elif event == 'KEY':
+            self._state = State.HOVER
         
         else:  # BASE
             self._state = State.BASE

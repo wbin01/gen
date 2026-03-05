@@ -81,19 +81,13 @@ class Layout(UI):
             return
         
         for ui in self._uis:
-            if not ui.visible: continue
-            if not ui._dirty:
-                continue
-
             if isinstance(ui, Layout):
                 if self._app and self._app._view_layout:
                     ui._draw(mode)
                 
                 ui._redraw(mode)
                 continue
-            
             ui._draw(mode)
-            ui._dirty = False
 
         self._dirty = False
     
