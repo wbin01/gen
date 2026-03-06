@@ -35,13 +35,13 @@ class Input(Cell):
         self._texture_h = 0
 
         # Input text
-        self._text_left = []
-        self._text_right = []
+        self._left = []
+        self._right = []
 
-        self._text_font_size = self.style['BASE']['font-size']
-        self._text_font_color = self.style['BASE']['font-color']
-        self._text_font = ImageFont.truetype(
-            self.style['BASE']['font'], self._text_font_size)
+        self._font_size = self.style['BASE']['font-size']
+        self._font_color = self.style['BASE']['font-color']
+        self._font = ImageFont.truetype(
+            self.style['BASE']['font'], self._font_size)
 
         self._text_texture = None
         self._textx = 0
@@ -60,47 +60,65 @@ class Input(Cell):
     
     def insert(self, text):
         for char in text:
-            self._text_left.append(str(char))
+            self._left.append(str(char))
         
-        self._text = ''.join(self._text_left) + ''.join(self._text_right)
-        self._cursor = len(self._text_left)
+        self._text = ''.join(self._left) + ''.join(self._right)
+        self._cursor = len(self._left)
         self._update_positions()
         self._dirty = True
 
     def backspace(self):
-        if self._text_left:
-            self._text_left.pop()
+        if self._left:
+            self._left.pop()
             self._dirty = True
-            self._text = ''.join(self._text_left) + ''.join(self._text_right)
-            self._cursor = len(self._text_left)
+            self._text = ''.join(self._left) + ''.join(self._right)
+            self._cursor = len(self._left)
             self._update_positions()
     
     def delete(self):
-        if self._text_right:
-            self._text_right.pop(0)
+        if self._right:
+            self._right.pop(0)
             self._dirty = True
-            self._text = ''.join(self._text_left) + ''.join(self._text_right)
-            self._cursor = len(self._text_left)
+            self._text = ''.join(self._left) + ''.join(self._right)
+            self._cursor = len(self._left)
             self._update_positions()
 
     def move_left(self):
-        if self._text_left:
-            self._text_right.insert(0, self._text_left.pop())
-            self._cursor = len(self._text_left)
+        if self._left:
+            self._right.insert(0, self._left.pop())
+            self._cursor = len(self._left)
 
     def move_right(self):
-        if self._text_right:
-            self._text_left.append(self._text_right.pop(0))
-            self._cursor = len(self._text_left)
+        if self._right:
+            self._left.append(self._right.pop(0))
+            self._cursor = len(self._left)
+    
+    def jump_left(self):
+        while self._left and self._left[-1] == ' ':
+            self._right.insert(0, self._left.pop())
+
+        while self._left and self._left[-1] != ' ':
+            self._right.insert(0, self._left.pop())
+        
+        self._cursor = len(self._left)
+    
+    def jump_right(self):
+        while self._right and self._right[0] == ' ':
+            self._left.append(self._right.pop(0))
+
+        while self._right and self._right[0] != ' ':
+            self._left.append(self._right.pop(0))
+        
+        self._cursor = len(self._left)
     
     def _click_update_cursor(self, mouse_x) -> None:
         pos = self._get_cursor_x_from_click(mouse_x)
-        self._text_left  = list(self._text[:pos])
-        self._text_right = list(self._text[pos:])
+        self._left  = list(self._text[:pos])
+        self._right = list(self._text[pos:])
     
     def _get_cursor_x(self) -> int:
-        left_text = ''.join(self._text_left)
-        return self._text_font.getlength(left_text)
+        left_text = ''.join(self._left)
+        return self._font.getlength(left_text)
     
     def _get_cursor_x_from_click_bkp(self, mouse_x) -> int:
         cursor = bisect.bisect_left(self._positions, mouse_x)
@@ -115,7 +133,7 @@ class Input(Cell):
                 return self._cursor
 
         end = len(self._positions)
-        if mouse_x > self._text_font.getlength(self._text):
+        if mouse_x > self._font.getlength(self._text):
             end += 1
         
         self._cursor = end - 1
@@ -127,7 +145,7 @@ class Input(Cell):
         x = 0
 
         for ch in self._text:
-            w = self._text_font.getlength(ch)
+            w = self._font.getlength(ch)
             self._positions.append(x)
             self._widths.append(w)
             x += w
@@ -144,7 +162,7 @@ class Input(Cell):
         if mode == 'UNIT':
             self._text_texture, self._textw, self._texth = self._drawer.font(
                 self._text, self._text_texture,
-                self._text_font, self._text_font_size, self._text_font_color)
+                self._font, self._font_size, self._font_color)
             self._texty = self._y + (self.height / 2) - (self._texth / 2)
 
         if mode == 'REBUILD':
@@ -163,7 +181,7 @@ class Input(Cell):
             
             self._text_texture, self._textw, self._texth = self._drawer.font(
                 self._text, self._text_texture,
-                self._text_font, self._text_font_size, self._text_font_color)
+                self._font, self._font_size, self._font_color)
             self._texty = self._y + (self.height / 2) - (self._texth / 2)
             
             self._resise_w = 0
@@ -208,8 +226,8 @@ class Input(Cell):
             self._textx, self._texty, self._textw, self._texth)
         
         self._drawer.font_cursor(
-            self._textx, self._texty, self._text_font_size,
-            self._get_cursor_x(), self._text_font_color)
+            self._textx, self._texty, self._font_size,
+            self._get_cursor_x(), self._font_color)
         
         if mode == 'REBUILD':
             self._dirty = False

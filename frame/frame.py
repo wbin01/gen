@@ -449,15 +449,22 @@ class Frame(UI):
             key = event.key.key
             mods = event.key.mod
             ctrl = mods & sdl3.SDL_KMOD_CTRL
+
             if ctrl:
                 if key == ord('c'):
-                    print('Ctrl+C')
+                    print('Ctrl+X')  # if self._input_ui: self._input_ui._copy()
 
                 elif key == ord('x'):
                     print('Ctrl+X')
 
                 elif key == ord('v'):
                     print('Ctrl+V')
+                
+                elif key == sdl3.SDLK_LEFT:
+                    if self._input_ui: self._input_ui.jump_left()
+                
+                elif key == sdl3.SDLK_RIGHT:
+                    if self._input_ui: self._input_ui.jump_right()
 
             if key == sdl3.SDLK_BACKSPACE:
                 if self._input_ui: self._input_ui.backspace()
