@@ -71,13 +71,24 @@ class Input(Cell):
     def text(self, text) -> None:
         self.insert(text)
 
-    def backspace(self):
-        if self._left:
-            self._left.pop()
+    def backspace(self) -> str:
+        del_char = ''
+        if self._selection[1]:
+            del_char = self._selection[1]
+            self.cut()
+
+        elif self._left:
+            del_char = self._left.pop()
             self._dirty = True
             self._text = ''.join(self._left) + ''.join(self._right)
             self._cursor = len(self._left)
             self._update_positions()
+        return del_char
+    
+    def clear_selection(self) -> None:
+        self._selection[0] = self._left
+        self._selection[1] = ''
+        self._selection[2] = self._right
     
     def copy(self) -> str:
         return self._selection[1]
@@ -87,6 +98,7 @@ class Input(Cell):
 
         self._left = list(start)
         self._right = list(end)
+        self.clear_selection()
 
         self._cursor = len(start)
         self._anchor = self._cursor
@@ -95,15 +107,21 @@ class Input(Cell):
         self._update_positions()
         return selected_text
 
-    def delete(self):
-        if self._right:
-            self._right.pop(0)
+    def delete(self) -> str:
+        del_char = ''
+        if self._selection[1]:
+            del_char = self._selection[1]
+            self.cut()
+        
+        elif self._right:
+            del_char = self._right.pop(0)
             self._dirty = True
             self._text = ''.join(self._left) + ''.join(self._right)
             self._cursor = len(self._left)
             self._update_positions()
+        return del_char
     
-    def insert(self, text):
+    def insert(self, text) -> None:
         for char in text:
             self._left.append(str(char))
         
@@ -112,12 +130,13 @@ class Input(Cell):
         self._update_positions()
         self._dirty = True
 
-    def move_left(self):
+    def move_left(self) -> int:
         if self._left:
             self._right.insert(0, self._left.pop())
             self._cursor = len(self._left)
+        return self._cursor
 
-    def move_left_by_jump(self):
+    def move_left_by_jump(self) -> int:
         while self._left and self._left[-1] == ' ':
             self._right.insert(0, self._left.pop())
 
@@ -125,13 +144,15 @@ class Input(Cell):
             self._right.insert(0, self._left.pop())
         
         self._cursor = len(self._left)
+        return self._cursor
     
-    def move_right(self):
+    def move_right(self) -> int:
         if self._right:
             self._left.append(self._right.pop(0))
             self._cursor = len(self._left)
+        return self._cursor
     
-    def move_right_by_jump(self):
+    def move_right_by_jump(self) -> int:
         while self._right and self._right[0] == ' ':
             self._left.append(self._right.pop(0))
 
@@ -139,6 +160,16 @@ class Input(Cell):
             self._left.append(self._right.pop(0))
         
         self._cursor = len(self._left)
+        return self._cursor
+    
+    def past(self, text) -> str:
+        for c in text:
+            self._left.append(c)
+        
+        self.clear_selection()
+        self._text = ''.join(self._left) + ''.join(self._right)
+        self._update_positions()
+        return text
     
     def select_all(self) -> str:
         self._selection[0] = ''

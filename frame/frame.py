@@ -462,7 +462,10 @@ class Frame(UI):
                         print('Ctrl+C', self._input.copy())
 
                 elif key == ord('v'):
-                    print('Ctrl+V')
+                    clip = sdl3.SDL_GetClipboardText()
+                    if clip:
+                        clip = clip.decode()
+                        self._input.past(clip)
                 
                 elif key == ord('x'):
                     if self._input:
