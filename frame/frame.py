@@ -452,7 +452,11 @@ class Frame(UI):
             shift = mods & sdl3.SDL_KMOD_SHIFT
 
             if ctrl:
-                if key == ord('c'):
+                if key == ord('a'):
+                    if self._input: self._input.select_all()
+                    print('Ctrl+A', self._input.select_all())
+                
+                elif key == ord('c'):
                     if self._input:
                         sdl3.SDL_SetClipboardText(self._input.copy().encode())
                         print('Ctrl+C', self._input.copy())
@@ -464,8 +468,6 @@ class Frame(UI):
                     if self._input:
                         sdl3.SDL_SetClipboardText(self._input.cut().encode())
                         print('Ctrl+X', self._input.cut())
-                        self._render_mode = 'UNIT'
-                        self._render_needs_updating = True
                 
                 elif key == sdl3.SDLK_LEFT:
                     if self._input: self._input.move_left_by_jump()

@@ -48,7 +48,7 @@ class Input(Cell):
         self._texty = 0
         self._textw = 0
         self._texth = 0
-        self._selection = ['', 0, 0]
+        self._selection = ['', '', '']
         self._select_direction = None
 
         # Cursor
@@ -139,6 +139,13 @@ class Input(Cell):
             self._left.append(self._right.pop(0))
         
         self._cursor = len(self._left)
+    
+    def select_all(self) -> str:
+        self._selection[0] = ''
+        self._selection[1] = self._text
+        self._selection[2] = ''
+
+        return self._selection[1]
     
     def select_left(self) -> str:
         self._select_direction = 'LEFT'
