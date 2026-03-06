@@ -476,6 +476,15 @@ class Frame(UI):
                     if self._input_ui:
                         print(self._input_ui.select_right())
 
+            if shift and ctrl:
+                if key == sdl3.SDLK_LEFT:
+                    if self._input_ui:
+                        print(self._input_ui.select_left())
+                
+                elif key == sdl3.SDLK_RIGHT:
+                    if self._input_ui:
+                        print(self._input_ui.select_right())
+
             if key == sdl3.SDLK_BACKSPACE:
                 if self._input_ui: self._input_ui.backspace()
 
