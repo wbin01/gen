@@ -447,6 +447,17 @@ class Frame(UI):
 
         elif event.type == sdl3.SDL_EVENT_KEY_DOWN:
             key = event.key.key
+            mods = event.key.mod
+            ctrl = mods & sdl3.SDL_KMOD_CTRL
+            if ctrl:
+                if key == ord('c'):
+                    print('Ctrl+C')
+
+                elif key == ord('x'):
+                    print('Ctrl+X')
+
+                elif key == ord('v'):
+                    print('Ctrl+V')
 
             if key == sdl3.SDLK_BACKSPACE:
                 if self._input_ui: self._input_ui.backspace()
@@ -459,6 +470,11 @@ class Frame(UI):
                 
             elif key == sdl3.SDLK_RIGHT:
                 if self._input_ui: self._input_ui.move_right()
+            
+            # elif key ==  sdl3.SDLK_RETURN:
+            #     pass
+            # elif key == sdl3.SDLK_ESCAPE:
+            #     pass
             
             self._input_ui._set_state('KEY')
             self._render_mode = 'UNIT'

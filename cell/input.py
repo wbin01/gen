@@ -49,9 +49,10 @@ class Input(Cell):
         self._textw = 0
         self._texth = 0
 
+        # Cursor
+        self._cursor = 0
         self._positions = []
         self._widths = []
-        self._acc = 0
     
     @property
     def text(self):
@@ -62,6 +63,7 @@ class Input(Cell):
             self._text_left.append(str(char))
         
         self._text = ''.join(self._text_left) + ''.join(self._text_right)
+        self._cursor = len(self._text_left)
         self._update_positions()
         self._dirty = True
 
@@ -70,6 +72,7 @@ class Input(Cell):
             self._text_left.pop()
             self._dirty = True
             self._text = ''.join(self._text_left) + ''.join(self._text_right)
+            self._cursor = len(self._text_left)
             self._update_positions()
     
     def delete(self):
@@ -77,15 +80,18 @@ class Input(Cell):
             self._text_right.pop(0)
             self._dirty = True
             self._text = ''.join(self._text_left) + ''.join(self._text_right)
+            self._cursor = len(self._text_left)
             self._update_positions()
-    
+
     def move_left(self):
         if self._text_left:
             self._text_right.insert(0, self._text_left.pop())
+            self._cursor = len(self._text_left)
 
     def move_right(self):
         if self._text_right:
             self._text_left.append(self._text_right.pop(0))
+            self._cursor = len(self._text_left)
     
     def _click_update_cursor(self, mouse_x) -> None:
         pos = self._get_cursor_x_from_click(mouse_x)
@@ -105,13 +111,15 @@ class Input(Cell):
             half = x + self._widths[i] // 2
 
             if mouse_x < half:
-                return i - 1
+                self._cursor = i - 1
+                return self._cursor
 
         end = len(self._positions)
         if mouse_x > self._text_font.getlength(self._text):
             end += 1
-
-        return end - 1
+        
+        self._cursor = end - 1
+        return self._cursor
     
     def _update_positions(self):
         self._positions = []
