@@ -48,9 +48,11 @@ class Input(Cell):
         self._texty = 0
         self._textw = 0
         self._texth = 0
+        self._selection = ''
 
         # Cursor
         self._cursor = 0
+        self._anchor = None
         self._positions = []
         self._widths = []
     
@@ -110,6 +112,22 @@ class Input(Cell):
             self._left.append(self._right.pop(0))
         
         self._cursor = len(self._left)
+    
+    def select_left(self) -> str:
+        if self._anchor is None: self._anchor = self._cursor
+
+        start = min(self._cursor, self._anchor)
+        end = max(self._cursor, self._anchor)
+        self._selection = self._text[start - 1:end]
+        return self._selection
+    
+    def select_right(self) -> str:
+        if self._anchor is None: self._anchor = self._cursor
+
+        start = min(self._cursor, self._anchor)
+        end = max(self._cursor, self._anchor)
+        self._selection = self._text[start:end + 1]
+        return self._selection
     
     def _click_update_cursor(self, mouse_x) -> None:
         pos = self._get_cursor_x_from_click(mouse_x)

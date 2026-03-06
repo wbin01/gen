@@ -449,6 +449,7 @@ class Frame(UI):
             key = event.key.key
             mods = event.key.mod
             ctrl = mods & sdl3.SDL_KMOD_CTRL
+            shift = mods & sdl3.SDL_KMOD_SHIFT
 
             if ctrl:
                 if key == ord('c'):
@@ -465,6 +466,15 @@ class Frame(UI):
                 
                 elif key == sdl3.SDLK_RIGHT:
                     if self._input_ui: self._input_ui.jump_right()
+            
+            if shift:
+                if key == sdl3.SDLK_LEFT:
+                    if self._input_ui:
+                        print(self._input_ui.select_left())
+                
+                elif key == sdl3.SDLK_RIGHT:
+                    if self._input_ui:
+                        print(self._input_ui.select_right())
 
             if key == sdl3.SDLK_BACKSPACE:
                 if self._input_ui: self._input_ui.backspace()
@@ -486,6 +496,14 @@ class Frame(UI):
             self._input_ui._set_state('KEY')
             self._render_mode = 'UNIT'
             self._render_needs_updating = True
+        
+        elif event.type == sdl3.SDL_EVENT_KEY_UP:
+            key = event.key.key
+            mods = event.key.mod
+            shift = mods & sdl3.SDL_KMOD_SHIFT
+
+            if not shift:
+                if self._input_ui: self._input_ui._anchor = None
     
     def _render(self) -> None:
         self._render_needs_updating = False
