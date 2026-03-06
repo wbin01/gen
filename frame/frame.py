@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import logging
 import time
 import sys
 from ctypes import c_float, c_int
@@ -32,7 +33,7 @@ class Frame(UI):
             sdl3.SDL_HINT_X11_WINDOW_TYPE, b'_NET_WM_WINDOW_TYPE_NORMAL')
         # Init
         if sdl3.SDL_Init(sdl3.SDL_INIT_VIDEO) < 0: # X SDL_INIT_EVERYTHING
-            print('SDL3 init error:', sdl3.SDL_GetError())
+            logging.error('SDL3 init error:', sdl3.SDL_GetError())
             sys.exit(1) # X SDL_SetHint(sdl3.SDL_HINT_RENDER_DRIVER, b'vulkan')
 
         # Frame
@@ -44,7 +45,7 @@ class Frame(UI):
                 # SDL_WINDOW_POPUP SDL_WINDOW_UTILITY
 
         if not self._frame:
-            print('Frame error:', sdl3.SDL_GetError())
+            logging.error('Frame error:', sdl3.SDL_GetError())
             sdl3.SDL_Quit()
             sys.exit(1)
 
@@ -53,7 +54,7 @@ class Frame(UI):
         # Style
         self._renderer  = sdl3.SDL_CreateRenderer(self._frame, None)
         if not self._renderer :
-            print('Renderer error:', sdl3.SDL_GetError())
+            logging.error('Renderer error:', sdl3.SDL_GetError())
             sdl3.SDL_DestroyWindow(self._frame)
             sdl3.SDL_Quit()
             sys.exit(1)
@@ -353,7 +354,6 @@ class Frame(UI):
             self._running = False
         
         if event.type == sdl3.SDL_EVENT_KEY_DOWN:
-            # if event.key.keysym.sym == sdl3.SDLK_ESCAPE:
             if event.key.key == sdl3.SDLK_ESCAPE:
                 self._running = False
         
@@ -368,10 +368,17 @@ class Frame(UI):
                         self._render_mode = 'UNIT'
                         self._render_needs_updating = True
 
-                        if item.__class__.__name__ == 'Input':
+                        if item._base_class == 'Input':
                             self._input = item
-                            sdl3.SDL_StartTextInput(self._frame)  # sdl3.SDL_StopTextInput()
+                            sdl3.SDL_StartTextInput(self._frame)
+                            self._input._focus = True
                             self._input._click_update_cursor(mx.value)
+                        else:
+                            if self._input:
+                                self._input._set_state('LEAVE')
+                                self._input._focus = False
+                                self._input = None
+                                sdl3.SDL_StopTextInput(self._frame)
                     else:
                         drag = sdl3.SDL_SetWindowHitTest(
                             self._frame, self._cursor_hit, None)
@@ -454,23 +461,20 @@ class Frame(UI):
             if ctrl:
                 if key == ord('a'):
                     if self._input: self._input.select_all()
-                    print('Ctrl+A', self._input.select_all())
                 
                 elif key == ord('c'):
                     if self._input:
                         sdl3.SDL_SetClipboardText(self._input.copy().encode())
-                        print('Ctrl+C', self._input.copy())
 
                 elif key == ord('v'):
                     clip = sdl3.SDL_GetClipboardText()
                     if clip:
                         clip = clip.decode()
-                        self._input.past(clip)
+                        if self._input: self._input.past(clip)
                 
                 elif key == ord('x'):
                     if self._input:
                         sdl3.SDL_SetClipboardText(self._input.cut().encode())
-                        print('Ctrl+X', self._input.cut())
                 
                 elif key == sdl3.SDLK_LEFT:
                     if self._input: self._input.move_left_by_jump()
@@ -480,21 +484,17 @@ class Frame(UI):
             
             if shift:
                 if key == sdl3.SDLK_LEFT:
-                    if self._input:
-                        print(self._input.select_left())
+                    if self._input: self._input.select_left()
                 
                 elif key == sdl3.SDLK_RIGHT:
-                    if self._input:
-                        print(self._input.select_right())
+                    if self._input: self._input.select_right()
 
             if shift and ctrl:
                 if key == sdl3.SDLK_LEFT:
-                    if self._input:
-                        print(self._input.select_left())
+                    if self._input: self._input.select_left()
                 
                 elif key == sdl3.SDLK_RIGHT:
-                    if self._input:
-                        print(self._input.select_right())
+                    if self._input: self._input.select_right()
 
             if key == sdl3.SDLK_BACKSPACE:
                 if self._input: self._input.backspace()
@@ -512,10 +512,10 @@ class Frame(UI):
             #     pass
             # elif key == sdl3.SDLK_ESCAPE:
             #     pass
-            
-            self._input._set_state('KEY')
-            self._render_mode = 'UNIT'
-            self._render_needs_updating = True
+            if self._input:
+                self._input._set_state('KEY')
+                self._render_mode = 'UNIT'
+                self._render_needs_updating = True
         
         elif event.type == sdl3.SDL_EVENT_KEY_UP:
             key = event.key.key
@@ -528,7 +528,6 @@ class Frame(UI):
     def _render(self) -> None:
         self._render_needs_updating = False
         self._render_count += 1
-        # print('render', self._render_count)
         
         sdl3.SDL_SetRenderDrawColor(self._renderer , 0,0,0,0)
         sdl3.SDL_RenderClear(self._renderer )

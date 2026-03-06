@@ -17,7 +17,7 @@ class Input(Cell):
             *args, **kwargs) -> None:
         """..."""
         super().__init__(fill=fill, *args, **kwargs)
-        self._base_class = 'Button'
+        self._base_class = 'Input'
         self.fill = fill
 
         self._text = text
@@ -33,6 +33,8 @@ class Input(Cell):
         self._texture_pressed = None
         self._texture_w = 0
         self._texture_h = 0
+
+        self._focus = False
 
         # Input text
         self._left = []
@@ -208,7 +210,7 @@ class Input(Cell):
         pos = self._get_cursor_x_from_click(mouse_x)
         self._left  = list(self._text[:pos])
         self._right = list(self._text[pos:])
-        self._selection[0] = ''
+        self.clear_selection()
     
     def _get_cursor_x(self) -> int:
         left_text = ''.join(self._left)
