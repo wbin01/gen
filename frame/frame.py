@@ -428,7 +428,7 @@ class Frame(UI):
                     self._render_needs_updating = True
                     self._resize_start()
             
-            if self._hovered_ui._active_move:
+            if self._hovered_ui:
                 self._hovered_ui._set_state('MOVE')
 
             if resize_area == ResizeArea.NONE:

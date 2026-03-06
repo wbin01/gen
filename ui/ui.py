@@ -13,7 +13,6 @@ class UI(object):
         self._dirty = True
         self._state = State.BASE
         self._visible = True
-        self._active_move = False
 
         self.enter = Signal()
         self.leave = Signal()
@@ -22,6 +21,12 @@ class UI(object):
         self.right_pressed = Signal()
         self.right_released = Signal()
         self.move = Signal()
+        self.drag_start = Signal()
+        self.drag_end = Signal()
+
+        self._dragging = False
+        self._accept_move = False
+        
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}()'
@@ -30,13 +35,13 @@ class UI(object):
         return self.__class__.__name__
     
     @property
-    def active_move(self) -> bool:
+    def accept_move(self) -> bool:
         """..."""
-        return self._active_move
+        return self._accept_move
     
-    @active_move.setter
-    def active_move(self, active_move: bool) -> None:
-        self._active_move = active_move
+    @accept_move.setter
+    def accept_move(self, accept_move: bool) -> None:
+        self._accept_move = accept_move
     
     @property
     def visible(self) -> bool:
@@ -55,6 +60,11 @@ class UI(object):
     def base_class(self) -> bool:
         """..."""
         return self._base_class
+    
+    @property
+    def dragging(self) -> bool:
+        """..."""
+        return self._dragging
     
     @property
     def parent(self) -> UI:
@@ -85,10 +95,19 @@ class UI(object):
                 self.right_released.emit(self)
             else:
                 self.released.emit(self)
-        
+            
+            if self._dragging:
+                self._dragging = False
+                self.drag_end.emit(self)
+                
         elif event == 'MOVE':
-            self._state = State.HOVER
-            self.move.emit(self)
+            if self._state == State.PRESSED:
+                if not self._dragging:
+                    self._dragging = True
+                    self.drag_start.emit(self)
+
+            if self._accept_move:
+                self.move.emit(self)
         
         elif event == 'LEAVE':
             self._state = State.BASE
