@@ -110,7 +110,7 @@ class Frame(UI):
 
         # Cell
         self._hovered_ui = self._container
-        self._input_ui = None
+        self._input = None
     
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}()'
@@ -369,9 +369,9 @@ class Frame(UI):
                         self._render_needs_updating = True
 
                         if item.__class__.__name__ == 'Input':
-                            self._input_ui = item
+                            self._input = item
                             sdl3.SDL_StartTextInput(self._frame)  # sdl3.SDL_StopTextInput()
-                            self._input_ui._click_update_cursor(mx.value)
+                            self._input._click_update_cursor(mx.value)
                     else:
                         drag = sdl3.SDL_SetWindowHitTest(
                             self._frame, self._cursor_hit, None)
@@ -438,10 +438,10 @@ class Frame(UI):
                     self._render_needs_updating = True
         
         elif event.type == sdl3.SDL_EVENT_TEXT_INPUT:
-            if self._input_ui:
+            if self._input:
                 text = event.text.text.decode('utf-8')
-                self._input_ui.insert(text)
-                self._input_ui._set_state('KEY')
+                self._input.insert(text)
+                self._input._set_state('KEY')
                 self._render_mode = 'UNIT'
                 self._render_needs_updating = True
 
@@ -453,56 +453,62 @@ class Frame(UI):
 
             if ctrl:
                 if key == ord('c'):
-                    print('Ctrl+X')  # if self._input_ui: self._input_ui._copy()
-
-                elif key == ord('x'):
-                    print('Ctrl+X')
+                    if self._input:
+                        sdl3.SDL_SetClipboardText(self._input.copy().encode())
+                        print('Ctrl+C', self._input.copy())
 
                 elif key == ord('v'):
                     print('Ctrl+V')
                 
+                elif key == ord('x'):
+                    if self._input:
+                        sdl3.SDL_SetClipboardText(self._input.cut().encode())
+                        print('Ctrl+X', self._input.cut())
+                        self._render_mode = 'UNIT'
+                        self._render_needs_updating = True
+                
                 elif key == sdl3.SDLK_LEFT:
-                    if self._input_ui: self._input_ui.jump_left()
+                    if self._input: self._input.move_left_by_jump()
                 
                 elif key == sdl3.SDLK_RIGHT:
-                    if self._input_ui: self._input_ui.jump_right()
+                    if self._input: self._input.move_right_by_jump()
             
             if shift:
                 if key == sdl3.SDLK_LEFT:
-                    if self._input_ui:
-                        print(self._input_ui.select_left())
+                    if self._input:
+                        print(self._input.select_left())
                 
                 elif key == sdl3.SDLK_RIGHT:
-                    if self._input_ui:
-                        print(self._input_ui.select_right())
+                    if self._input:
+                        print(self._input.select_right())
 
             if shift and ctrl:
                 if key == sdl3.SDLK_LEFT:
-                    if self._input_ui:
-                        print(self._input_ui.select_left())
+                    if self._input:
+                        print(self._input.select_left())
                 
                 elif key == sdl3.SDLK_RIGHT:
-                    if self._input_ui:
-                        print(self._input_ui.select_right())
+                    if self._input:
+                        print(self._input.select_right())
 
             if key == sdl3.SDLK_BACKSPACE:
-                if self._input_ui: self._input_ui.backspace()
+                if self._input: self._input.backspace()
 
             elif key == sdl3.SDLK_DELETE:
-                if self._input_ui: self._input_ui.delete()
+                if self._input: self._input.delete()
 
             elif key == sdl3.SDLK_LEFT:
-                if self._input_ui: self._input_ui.move_left()
+                if self._input: self._input.move_left()
                 
             elif key == sdl3.SDLK_RIGHT:
-                if self._input_ui: self._input_ui.move_right()
+                if self._input: self._input.move_right()
             
             # elif key ==  sdl3.SDLK_RETURN:
             #     pass
             # elif key == sdl3.SDLK_ESCAPE:
             #     pass
             
-            self._input_ui._set_state('KEY')
+            self._input._set_state('KEY')
             self._render_mode = 'UNIT'
             self._render_needs_updating = True
         
@@ -512,7 +518,7 @@ class Frame(UI):
             shift = mods & sdl3.SDL_KMOD_SHIFT
 
             if not shift:
-                if self._input_ui: self._input_ui._anchor = None
+                if self._input: self._input._anchor = None
     
     def _render(self) -> None:
         self._render_needs_updating = False
