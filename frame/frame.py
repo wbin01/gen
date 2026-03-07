@@ -7,7 +7,7 @@ from ctypes import c_float, c_int
 import sdl3
 # import sdl3.sdlttf as ttf
 
-from ..flag import ResizeArea, Cursor
+from ..flag import ResizeArea, Cursor, StyleClass
 from ..layout import Col
 from ..ui import UI, Drawer, Theme
 
@@ -113,6 +113,7 @@ class Frame(UI):
         self._hovered = self._container
         self._input = None
         self._focus = None
+        self._default = None
     
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}()'
@@ -189,6 +190,16 @@ class Frame(UI):
         self._event_loop()
         self._destroy()
         return 0
+    
+    @property
+    def default(self) -> Cell:
+        """..."""
+        return self._default
+    
+    @default.setter
+    def default(self, cell: Cell) -> None:
+        self._default = cell
+        self._default.style_class = StyleClass.DEFAULT
     
     def _cursor_hit_test(self, window, area, data):
         x = area.contents.x
@@ -518,8 +529,14 @@ class Frame(UI):
             elif key == sdl3.SDLK_RIGHT:
                 if self._input: self._input.move_right()
             
-            # elif key ==  sdl3.SDLK_RETURN:
-            #     pass
+            elif key ==  sdl3.SDLK_RETURN:
+                if self._default:
+                    for fn in self._default.pressed._slots:
+                        fn(self._default)
+                    
+                    for fn in self._default.released._slots:
+                        fn(self._default)
+            
             # elif key == sdl3.SDLK_ESCAPE:
             #     pass
             if self._input:

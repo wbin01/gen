@@ -23,7 +23,40 @@ class Cell(Margin, Size, UI):
 
         self._x = 0
         self._y = 0
-        
+
+        self._style = None
+        self.style_class = style_class
+
+    def __repr__(self) -> str:
+        return f'{self.__class__.__name__}()'
+
+    def __str__(self) -> str:
+        return self.__class__.__name__
+    
+    @property
+    def fill(self) -> Fill:
+        """..."""
+        return self._fill
+    
+    @fill.setter
+    def fill(self, fill: Fill) -> None:
+        self._fill = fill
+    
+    @property
+    def style(self) -> dict:
+        return self._style
+    
+    @style.setter
+    def style(self, style: dict) -> None:
+        self._style = style
+    
+    @property
+    def style_class(self) -> str:
+        return self._style_class
+    
+    @style_class.setter
+    def style_class(self, style_class: str) -> None:
+
         class_name = self.__class__.__name__
         if not hasattr(Theme, class_name):
             class_name = self.__class__.__base__.__name__
@@ -56,29 +89,6 @@ class Cell(Margin, Size, UI):
             theme = Theme.classes[state_id]
         
         self._style = theme
-
-    def __repr__(self) -> str:
-        return f'{self.__class__.__name__}()'
-
-    def __str__(self) -> str:
-        return self.__class__.__name__
-    
-    @property
-    def fill(self) -> Fill:
-        """..."""
-        return self._fill
-    
-    @fill.setter
-    def fill(self, fill: Fill) -> None:
-        self._fill = fill
-    
-    @property
-    def style(self) -> dict:
-        return self._style
-    
-    @style.setter
-    def style(self, style: dict) -> None:
-        self._style = style
     
     def _hit_test(self, x: int, y: int) -> UI | None:
         if not self.visible:
