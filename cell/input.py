@@ -1,6 +1,4 @@
 #!/usr/bin/env python3
-import bisect
-
 from PIL import ImageFont
 import sdl3
 
@@ -50,8 +48,19 @@ class Input(Cell):
         self._texty = 0
         self._textw = 0
         self._texth = 0
+
+        # Selection
+        self._selection_texture = None
+        self._selx = 0
+        self._sely = 0
+        self._selw = 0
+        self._selh = 0
+
         self._selection = ['', '', '']
         self._select_direction = None
+        self._selecting = False
+        self._selection_start = False
+        self._selection_end = False
 
         # Cursor
         self._cursor = 0
@@ -182,7 +191,11 @@ class Input(Cell):
     
     def select_left(self) -> str:
         self._select_direction = 'LEFT'
-        if self._anchor is None: self._anchor = self._cursor
+        if self._anchor is None:
+            self._anchor = self._cursor
+            self._sely = self._texty - 1
+            self._selh = self._font_size + 2
+            self.clear_selection()
 
         start = min(self._cursor, self._anchor)
         end = max(self._cursor, self._anchor)
@@ -190,12 +203,20 @@ class Input(Cell):
         self._selection[0] = self._text[:start - 1]
         self._selection[1] = self._text[start - 1:end]
         self._selection[2] = self._text[end:]
+        self._selx = self._get_cursor_x() + self._textx - 1 - (
+            self._font.getlength(self._selection[1][0]))
+        self._selw = int(self._font.getlength(self._selection[1])) + 2
 
         return self._selection[1]
     
     def select_right(self) -> str:
         self._select_direction = 'RIGHT'
-        if self._anchor is None: self._anchor = self._cursor
+        if self._anchor is None:
+            self._anchor = self._cursor
+            self._selx = self._get_cursor_x() + self._textx - 1
+            self._sely = self._texty - 1
+            self._selh = self._font_size + 2
+            self.clear_selection()
 
         start = min(self._cursor, self._anchor)
         end = max(self._cursor, self._anchor)
@@ -203,6 +224,7 @@ class Input(Cell):
         self._selection[0] = self._text[:start]
         self._selection[1] = self._text[start:end + 1]
         self._selection[2] = self._text[end + 1:]
+        self._selw = int(self._font.getlength(self._selection[1])) + 2
 
         return self._selection[1]
     
@@ -215,10 +237,6 @@ class Input(Cell):
     def _get_cursor_x(self) -> int:
         left_text = ''.join(self._left)
         return self._font.getlength(left_text)
-    
-    def _get_cursor_x_from_click_bkp(self, mouse_x) -> int:
-        cursor = bisect.bisect_left(self._positions, mouse_x)
-        return cursor
     
     def _get_cursor_x_from_click(self, mouse_x) -> int:
         for i, x in enumerate(self._positions):
@@ -235,6 +253,23 @@ class Input(Cell):
         self._cursor = end - 1
         return self._cursor
     
+    def _mouse_selection(self, mouse_x) -> None:
+        if not self._selecting:
+            self._selecting = True
+            self._anchor = self._get_cursor_x_from_click(mouse_x)
+
+        if self._selecting:
+            self._cursor = self._get_cursor_x_from_click(mouse_x)
+
+            self._selection[1] = self._text[self._anchor:self._cursor]
+            self._selection[0] = self._text[:self._anchor]
+            self._selection[2] = self._text[self._cursor:]
+
+            self._selx = self._get_cursor_x() + self._textx - 1
+            self._sely = self._texty - 1
+            self._selw = int(self._font.getlength(self._selection[1])) + 2
+            self._selh = self._font_size + 2
+    
     def _update_positions(self):
         self._positions = []
         self._widths = []
@@ -250,6 +285,10 @@ class Input(Cell):
         if not self._dirty: return
 
         if mode == 'UNIT':
+            if self._selection[1]:
+                self._selection_texture = self._drawer.build_texture(
+                    self._selw, self._selh, self._draw_ui, 'HOVER')
+
             self._text_texture, self._textw, self._texth = self._drawer.font(
                 self._text, self._text_texture,
                 self._font, self._font_size, self._font_color)
@@ -311,6 +350,11 @@ class Input(Cell):
                 self._texture_pressed,
                 int(self._x), int(self._y), int(self.width), int(self.height))
         
+        if self._selection[1]:
+            self._drawer.set_texture(
+                self._selection_texture,
+                self._selx, self._sely, self._selw, self._selh)
+
         self._drawer.set_texture(
             self._text_texture,
             self._textx, self._texty, self._textw, self._texth)
@@ -323,10 +367,17 @@ class Input(Cell):
             self._dirty = False
     
     def _draw_ui(self, state: str = 'BASE'):
+        x = y = 0
+
+        if self._selection[1]:
+            sel_color = self.style[state]['selection-color']
+            self._drawer.rect(x, y, self._selw, self._selh, sel_color, 2)
+            return
+
         bg_color = self.style[state]['background-color']
         bd_color = self.style[state]['border-color']
         rad = self.style[state]['radius']
-        x = y = 0
+        
         self._drawer.rect(x, y, self.width, self.height, bd_color, rad)
         self._drawer.rect(
             x + 1, y + 1, self.width - 2,self.height - 2, bg_color, rad - 1)

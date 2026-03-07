@@ -110,7 +110,7 @@ class Frame(UI):
         sdl3.SDL_SetWindowHitTest(self._frame, self._cursor_hit, None)
 
         # Cell
-        self._hovered_ui = self._container
+        self._hovered = self._container
         self._input = None
     
     def __repr__(self) -> str:
@@ -413,6 +413,8 @@ class Frame(UI):
                         item._set_state('RELEASED')
                         self._render_mode = 'UNIT'
                         self._render_needs_updating = True
+                    
+                    if self._input: self._input._selecting = False
             
             elif event.button.button == sdl3.SDL_BUTTON_RIGHT:
                 item = self._container._hit_test(mx, my)
@@ -428,18 +430,25 @@ class Frame(UI):
                     self._render_needs_updating = True
                     self._resize_start()
             
-            if self._hovered_ui:
-                self._hovered_ui._set_state('MOVE')
+            if self._hovered:
+                self._hovered._set_state('MOVE')
+
+                if self._input:
+                    if self._input._state.value == 'PRESSED':
+                        print('self._input is dragging')
+                        self._input._mouse_selection(mx.value)
+                        self._render_mode = 'UNIT'
+                        self._render_needs_updating = True
 
             if resize_area == ResizeArea.NONE:
                 ui = None
                 if not self._resizing:
                     ui = self._container._hit_test(mx, my)
                 
-                if ui and ui != self._hovered_ui:
-                    self._hovered_ui._set_state('LEAVE')
-                    self._hovered_ui = ui
-                    self._hovered_ui._set_state('ENTER')
+                if ui and ui != self._hovered:
+                    self._hovered._set_state('LEAVE')
+                    self._hovered = ui
+                    self._hovered._set_state('ENTER')
 
                     self._render_mode = 'UNIT'
                     self._render_needs_updating = True

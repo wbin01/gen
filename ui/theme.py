@@ -75,6 +75,7 @@ class Theme:
     Input = {
         'BASE': {
             'font-color': (200, 200, 200, 255),
+            'selection-color': (60, 100, 150, 100),
             'background-color': (30, 30, 30, 255),
             'border-color': (80, 80, 80, 255),
             'border': 1,
@@ -85,6 +86,7 @@ class Theme:
             },
         'HOVER': {
             'font-color': (200, 200, 200, 255),
+            'selection-color': (60, 100, 150, 100),
             'background-color': (30, 30, 30, 255),
             'border-color': (60, 100, 150, 255),
             'border': 1,
@@ -95,6 +97,7 @@ class Theme:
             },
         'PRESSED': {
             'font-color': (200, 200, 200, 255),
+            'selection-color': (60, 100, 150, 100),
             'background-color': (30, 30, 30, 255),
             'border-color': (80, 120, 170, 255),
             'border': 1,
