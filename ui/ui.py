@@ -110,7 +110,8 @@ class UI(object):
                 self.move.emit(self)
         
         elif event == 'LEAVE':
-            self._state = State.BASE
+            if self._app and self._app._focus != self:
+                self._state = State.BASE
             self.leave.emit(self)
 
         elif event == 'KEY':

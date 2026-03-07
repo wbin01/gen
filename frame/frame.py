@@ -112,6 +112,7 @@ class Frame(UI):
         # Cell
         self._hovered = self._container
         self._input = None
+        self._focus = None
     
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}()'
@@ -371,13 +372,14 @@ class Frame(UI):
                         if item._base_class == 'Input':
                             self._input = item
                             sdl3.SDL_StartTextInput(self._frame)
-                            self._input._focus = True
+                            self._focus = self._input
                             self._input._click_update_cursor(mx.value)
                         else:
                             if self._input:
-                                self._input._set_state('LEAVE')
-                                self._input._focus = False
+                                input_item = self._input
+                                self._focus = None
                                 self._input = None
+                                input_item._set_state('BASE')
                                 sdl3.SDL_StopTextInput(self._frame)
                     else:
                         drag = sdl3.SDL_SetWindowHitTest(
@@ -435,7 +437,6 @@ class Frame(UI):
 
                 if self._input:
                     if self._input._state.value == 'PRESSED':
-                        print('self._input is dragging')
                         self._input._mouse_selection(mx.value)
                         self._render_mode = 'UNIT'
                         self._render_needs_updating = True

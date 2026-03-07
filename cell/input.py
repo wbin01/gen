@@ -359,9 +359,10 @@ class Input(Cell):
             self._text_texture,
             self._textx, self._texty, self._textw, self._texth)
         
-        self._drawer.font_cursor(
-            self._textx, self._texty, self._font_size,
-            self._get_cursor_x(), self._font_color)
+        if self._app and self._app._focus == self:
+            self._drawer.font_cursor(
+                self._textx, self._texty, self._font_size,
+                self._get_cursor_x(), self._font_color)
         
         if mode == 'REBUILD':
             self._dirty = False
