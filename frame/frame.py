@@ -74,6 +74,7 @@ class Frame(UI):
         # Loop
         self._running = True
         self._queue_list = []
+        self._timers = []
 
         # Render
         self._render_mode = 'UNIT'
@@ -347,6 +348,23 @@ class Frame(UI):
 
                     while sdl3.SDL_PollEvent(event):
                         self._handle_events(event, resize_area, mx, my)
+            
+            # for timer in self._timers:
+            #     timer.tick(now)
+
+            # now = str(round(time.time(), 3))
+
+            for timer in self._timers:
+                current_time = time.monotonic()
+                if current_time >= timer._next_tick:
+                    timer._next_tick = time.monotonic() + timer.interval
+                    print('TICK')
+            
+            # if now - self._last_tick >= 500:
+            #     self._last_tick = self._now
+
+            #     for timer in self._timers:
+            #         timer.tick = self._now
 
             if self._queue_list:
                 self._container._redraw_queue(self._queue_list)

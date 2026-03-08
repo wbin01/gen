@@ -22,11 +22,15 @@ class Add(object):
 
         mro = str(type(ui).__mro__)
         if 'layout.layout.Layout' not in mro and 'cell.cell.Cell' not in mro:
-            raise TypeError('Layout only accepts Cell or Layout.')
+            raise TypeError(
+                'Layout only accepts Cell, Layout or Control objects.')
         
         self._uis.append(ui)
         ui._parent = self
         ui._app = self._app
+
+        if 'control.timer.Timer' in mro:
+            pass
 
         if 'cell.cell.Cell' in mro:
             ui._drawer = self._app._drawer

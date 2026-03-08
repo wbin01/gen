@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from ..flag import State
-from ..ui import Signal
+from ..control import Signal
 
 
 class UI(object):
