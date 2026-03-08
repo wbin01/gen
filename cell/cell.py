@@ -17,6 +17,8 @@ class Cell(Margin, Size, UI):
             *args, **kwargs) -> None:
         """..."""
         super().__init__(*args, **kwargs)
+        self._base_class = 'Cell'
+        
         self._drawer = None
         self._fill = fill
         self._style_class = style_class

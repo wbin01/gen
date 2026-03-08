@@ -14,9 +14,6 @@ class Empty(Cell):
             *args, **kwargs) -> None:
         """..."""
         super().__init__(fill=fill, *args, **kwargs)
-
-        self._base_class = 'Empty'
-
         self.width = width
         self.height = height
 

@@ -11,6 +11,8 @@ class Layout(UI):
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
+        self._base_class = 'Layout'
+
         self._drawer = None
         self._first_redraw = True
         self._queue = []

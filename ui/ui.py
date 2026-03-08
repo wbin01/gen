@@ -13,6 +13,7 @@ class UI(object):
         self._dirty = True
         self._state = State.BASE
         self._visible = True
+        self._timer = None
 
         self.enter = Signal()
         self.leave = Signal()

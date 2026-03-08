@@ -12,7 +12,6 @@ class Button(Cell):
             *args, **kwargs) -> None:
         """..."""
         super().__init__(fill=fill, *args, **kwargs)
-        self._base_class = 'Button'
         self.fill = fill
 
         self._text = text

@@ -22,6 +22,7 @@ class Frame(UI):
             *args, **kwargs) -> None:
         """..."""
         super().__init__(*args, **kwargs)
+        self._base_class = 'Frame'
         self._title = title
         self._x = x
         self._y = y
@@ -64,17 +65,17 @@ class Frame(UI):
         self._drawer = Drawer(self._renderer )
         self._style = self._theme
 
+        # Loop
+        self._running = True
+        self._queue_list = []
+        self._timers = []
+
         # Container
         self._container = Col()
         self._container._first = True
         self._container._parent = self
         self._container._app = self
         self._container._drawer = self._drawer
-
-        # Loop
-        self._running = True
-        self._queue_list = []
-        self._timers = []
 
         # Render
         self._render_mode = 'UNIT'
@@ -348,23 +349,12 @@ class Frame(UI):
 
                     while sdl3.SDL_PollEvent(event):
                         self._handle_events(event, resize_area, mx, my)
-            
-            # for timer in self._timers:
-            #     timer.tick(now)
 
-            # now = str(round(time.time(), 3))
-
+            current_time = time.monotonic()
             for timer in self._timers:
-                current_time = time.monotonic()
                 if current_time >= timer._next_tick:
                     timer._next_tick = time.monotonic() + timer.interval
-                    print('TICK')
-            
-            # if now - self._last_tick >= 500:
-            #     self._last_tick = self._now
-
-            #     for timer in self._timers:
-            #         timer.tick = self._now
+                    timer._exec()
 
             if self._queue_list:
                 self._container._redraw_queue(self._queue_list)

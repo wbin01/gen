@@ -3,6 +3,7 @@ from PIL import ImageFont
 import sdl3
 
 from .cell import Cell
+from ..control import Timer
 from ..flag import Fill
 from ..ui import FontRender
 
@@ -15,7 +16,6 @@ class Input(Cell):
             *args, **kwargs) -> None:
         """..."""
         super().__init__(fill=fill, *args, **kwargs)
-        self._base_class = 'Input'
         self.fill = fill
 
         self._text = text

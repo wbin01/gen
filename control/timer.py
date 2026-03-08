@@ -1,19 +1,23 @@
 #!/usr/bin/env python3
+from .control import Control
 
 
-class Timer(object):
-    def __init__(self, cell: Cell, interval: int, tick: callable) -> None:
-        self._cell = cell
+class Timer(Control):
+    def __init__(
+            self, call: callable, interval: int = 0.5, cell: Cell = None,
+            *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self._call = call
         self._interval = interval
-        self._tick = tick
+        self._cell = cell
 
         self._next_tick = 0
     
     def __repr__(self) -> str:
         return (
             f'{self.__class__.__name__}'
-            f'(cell={self.__cell.__class__.__name__}, '
-            f'interval={self._interval}, tick={self._tick})')
+            f'(interval={self._interval}, tick={self._tick}, '
+            f'cell={self.__cell.__class__.__name__})')
     
     def __str__(self) -> str:
         return f'{self.__class__.__name__}("{self._text}")'
@@ -35,13 +39,15 @@ class Timer(object):
         self._interval = interval
 
     @property
-    def tick(self) -> callable:
-        return self._tick
+    def call(self) -> callable:
+        return self._call
     
-    @tick.setter
-    def tick(self, tick: callable) -> None:
-        self._tick = tick
+    @call.setter
+    def call(self, call: callable) -> None:
+        self._call = call
     
     def _exec(self) -> None:
-        if self._cell._visible:
-            self._tick()
+        if self._cell and self._cell._visible:
+            self._call()
+        else:
+            self._call()
