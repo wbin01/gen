@@ -136,16 +136,11 @@ class Box(Margin, Size, Add, Layout):
                 Theme.Frame['BASE']['background-color'],
                 Theme.Frame['BASE']['radius'])
     
-    def _update(self) -> None:
+    def _update(self, mode: str = 'REBUILD') -> None:
         # Updates the width, fill, alignment, and position of cells.
-        if self._orientation == 'POSITION':
-            return
-        
-        if self._dirty == 'HOVER':
-            return
-        
-        if not self._uis:
-            return
+        if self._orientation == 'POSITION': return
+        if mode == 'UNIT': return
+        if not self._uis: return
         
         if self._first:
             self._update_size(self)
@@ -169,8 +164,7 @@ class Box(Margin, Size, Add, Layout):
                 ui._update() #  Repeat for all
     
     def _update_align(self, layout: Box) -> None:
-        if not layout._uis:
-            return
+        if not layout._uis: return
         
         if layout._orientation == 'VERTICAL':
             if layout.align == Align.START:
@@ -221,8 +215,7 @@ class Box(Margin, Size, Add, Layout):
     
     def _update_fill(self, layout: Box) -> None:
         # Updates the fill of layouts and cells.
-        if not layout._uis:
-            return
+        if not layout._uis: return
         
         if layout._first:
             layout._width = layout._parent.width

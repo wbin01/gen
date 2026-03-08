@@ -36,6 +36,12 @@ class Add(object):
 
         if ui._base_class == 'Cell':
             ui._drawer = self._app._drawer
+
+            # if ui.timer:
+            #     self._app._timers.append(ui.timer)
+
+            if ui._timer:
+                self._app._timers.append(ui._timer)
         
         elif ui._base_class == 'Layout':
             ui._drawer = self._app._drawer

@@ -7,6 +7,7 @@ from ctypes import c_float, c_int
 import sdl3
 # import sdl3.sdlttf as ttf
 
+from ..cell import Input
 from ..flag import ResizeArea, Cursor, StyleClass
 from ..layout import Col
 from ..ui import UI, Drawer, Theme
@@ -355,6 +356,9 @@ class Frame(UI):
                 if current_time >= timer._next_tick:
                     timer._next_tick = time.monotonic() + timer.interval
                     timer._exec()
+                    timer._invalidate(timer)
+                    self._render_needs_updating = True
+                    # self._render_mode = 'UNIT'
 
             if self._queue_list:
                 self._container._redraw_queue(self._queue_list)
@@ -388,7 +392,7 @@ class Frame(UI):
                         self._render_mode = 'UNIT'
                         self._render_needs_updating = True
 
-                        if item._base_class == 'Input':
+                        if isinstance(item, Input):
                             self._input = item
                             sdl3.SDL_StartTextInput(self._frame)
                             self._focus = self._input
@@ -573,7 +577,7 @@ class Frame(UI):
                 sdl3.SDL_RenderTexture(
                     self._renderer , self._frame_base_texture, None, None)
                 self._container._invalidate()
-                self._container._update()
+                self._container._update(self._render_mode)
                 self._container._redraw('RESIZE')
 
             if not self._resizing:
@@ -582,7 +586,7 @@ class Frame(UI):
                 sdl3.SDL_RenderTexture(
                     self._renderer , self._frame_base_texture, None, None)
                 self._container._invalidate()
-                self._container._update()
+                self._container._update(self._render_mode)
                 self._queue_list = self._container._queue_list()
                 self._container._queue_list_clear()
 
@@ -594,7 +598,7 @@ class Frame(UI):
                 self._container._invalidate()
                 self._first_render = False
             
-            self._container._update()
+            self._container._update(self._render_mode)
             self._container._redraw(self._render_mode)
 
         sdl3.SDL_RenderPresent(self._renderer )

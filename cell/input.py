@@ -67,6 +67,11 @@ class Input(Cell):
         self._anchor = None
         self._positions = []
         self._widths = []
+        self._cursor_visible = False
+        self._cursor_texture_on = None
+        self._cursor_texture_off = None
+        # self._timer = Timer(call=lambda: self._draw('HOVER'))
+        self._timer = Timer(call=self._cursor_tick)
     
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}(text="{self._text}")'
@@ -312,11 +317,17 @@ class Input(Cell):
                 self._text, self._text_texture,
                 self._font, self._font_size, self._font_color)
             self._texty = self._y + (self.height / 2) - (self._texth / 2)
+
+            self._cursor_texture_on = self._drawer.build_texture(
+                2, self._font_size, self._draw_ui, 'CURSOR_ON')
+            
+            self._cursor_texture_off = self._drawer.build_texture(
+                2, self._font_size, self._draw_ui, 'CURSOR_OFF')
             
             self._resise_w = 0
             self._resise_h = 0
         
-        elif mode == 'RESIZE':
+        if mode == 'RESIZE':
             if not self._resise_h:
                 self._resise_w = int(self.width)
                 self._resise_h = int(self.height)
@@ -358,17 +369,30 @@ class Input(Cell):
         self._drawer.set_texture(
             self._text_texture,
             self._textx, self._texty, self._textw, self._texth)
-        
+
         if self._app and self._app._focus == self:
-            self._drawer.font_cursor(
-                self._textx, self._texty, self._font_size,
-                self._get_cursor_x(), self._font_color)
+            if self._cursor_visible:
+                self._drawer.set_texture(
+                    self._cursor_texture_on,
+                    self._textx + self._get_cursor_x(), self._texty, 1, self._font_size)
+            else:
+                self._drawer.set_texture(
+                    self._cursor_texture_off,
+                    self._textx + self._get_cursor_x(), self._texty, 1, self._font_size)
         
         if mode == 'REBUILD':
             self._dirty = False
     
+    def _cursor_tick(self) -> None:
+        self._cursor_visible = False if self._cursor_visible else True
+    
     def _draw_ui(self, state: str = 'BASE'):
         x = y = 0
+
+        if 'CURSOR' in state:
+            color = self._font_color if state == 'CURSOR_ON' else (0, 0, 0, 0)
+            self._drawer.rect(0, 0, self._font_size, self._font_size, color, 2)
+            return
 
         if self._selection[1]:
             sel_color = self.style[state]['selection-color']

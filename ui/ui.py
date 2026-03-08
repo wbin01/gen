@@ -121,11 +121,12 @@ class UI(object):
         else:  # BASE
             self._state = State.BASE
 
-        self._dirty = 'HOVER'
+        self._invalidate()
 
-        def inv(ui):
-            if hasattr(ui, '_parent') and ui._parent:
-                ui._parent._dirty = 'HOVER'
-                inv(ui._parent)
-        
-        inv(self)
+    def _invalidate(self, ui=None):
+        if not ui: ui = self
+        ui._dirty = True
+
+        if hasattr(ui, '_parent') and ui._parent:
+            ui._parent._dirty = 'HOVER'
+            self._invalidate(ui._parent)
