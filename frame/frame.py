@@ -357,8 +357,9 @@ class Frame(UI):
                     timer._next_tick = time.monotonic() + timer.interval
                     timer._exec()
                     timer._invalidate(timer)
-                    self._render_needs_updating = True
-                    # self._render_mode = 'UNIT'
+
+                    if self._render_mode == 'UNIT':
+                        self._render_needs_updating = True
 
             if self._queue_list:
                 self._container._redraw_queue(self._queue_list)
