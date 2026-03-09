@@ -356,7 +356,6 @@ class Frame(UI):
                 if current_time >= timer._next_tick:
                     timer._next_tick = time.monotonic() + timer.interval
                     timer._exec()
-                    timer._invalidate(timer)
 
                     if self._render_mode == 'UNIT':
                         self._render_needs_updating = True

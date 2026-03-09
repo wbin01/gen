@@ -29,8 +29,14 @@ class Button(Cell):
         self._texture_h = 0
     
     @property
-    def text(self):
+    def text(self) -> str:
+        """..."""
         return self._text
+    
+    @text.setter
+    def text(self, text: str) -> None:
+        self._text = text
+        self._invalidate()
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}(text="{self._text}")'

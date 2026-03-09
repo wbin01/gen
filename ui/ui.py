@@ -1,15 +1,17 @@
 #!/usr/bin/env python3
-from ..flag import State
 from ..control import Signal
+from ..flag import State
+from ..mixin import Core
 
 
-class UI(object):
+class UI(Core):
     """..."""
     def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
         """..."""
-        self._base_class = 'UI'
-        self._app = None
-        self._parent = None
+        # self._base_class = 'UI'
+        # self._app = None
+        # self._parent = None
         self._dirty = True
         self._state = State.BASE
         self._visible = True
@@ -53,23 +55,23 @@ class UI(object):
     def visible(self, visible: bool) -> None:
         self._visible = visible
     
-    @property
-    def app(self) -> UI:
-        return self._app
+    # @property
+    # def app(self) -> UI:
+    #     return self._app
     
-    @property
-    def base_class(self) -> bool:
-        """..."""
-        return self._base_class
+    # @property
+    # def base_class(self) -> bool:
+    #     """..."""
+    #     return self._base_class
     
     @property
     def dragging(self) -> bool:
         """..."""
         return self._dragging
     
-    @property
-    def parent(self) -> UI:
-        return self._parent
+    # @property
+    # def parent(self) -> UI:
+    #     return self._parent
     
     def _rect_contains(self, ui: UI, x: int, y: int) -> bool:
         ui_x, ui_y = int(ui._x), int(ui._y)

@@ -216,10 +216,15 @@ class Drawer(object):
         sdl3.SDL_SetRenderDrawColor(self._renderer, 0, 0, 0, 0)
         sdl3.SDL_RenderClear(self._renderer)
 
+        # if blend:
+        #     sdl3.SDL_SetRenderDrawBlendMode(
+        #         self._renderer, sdl3.SDL_BLENDMODE_AD)
         if state:
             draw(state)
         else:
             draw()
+        # sdl3.SDL_SetRenderDrawBlendMode(
+        #     self._renderer, sdl3.SDL_BLENDMODE_NONE)
 
         sdl3.SDL_SetRenderTarget(self._renderer, old_target)
         

@@ -64,6 +64,7 @@ class Input(Cell):
 
         # Cursor
         self._cursor = 0
+        self._cursor_w = 1
         self._anchor = None
         self._positions = []
         self._widths = []
@@ -198,8 +199,8 @@ class Input(Cell):
         self._select_direction = 'LEFT'
         if self._anchor is None:
             self._anchor = self._cursor
-            self._sely = self._texty - 1
-            self._selh = self._font_size + 2
+            self._sely = self._texty - 2
+            self._selh = self._font_size + 4
             self.clear_selection()
 
         start = min(self._cursor, self._anchor)
@@ -219,8 +220,8 @@ class Input(Cell):
         if self._anchor is None:
             self._anchor = self._cursor
             self._selx = self._get_cursor_x() + self._textx - 1
-            self._sely = self._texty - 1
-            self._selh = self._font_size + 2
+            self._sely = self._texty - 2
+            self._selh = self._font_size + 4
             self.clear_selection()
 
         start = min(self._cursor, self._anchor)
@@ -271,9 +272,9 @@ class Input(Cell):
             self._selection[2] = self._text[self._cursor:]
 
             self._selx = self._get_cursor_x() + self._textx - 1
-            self._sely = self._texty - 1
+            self._sely = self._texty - 2
             self._selw = int(self._font.getlength(self._selection[1])) + 2
-            self._selh = self._font_size + 2
+            self._selh = self._font_size + 4
     
     def _update_positions(self):
         self._positions = []
@@ -319,10 +320,10 @@ class Input(Cell):
             self._texty = self._y + (self.height / 2) - (self._texth / 2)
 
             self._cursor_texture_on = self._drawer.build_texture(
-                2, self._font_size, self._draw_ui, 'CURSOR_ON')
+                self._cursor_w, self._font_size, self._draw_ui, 'CURSOR_ON')
             
             self._cursor_texture_off = self._drawer.build_texture(
-                2, self._font_size, self._draw_ui, 'CURSOR_OFF')
+                self._cursor_w, self._font_size, self._draw_ui, 'CURSOR_OFF')
             
             self._resise_w = 0
             self._resise_h = 0
@@ -374,11 +375,13 @@ class Input(Cell):
             if self._cursor_visible:
                 self._drawer.set_texture(
                     self._cursor_texture_on,
-                    self._textx + self._get_cursor_x(), self._texty, 1, self._font_size)
+                    self._textx + self._get_cursor_x(),
+                    self._texty, self._cursor_w, self._font_size)
             else:
                 self._drawer.set_texture(
                     self._cursor_texture_off,
-                    self._textx + self._get_cursor_x(), self._texty, 1, self._font_size)
+                    self._textx + self._get_cursor_x(),
+                    self._texty, self._cursor_w, self._font_size)
         
         if mode == 'REBUILD':
             self._dirty = False
@@ -391,12 +394,12 @@ class Input(Cell):
 
         if 'CURSOR' in state:
             color = self._font_color if state == 'CURSOR_ON' else (0, 0, 0, 0)
-            self._drawer.rect(0, 0, self._font_size, self._font_size, color, 2)
+            self._drawer.rect(0, 0, self._cursor_w + 1, self._font_size, color, 0)
             return
 
         if self._selection[1]:
             sel_color = self.style[state]['selection-color']
-            self._drawer.rect(x, y, self._selw, self._selh, sel_color, 2)
+            self._drawer.rect(x, y, self._selw, self._selh, sel_color, 1)
             return
 
         bg_color = self.style[state]['background-color']

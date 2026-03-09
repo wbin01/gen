@@ -25,20 +25,25 @@ class Add(object):
             raise TypeError(
                 'Layout only accepts Cell, Layout or Control objects.')
         
+        ui._parent = self
+        ui._app = self._app
+
+        if not isinstance(ui, Signal):
+            self._uis.append(ui)
+            # ui._parent = self
+            # ui._app = self._app
+        
         if isinstance(ui, Timer):
             self._app._timers.append(ui)
             return
 
-        if not isinstance(ui, Signal):
-            self._uis.append(ui)
-            ui._parent = self
-            ui._app = self._app
-
         if ui._base_class == 'Cell':
             ui._drawer = self._app._drawer
 
-            # if ui.timer:
-            #     self._app._timers.append(ui.timer)
+            if hasattr(ui, '_timer') and isinstance(ui._timer, Timer):
+                self._app._timers.append(ui._timer)
+                ui._timer._parent = self
+                ui._timer._app = self._app
 
             if ui._timer:
                 self._app._timers.append(ui._timer)

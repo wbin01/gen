@@ -55,7 +55,6 @@ class Box(Margin, Size, Add, Layout):
         self._fill = fill
         self._first = False
         self._orientation = 'VERTICAL'
-        self._dirty = True
 
         self._x = 0
         self._y = 0
