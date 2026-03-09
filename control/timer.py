@@ -51,10 +51,3 @@ class Timer(Control):
             self._call()
         else:
             self._call()
-        
-        if self._app:
-            if self._app._hovered and not self._app._hovered._dirty:
-                self._app._hovered._invalidate()
-            
-            if self._app._focus and not self._app._focus._dirty:
-                self._app._focus._invalidate()

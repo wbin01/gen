@@ -78,7 +78,14 @@ class Layout(UI):
                 ui._queue_list_clear()
                 continue
 
-    def _redraw(self, mode: str = None) -> None:
+    def _redraw(self, mode: str = None) -> None:        
+        if self._app:
+            if self._app._hovered and not self._app._hovered._dirty:
+                self._app._hovered._invalidate()
+            
+            if self._app._focus and not self._app._focus._dirty:
+                self._app._focus._invalidate()
+        
         if not self._uis:
             return
         
