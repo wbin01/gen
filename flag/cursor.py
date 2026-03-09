@@ -14,6 +14,12 @@ class Cursor(Enum):
     BOTTOM_LEFT = 'BOTTOM_LEFT'
     NONE = 'NONE'
     DRAG = 'DRAG'
+    BEAM = 'BEAM'
+    WAIT = 'WAIT'
+    CROSSHAIR = 'CROSSHAIR'
+    ARROW_WAIT = 'ARROW_WAIT'
+    NOT_ALLOWED = 'NOT_ALLOWED'
+    POINTER = 'POINTER'
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}()'

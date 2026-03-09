@@ -97,6 +97,12 @@ class Frame(UI):
 
         # Cursor
         self._cursor = {
+            'BEAM': sdl3.SDL_CreateSystemCursor(1),
+            'WAIT': sdl3.SDL_CreateSystemCursor(2),
+            'CROSSHAIR': sdl3.SDL_CreateSystemCursor(3),
+            'ARROW_WAIT': sdl3.SDL_CreateSystemCursor(4),
+            'NOT_ALLOWED': sdl3.SDL_CreateSystemCursor(10),
+            'POINTER': sdl3.SDL_CreateSystemCursor(11),
             'TOP': sdl3.SDL_CreateSystemCursor(8),
             'BOTTOM': sdl3.SDL_CreateSystemCursor(8),
             'LEFT': sdl3.SDL_CreateSystemCursor(7),
@@ -471,11 +477,17 @@ class Frame(UI):
                 
                 if ui and ui != self._hovered:
                     self._hovered._set_state('LEAVE')
+                    if isinstance(self._hovered, Input):
+                        self._cursor_update_shape('NONE')
+
                     self._hovered = ui
                     self._hovered._set_state('ENTER')
 
                     self._render_mode = 'UNIT'
                     self._render_needs_updating = True
+                
+                if isinstance(self._hovered, Input):
+                    self._cursor_update_shape('BEAM')
         
         elif event.type == sdl3.SDL_EVENT_TEXT_INPUT:
             if self._input:
