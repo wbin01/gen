@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-from .box import Box
+from .container import Container
 
 
-class Row(Box):
+class Row(Container):
     """..."""
     def __init__(self, *args, **kwargs) -> None:
         """..."""

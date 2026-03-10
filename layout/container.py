@@ -6,7 +6,7 @@ from ..mixin import Add, Margin, Size
 from ..ui import Theme
 
 
-class Box(Margin, Size, Add, Layout):
+class Container(Margin, Size, Add, Layout):
     """Organizes the positioning of the elements."""
     def __init__(
             self,

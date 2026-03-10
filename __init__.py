@@ -4,11 +4,11 @@ from .cell import Button, Cell, ColExpander, RowExpander, Empty, Input
 from .control import Signal, Timer
 from .flag import Align, Fill, State, StyleClass
 from .frame import Frame
-from .layout import Row, Col, Pos
+from .layout import Col, Row, Scroll
 
 
 __all__ = [
-    'Application', 'Frame', 'Col', 'Row',
+    'Application', 'Frame', 'Col', 'Row', 'Scroll',
     'Align', 'Fill', 'State', 'StyleClass',
     'Signal', 'Timer',
     'Cell', 'ColExpander', 'RowExpander', 'Button', 'Empty', 'Input'

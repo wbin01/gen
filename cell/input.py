@@ -339,9 +339,14 @@ class Input(Cell):
                     self._text, self._text_texture,
                     self._font, font_size, font_color)
                 self._texty = self._y + (self.height / 2) - (self._texth / 2)
+            
+            self._invalidate_item = None
+            self._need_rebuild = True
 
         if mode == 'REBUILD':
             self._set_state('BASE')
+            self._need_rebuild = False
+
             self._texture_w = int(self.width)
             self._texture_h = int(self.height)
 
@@ -385,6 +390,7 @@ class Input(Cell):
                 self._textx, self._texty, self._textw, self._texth)
             return
         
+        if self._need_rebuild: self._dirty = True
         self._textx = self._x + self.style['BASE']['padding'] + 5
 
         if self._state.value == 'BASE':
@@ -444,7 +450,7 @@ class Input(Cell):
             return
 
         if self._selection[1]:
-            sel_color = self.style[state]['selection-color']
+            sel_color = self.style['BASE']['selection-color']
             self._drawer.rect(0, 0, self._selw, self._selh, sel_color, 1)
             return
 
