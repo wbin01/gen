@@ -125,10 +125,9 @@ class UI(Core):
 
         self._invalidate()
 
-    def _invalidate(self, ui=None):
-        if not ui: ui = self
-        ui._dirty = True
+    def _invalidate(self, parent=None) -> None:
+        if not parent: parent = self
+        parent._dirty = True
 
-        if hasattr(ui, '_parent') and ui._parent:
-            ui._parent._dirty = 'HOVER'
-            self._invalidate(ui._parent)
+        if parent._parent:
+            self._invalidate(parent._parent)

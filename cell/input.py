@@ -39,9 +39,9 @@ class Input(Cell):
         self._left = []
         self._right = []
 
+        self._font_name = self.style['BASE']['font']
         self._font_size = self.style['BASE']['font-size']
-        self._font = ImageFont.truetype(
-            self.style['BASE']['font'], self._font_size)
+        self._font = ImageFont.truetype(self._font_name, self._font_size)
         
         self._text_texture = None
         self._textx = 0
@@ -71,7 +71,6 @@ class Input(Cell):
         self._cursor_visible = False
         self._cursor_texture_on = None
         self._cursor_texture_off = None
-        # self._timer = Timer(call=lambda: self._draw('HOVER'))
         self._timer = Timer(call=self._cursor_tick)
     
     def __repr__(self) -> str:
@@ -317,9 +316,15 @@ class Input(Cell):
 
     def _draw(self, mode: str = None) -> None:
         if not self._dirty: return
+        self._dirty = False
 
-        font_size = self.style['BASE']['font-size']
+        if self.style['BASE']['font'] != self._font_name:
+            self._font_name = self.style['BASE']['font']
+            self._font = ImageFont.truetype(
+                self._font_name, self.style['BASE']['font-size'])
+        
         font_color = self.style['BASE']['font-color']
+        font_size = self.style['BASE']['font-size']
 
         if mode == 'UNIT':
             if self._invalidate_item == 'SELECT':
