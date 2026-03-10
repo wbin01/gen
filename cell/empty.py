@@ -26,6 +26,9 @@ class Empty(Cell):
         self._texture_w = 0
         self._texture_h = 0
 
+        self._radius = self.style['BASE']['radius']
+        self._border = self.style['BASE']['border']
+
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}()'
     
@@ -84,9 +87,10 @@ class Empty(Cell):
     def _draw_ui(self, state: str = 'BASE'):
         bg_color = self.style[state]['background-color']
         bd_color = self.style[state]['border-color']
-        rad = self.style[state]['radius']
+        bd_space = self._border * 2
 
-        x = y = 0
-        self._drawer.rect(x, y, self.width, self.height, bd_color, rad)
+        self._drawer.rect(0, 0, self.width, self.height, bd_color, self._radius)
         self._drawer.rect(
-            x + 1, y + 1, self.width - 2,self.height - 2, bg_color, rad - 1)
+            self._border, self._border,
+            self.width - bd_space, self.height - bd_space,
+            bg_color, self._radius - self._border)

@@ -39,10 +39,8 @@ class Input(Cell):
         self._left = []
         self._right = []
 
-        self._font_size = self.style['BASE']['font-size']
-        self._font_color = self.style['BASE']['font-color']
         self._font = ImageFont.truetype(
-            self.style['BASE']['font'], self._font_size)
+            self.style['BASE']['font'], self.style['BASE']['font-size'])
 
         self._text_texture = None
         self._textx = 0
@@ -319,20 +317,21 @@ class Input(Cell):
     def _draw(self, mode: str = None) -> None:
         if not self._dirty: return
 
+        font_size = self.style['BASE']['font-size']
+        font_color = self.style['BASE']['font-color']
+
         if mode == 'UNIT':
             if self._invalidate_item == 'SELECT':
                 self._invalidate_item = None
-                print('input unit select')
                 if self._selection[1]:
                     self._selection_texture = self._drawer.build_texture(
                         self._selw, self._selh, self._draw_ui, 'HOVER')
 
             elif self._invalidate_item == 'TEXT':
                 self._invalidate_item = None
-                print('input unit text')
                 self._text_texture, self._textw, self._texth = self._drawer.font(
                     self._text, self._text_texture,
-                    self._font, self._font_size, self._font_color)
+                    self._font, font_size, font_color)
                 self._texty = self._y + (self.height / 2) - (self._texth / 2)
 
         if mode == 'REBUILD':
@@ -351,14 +350,14 @@ class Input(Cell):
             
             self._text_texture, self._textw, self._texth = self._drawer.font(
                 self._text, self._text_texture,
-                self._font, self._font_size, self._font_color)
+                self._font, font_size, font_color)
             self._texty = self._y + (self.height / 2) - (self._texth / 2)
 
             self._cursor_texture_on = self._drawer.build_texture(
-                self._cursor_w, self._font_size, self._draw_ui, 'CURSOR_ON')
+                self._cursor_w, font_size, self._draw_ui, 'CURSOR_ON')
             
             self._cursor_texture_off = self._drawer.build_texture(
-                self._cursor_w, self._font_size, self._draw_ui, 'CURSOR_OFF')
+                self._cursor_w, font_size, self._draw_ui, 'CURSOR_OFF')
             
             self._resise_w = 0
             self._resise_h = 0
@@ -411,12 +410,12 @@ class Input(Cell):
                 self._drawer.set_texture(
                     self._cursor_texture_on,
                     self._textx + self._get_cursor_x(),
-                    self._texty, self._cursor_w, self._font_size)
+                    self._texty, self._cursor_w, font_size)
             else:
                 self._drawer.set_texture(
                     self._cursor_texture_off,
                     self._textx + self._get_cursor_x(),
-                    self._texty, self._cursor_w, self._font_size)
+                    self._texty, self._cursor_w, font_size)
         
         if mode == 'REBUILD':
             self._dirty = False
@@ -428,22 +427,26 @@ class Input(Cell):
         return False
     
     def _draw_ui(self, state: str = 'BASE'):
-        x = y = 0
+        radius = self.style['BASE']['radius']
+        border = self.style['BASE']['border']
+        font_color = self.style['BASE']['font-color']
+        font_size = self.style['BASE']['font-size']
 
         if 'CURSOR' in state:
-            color = self._font_color if state == 'CURSOR_ON' else (0, 0, 0, 0)
-            self._drawer.rect(0, 0, self._cursor_w + 1, self._font_size, color, 0)
+            color = font_color if state == 'CURSOR_ON' else (0, 0, 0, 0)
+            self._drawer.rect(0, 0, self._cursor_w + 1, font_size, color, 0)
             return
 
         if self._selection[1]:
             sel_color = self.style[state]['selection-color']
-            self._drawer.rect(x, y, self._selw, self._selh, sel_color, 1)
+            self._drawer.rect(0, 0, self._selw, self._selh, sel_color, 1)
             return
 
         bg_color = self.style[state]['background-color']
         bd_color = self.style[state]['border-color']
-        rad = self.style[state]['radius']
-        
-        self._drawer.rect(x, y, self.width, self.height, bd_color, rad)
+        bd_space = border * 2
+
+        self._drawer.rect(0, 0, self.width, self.height, bd_color, radius)
         self._drawer.rect(
-            x + 1, y + 1, self.width - 2,self.height - 2, bg_color, rad - 1)
+            border, border, self.width - bd_space, self.height - bd_space,
+            bg_color, radius - border)

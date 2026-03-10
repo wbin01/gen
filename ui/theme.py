@@ -11,10 +11,7 @@ class Theme:
             },
         'INACTIVE': {
             'background-color': (20, 20, 20, 240),
-            'border': 1,
             'border-color': (55, 55, 55, 200),
-            'radius': 8,
-            'accent-color': (60, 100, 150, 255),
             },
         }
     
@@ -33,21 +30,11 @@ class Theme:
             'font-color': (200, 200, 200, 255),
             'background-color': (40, 45, 55, 255),
             'border-color': (60, 100, 150, 255),
-            'border': 1,
-            'font': 'DejaVuSans.ttf',
-            'font-size': 12,
-            'padding': 10,
-            'radius': 6,
             },
         'PRESSED': {
             'font-color': (200, 200, 200, 255),
             'background-color': (50, 63, 88, 255),
             'border-color': (60, 100, 150, 255),
-            'border': 1,
-            'font': 'DejaVuSans.ttf',
-            'font-size': 12,
-            'padding': 10,
-            'radius': 6,
             },
         }
     
@@ -61,14 +48,10 @@ class Theme:
         'HOVER': {
             'background-color': (50, 50, 50, 255),
             'border-color': (60, 100, 150, 255),
-            'border': 1,
-            'radius': 6,
             },
         'PRESSED': {
             'background-color': (60, 100, 150, 255),
             'border-color': (60, 100, 150, 255),
-            'border': 1,
-            'radius': 6,
             },
         }
     
@@ -86,25 +69,13 @@ class Theme:
             },
         'HOVER': {
             'font-color': (200, 200, 200, 255),
-            'selection-color': (60, 100, 150, 100),
             'background-color': (30, 30, 30, 255),
             'border-color': (60, 100, 150, 255),
-            'border': 1,
-            'font': 'DejaVuSans.ttf',
-            'font-size': 14,
-            'padding': 8,
-            'radius': 6,
             },
         'PRESSED': {
             'font-color': (200, 200, 200, 255),
-            'selection-color': (60, 100, 150, 100),
             'background-color': (30, 30, 30, 255),
             'border-color': (80, 120, 170, 255),
-            'border': 1,
-            'font': 'DejaVuSans.ttf',
-            'font-size': 14,
-            'padding': 8,
-            'radius': 6,
             },
         }
     
@@ -132,6 +103,7 @@ class Theme:
                 'font-color': (200, 200, 200, 255),
                 'background-color': (40, 50, 70, 255),
                 'border-color': (60, 100, 150, 255),
+                'border': 2,
                 },
             'HOVER': {
                 'font-color': (200, 200, 200, 255),

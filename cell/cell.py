@@ -82,14 +82,20 @@ class Cell(Margin, Size, UI):
         if theme and class_theme:
             for state in ('BASE', 'HOVER', 'PRESSED'):
                 for key in (
-                        'font-color', 'background-color', 'border-color'):
-                    if key in theme[state]:
+                        'font-color', 'background-color',
+                        'border-color', 'border'):
+                    if key in theme[state] and key in class_theme[state]:
                         theme[state][key] = class_theme[state][key]
             
-            state_id = style_class.value + str(id(self))
+            if isinstance(style_class, StyleClass):
+                state_id = style_class.value + str(id(self))
+            else:
+                state_id = style_class + str(id(self))
+            
             Theme.classes[state_id] = copy.deepcopy(theme)
             theme = Theme.classes[state_id]
         
+        self._style_class = style_class
         self._style = theme
     
     def _hit_test(self, x: int, y: int) -> UI | None:
