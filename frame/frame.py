@@ -80,7 +80,7 @@ class Frame(UI):
 
         # Render
         self._render_mode = 'UNIT'
-        self._render_needs_updating = True
+        self._render_update = True
         self._render_count = 0
         self._first_render = True
 
@@ -242,7 +242,7 @@ class Frame(UI):
                 return sdl3.SDL_HITTEST_RESIZE_RIGHT
 
         # DRAG
-        if border < x < w.value - border and border < y < 40:
+        if border < x < w.value - border and border < y < 30:
             return sdl3.SDL_HITTEST_DRAGGABLE
 
         return sdl3.SDL_HITTEST_NORMAL
@@ -361,17 +361,17 @@ class Frame(UI):
             for timer in self._timers:
                 if current_time >= timer._next_tick:
                     timer._next_tick = time.monotonic() + timer.interval
-                    timer._exec()
 
-                    if self._render_mode == 'UNIT':
-                        self._render_needs_updating = True
+                    if timer._exec():
+                        if self._render_mode == 'UNIT':
+                            self._render_update = True
 
             if self._queue_list:
                 self._container._redraw_queue(self._queue_list)
                 self._render_mode = 'UNIT'
-                self._render_needs_updating = True
+                self._render_update = True
 
-            if self._render_needs_updating:
+            if self._render_update or self._container._dirty:
                 self._render()
                 self._render_count += 1
     
@@ -396,7 +396,7 @@ class Frame(UI):
                     if item:
                         item._set_state('PRESSED')
                         self._render_mode = 'UNIT'
-                        self._render_needs_updating = True
+                        self._render_update = True
 
                         if isinstance(item, Input):
                             self._input = item
@@ -427,7 +427,7 @@ class Frame(UI):
                 if item:
                     item._set_state('RIGHT_PRESSED')
                     self._render_mode = 'UNIT'
-                    self._render_needs_updating = True
+                    self._render_update = True
                 else:
                     sdl3.SDL_SetWindowHitTest(
                         self._frame, self._cursor_hit, None)
@@ -437,13 +437,13 @@ class Frame(UI):
                 if self._resizing:
                     self._resize_stop()
                     self._render_mode = 'RESIZE'
-                    self._render_needs_updating = True
+                    self._render_update = True
                 else:
                     item = self._container._hit_test(mx, my)
                     if item:
                         item._set_state('RELEASED')
                         self._render_mode = 'UNIT'
-                        self._render_needs_updating = True
+                        self._render_update = True
                     
                     if self._input: self._input._selecting = False
             
@@ -452,13 +452,13 @@ class Frame(UI):
                 if item:
                     item._set_state('RIGHT_RELEASED')
                     self._render_mode = 'UNIT'
-                    self._render_needs_updating = True
+                    self._render_update = True
 
         elif event.type == sdl3.SDL_EVENT_MOUSE_MOTION:
             if not self._resize_wm:
                 if self._resize_area != ResizeArea.NONE:
                     self._render_mode = 'RESIZE'
-                    self._render_needs_updating = True
+                    self._render_update = True
                     self._resize_start()
             
             if self._hovered:
@@ -468,7 +468,7 @@ class Frame(UI):
                     if self._input._state.value == 'PRESSED':
                         self._input._mouse_selection(mx.value)
                         self._render_mode = 'UNIT'
-                        self._render_needs_updating = True
+                        self._render_update = True
 
             if resize_area == ResizeArea.NONE:
                 ui = None
@@ -484,7 +484,7 @@ class Frame(UI):
                     self._hovered._set_state('ENTER')
 
                     self._render_mode = 'UNIT'
-                    self._render_needs_updating = True
+                    self._render_update = True
                 
                 if isinstance(self._hovered, Input):
                     self._cursor_update_shape('BEAM')
@@ -495,7 +495,7 @@ class Frame(UI):
                 self._input.insert(text)
                 self._input._set_state('KEY')
                 self._render_mode = 'UNIT'
-                self._render_needs_updating = True
+                self._render_update = True
 
         elif event.type == sdl3.SDL_EVENT_KEY_DOWN:
             key = event.key.key
@@ -566,7 +566,7 @@ class Frame(UI):
             if self._input:
                 self._input._set_state('KEY')
                 self._render_mode = 'UNIT'
-                self._render_needs_updating = True
+                self._render_update = True
         
         elif event.type == sdl3.SDL_EVENT_KEY_UP:
             key = event.key.key
@@ -577,7 +577,7 @@ class Frame(UI):
                 if self._input: self._input._anchor = None
     
     def _render(self) -> None:
-        self._render_needs_updating = False
+        self._render_update = False
         self._render_count += 1
         
         sdl3.SDL_SetRenderDrawColor(self._renderer , 0,0,0,0)

@@ -17,6 +17,7 @@ class Input(Cell):
         """..."""
         super().__init__(fill=fill, *args, **kwargs)
         self.fill = fill
+        self._invalidate_item = None
 
         self._text = text
         self.width = width
@@ -87,6 +88,8 @@ class Input(Cell):
     @text.setter
     def text(self, text) -> None:
         self.insert(text)
+        self._invalidate_item = 'TEXT'
+        self._invalidate()
 
     def backspace(self) -> str:
         del_char = ''
@@ -100,12 +103,17 @@ class Input(Cell):
             self._text = ''.join(self._left) + ''.join(self._right)
             self._cursor = len(self._left)
             self._update_positions()
+        
+        self._invalidate_item = 'TEXT'
+        self._invalidate()
         return del_char
     
     def clear_selection(self) -> None:
         self._selection[0] = self._left
         self._selection[1] = ''
         self._selection[2] = self._right
+        self._invalidate_item = 'TEXT'
+        self._invalidate()
     
     def copy(self) -> str:
         return self._selection[1]
@@ -122,6 +130,9 @@ class Input(Cell):
 
         self._text = ''.join(self._left) + ''.join(self._right)
         self._update_positions()
+
+        self._invalidate_item = 'TEXT'
+        self._invalidate()
         return selected_text
 
     def delete(self) -> str:
@@ -136,6 +147,9 @@ class Input(Cell):
             self._text = ''.join(self._left) + ''.join(self._right)
             self._cursor = len(self._left)
             self._update_positions()
+        
+        self._invalidate_item = 'TEXT'
+        self._invalidate()
         return del_char
     
     def insert(self, text) -> None:
@@ -145,7 +159,10 @@ class Input(Cell):
         self._text = ''.join(self._left) + ''.join(self._right)
         self._cursor = len(self._left)
         self._update_positions()
-        self._dirty = True
+        # self._dirty = True
+
+        self._invalidate_item = 'TEXT'
+        self._invalidate()
 
     def move_left(self) -> int:
         if self._left:
@@ -186,6 +203,9 @@ class Input(Cell):
         self.clear_selection()
         self._text = ''.join(self._left) + ''.join(self._right)
         self._update_positions()
+
+        self._invalidate_item = 'TEXT'
+        self._invalidate()
         return text
     
     def select_all(self) -> str:
@@ -193,6 +213,8 @@ class Input(Cell):
         self._selection[1] = self._text
         self._selection[2] = ''
 
+        self._invalidate_item = 'SELECT'
+        self._invalidate()
         return self._selection[1]
     
     def select_left(self) -> str:
@@ -213,6 +235,8 @@ class Input(Cell):
             self._font.getlength(self._selection[1][0]))
         self._selw = int(self._font.getlength(self._selection[1])) + 2
 
+        self._invalidate_item = 'SELECT'
+        self._invalidate()
         return self._selection[1]
     
     def select_right(self) -> str:
@@ -232,6 +256,8 @@ class Input(Cell):
         self._selection[2] = self._text[end + 1:]
         self._selw = int(self._font.getlength(self._selection[1])) + 2
 
+        self._invalidate_item = 'SELECT'
+        self._invalidate()
         return self._selection[1]
     
     def _click_update_cursor(self, mouse_x) -> None:
@@ -275,6 +301,9 @@ class Input(Cell):
             self._sely = self._texty - 2
             self._selw = int(self._font.getlength(self._selection[1])) + 2
             self._selh = self._font_size + 4
+        
+        self._invalidate_item = 'SELECT'
+        self._invalidate()
     
     def _update_positions(self):
         self._positions = []
@@ -291,14 +320,20 @@ class Input(Cell):
         if not self._dirty: return
 
         if mode == 'UNIT':
-            if self._selection[1]:
-                self._selection_texture = self._drawer.build_texture(
-                    self._selw, self._selh, self._draw_ui, 'HOVER')
+            if self._invalidate_item == 'SELECT':
+                self._invalidate_item = None
+                print('input unit select')
+                if self._selection[1]:
+                    self._selection_texture = self._drawer.build_texture(
+                        self._selw, self._selh, self._draw_ui, 'HOVER')
 
-            self._text_texture, self._textw, self._texth = self._drawer.font(
-                self._text, self._text_texture,
-                self._font, self._font_size, self._font_color)
-            self._texty = self._y + (self.height / 2) - (self._texth / 2)
+            elif self._invalidate_item == 'TEXT':
+                self._invalidate_item = None
+                print('input unit text')
+                self._text_texture, self._textw, self._texth = self._drawer.font(
+                    self._text, self._text_texture,
+                    self._font, self._font_size, self._font_color)
+                self._texty = self._y + (self.height / 2) - (self._texth / 2)
 
         if mode == 'REBUILD':
             self._set_state('BASE')
@@ -387,7 +422,10 @@ class Input(Cell):
             self._dirty = False
     
     def _cursor_tick(self) -> None:
-        self._cursor_visible = False if self._cursor_visible else True
+        if self._app and self._app._input:
+            self._cursor_visible = False if self._cursor_visible else True
+            return True
+        return False
     
     def _draw_ui(self, state: str = 'BASE'):
         x = y = 0

@@ -48,6 +48,5 @@ class Timer(Control):
     
     def _exec(self) -> None:
         if self._cell and self._cell._visible:
-            self._call()
-        else:
-            self._call()
+            return self._call()
+        return self._call()

@@ -38,11 +38,14 @@ class Drawer(object):
         else:
             self._rounded_rect(x, y, w, h, color, r)
     
-    def text(self, x: int, y: int, text: FontRender) -> None:
+    def text(self, x: int, y: int, texture, text: FontRender) -> None:
         """..."""
         surface = sdl3.SDL_CreateSurfaceFrom(
             text.width, text.height, sdl3.SDL_PIXELFORMAT_RGBA32,
             text._bytes, text.width * 4)
+        
+        if texture:
+            sdl3.SDL_DestroyTexture(texture)
         
         texture = sdl3.SDL_CreateTextureFromSurface(self._renderer, surface)
         sdl3.SDL_DestroySurface(surface)
@@ -50,7 +53,9 @@ class Drawer(object):
         dst = sdl3.SDL_FRect(x, y, text.width, text.height)
         sdl3.SDL_RenderTexture(self._renderer, texture, None, dst)
     
-    def font(self, text, texture, font, size, color) -> tuple:
+    def font(
+            self, text, texture, font, size, color, elided=False, total_width=0
+            ) -> tuple:
         font_hide = 'Hhqg'
         font_hide_box = font.getbbox(font_hide)
 
@@ -60,6 +65,9 @@ class Drawer(object):
         h = bbox[3] - bbox[1]
         if h < size: h = size
         w -= font_hide_box[2] - font_hide_box[0]
+
+        if elided:
+            if w > total_width: w = total_width
         
         img = Image.new('RGBA', (w, h), (0, 0, 0, 0))
         draw = ImageDraw.Draw(img)
