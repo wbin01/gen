@@ -39,9 +39,10 @@ class Input(Cell):
         self._left = []
         self._right = []
 
+        self._font_size = self.style['BASE']['font-size']
         self._font = ImageFont.truetype(
-            self.style['BASE']['font'], self.style['BASE']['font-size'])
-
+            self.style['BASE']['font'], self._font_size)
+        
         self._text_texture = None
         self._textx = 0
         self._texty = 0

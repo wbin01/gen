@@ -362,8 +362,8 @@ class Frame(UI):
                 if current_time >= timer._next_tick:
                     timer._next_tick = time.monotonic() + timer.interval
 
-                    if timer._exec():
-                        if self._render_mode == 'UNIT':
+                    if timer._exec() and self._render_mode == 'UNIT':
+                        if self._resize_area == ResizeArea.NONE:
                             self._render_update = True
 
             if self._queue_list:
