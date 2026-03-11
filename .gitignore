@@ -2,6 +2,7 @@
 /static/qml/main.qml
 .directory
 .idea/
+.vscode/
 src/db.sqlite3
 reg.json
 build/
