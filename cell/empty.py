@@ -5,16 +5,10 @@ from ..flag import Fill
 
 class Empty(Cell):
     """..."""
-    def __init__(
-            self, width: int = 100, height: int = 32, fill: Fill = Fill.X,
-            *args, **kwargs) -> None:
+    def __init__(self, *args, **kwargs) -> None:
         """..."""
-        super().__init__(fill=fill, *args, **kwargs)
-        self.fill = fill
+        super().__init__(*args, **kwargs)
         self._invalidate_item = None
-
-        self.width = width
-        self.height = height
 
         self._resize_width = 0
         self._resize_height = 0
@@ -51,7 +45,7 @@ class Empty(Cell):
             self._resize_width = 0
             self._resize_height = 0
         
-        elif mode == 'RESIZE':
+        elif mode in ('RESIZE', 'POSITION'):
             if not self._resize_height:
                 self._resize_width = int(self.width)
                 self._resize_height = int(self.height)

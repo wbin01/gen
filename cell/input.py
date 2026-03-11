@@ -373,7 +373,7 @@ class Input(Cell):
             self._resise_w = 0
             self._resise_h = 0
         
-        if mode == 'RESIZE':
+        if mode in ('RESIZE', 'POSITION'):
             if not self._resise_h:
                 self._resise_w = int(self.width)
                 self._resise_h = int(self.height)

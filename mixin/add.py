@@ -30,8 +30,6 @@ class Add(object):
 
         if not isinstance(ui, Signal):
             self._uis.append(ui)
-            # ui._parent = self
-            # ui._app = self._app
         
         if isinstance(ui, Timer):
             self._app._timers.append(ui)

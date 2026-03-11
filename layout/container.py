@@ -147,6 +147,10 @@ class Container(Margin, Size, Add, Layout):
             self._update_fill(self)
         
         ui_x, ui_y = self._x, self._y  # Reset
+
+        if hasattr(self, '_scroll') and self._scroll:
+            ui_y += self._scroll._scroll_y
+        
         for ui in self._uis:
             if not ui.visible: continue
             if not ui._dirty: continue
@@ -159,8 +163,8 @@ class Container(Margin, Size, Add, Layout):
             elif self._orientation == 'HORIZONTAL':
                 ui_x += ui.width + ui._margin_x + self._spacing
             
-            if isinstance(ui, Layout):
-                ui._update() #  Repeat for all
+            if isinstance(ui, Layout):  #  Repeat for all
+                ui._update()
     
     def _update_align(self, layout: Box) -> None:
         if not layout._uis: return

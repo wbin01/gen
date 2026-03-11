@@ -29,8 +29,9 @@ class UI(Core):
 
         self._dragging = False
         self._accept_move = False
-        
 
+        self._container = None
+        
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}()'
 
@@ -81,6 +82,10 @@ class UI(Core):
         return False
     
     def _set_state(self, event: str) -> None:
+        if self._container:
+            self._container._set_state(event)
+        #     # self._container._invalidate()
+
         if event == 'ENTER':
             self._state = State.HOVER
             self.enter.emit(self)

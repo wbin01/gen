@@ -1,16 +1,14 @@
 #!/usr/bin/env python3
-from .col import Col
+from .container import Container
 
 
-class Scroll(Col):
+class Scroll(Container):
     """..."""
-    def __init__(
-            self, width: int = None, height: int = None,
-            *args, **kwargs) -> None:
+    def __init__(self, *args, **kwargs) -> None:
         """..."""
-        super().__init__(width=width, height=height, *args, **kwargs)
-        self._view_width = width
-        self._view_heigh = height
+        super().__init__(*args, **kwargs)
+        self._scroll = self
+        self._scroll_y = self._y
     
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}()'

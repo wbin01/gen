@@ -11,5 +11,5 @@ __all__ = [
     'Application', 'Frame', 'Col', 'Row', 'Scroll',
     'Align', 'Fill', 'State', 'StyleClass',
     'Signal', 'Timer',
-    'Cell', 'ColExpander', 'RowExpander', 'Button', 'Empty', 'Input'
+    'Cell', 'ColExpander', 'RowExpander', 'Button', 'Empty', 'Input',
     ]
