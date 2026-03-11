@@ -374,6 +374,8 @@ class Input(Cell):
             self._resise_h = 0
         
         if mode in ('RESIZE', 'POSITION'):
+            if mode == 'POSITION': self._need_rebuild = True
+            
             if not self._resise_h:
                 self._resise_w = int(self.width)
                 self._resise_h = int(self.height)

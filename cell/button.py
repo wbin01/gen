@@ -87,6 +87,8 @@ class Button(Cell):
             self._resize_height = 0
         
         elif mode in ('RESIZE', 'POSITION'):
+            if mode == 'POSITION': self._need_rebuild = True
+            
             if not self._resize_height:
                 self._resize_width = int(self.width)
                 self._resize_height = int(self.height)

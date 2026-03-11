@@ -97,17 +97,11 @@ class Layout(UI):
 
             if isinstance(ui, Layout):
                 if ui._scroll:
-                    sdl3.SDL_RenderClipEnabled(self._app._drawer._renderer)
-                    clip = sdl3.SDL_Rect(ui._x, ui._y, 500, 200)
-                    sdl3.SDL_SetRenderClipRect(
-                        self._app._drawer._renderer, ctypes.byref(clip))
-
+                    self._viewport(ui)
                     if self._app and self._app._view_layout:
                         ui._draw(mode)
                     ui._redraw(mode)
-                
-                    sdl3.SDL_SetRenderClipRect(
-                        self._app._drawer._renderer, ctypes.POINTER(sdl3.SDL_Rect)())
+                    self._viewport()
                 else:
                     if self._app and self._app._view_layout:
                         ui._draw(mode)
@@ -117,6 +111,17 @@ class Layout(UI):
             ui._draw(mode)
 
         self._dirty = False
+    
+    def _viewport(self, ui: Layout = None) -> None:
+        if ui:
+            sdl3.SDL_RenderClipEnabled(self._app._drawer._renderer)
+            clip = sdl3.SDL_Rect(ui._x, ui._y, 500, 200)
+            sdl3.SDL_SetRenderClipRect(
+                self._app._drawer._renderer, ctypes.byref(clip))
+            return
+        
+        sdl3.SDL_SetRenderClipRect(
+            self._app._drawer._renderer, ctypes.POINTER(sdl3.SDL_Rect)())
     
     def _redraw_queue(
             self, queue_list: list, budget_ms: float = 3.0) -> None:
@@ -141,12 +146,7 @@ class Layout(UI):
     
     def _roll(self):
         if self._scroll:
-
-            # sdl3.SDL_RenderClipEnabled(self._app._drawer._renderer)
-            # clip = sdl3.SDL_Rect(self._scroll._x, self._scroll._y, 500, 200)
-            # sdl3.SDL_SetRenderClipRect(
-            #     self._app._drawer._renderer, ctypes.byref(clip))
-            
+            # self._viewport(ui)
             self._draw('REBUILD')
 
             self._scroll_y -= 20
@@ -154,11 +154,8 @@ class Layout(UI):
                 ui._y -= 20
                 ui._invalidate()
                 ui._draw('POSITION')
-                if hasattr(ui, '_need_rebuild'): ui._need_rebuild = True
             
             # self._app._render_mode = 'REBUILD'
             # self._app._render_update = True
             self._scroll._invalidate()
-
-            # sdl3.SDL_SetRenderClipRect(
-            # self._app._drawer._renderer, ctypes.POINTER(sdl3.SDL_Rect)())
+            # self._viewport()
