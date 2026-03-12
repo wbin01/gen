@@ -6,11 +6,11 @@ import sdl3
 
 from ..flag import Fill
 from ..mixin import Margin, Size
-from ..ui import UI, Theme
+from ..ui import UIObject, Theme
 from ..flag import StyleClass
 
 
-class Cell(Margin, Size, UI):
+class Cell(Margin, Size, UIObject):
     """..."""
     def __init__(
             self, style_class: str = None, fill: Fill = Fill.XY,
@@ -98,7 +98,7 @@ class Cell(Margin, Size, UI):
         self._style_class = style_class
         self._style = theme
     
-    def _hit_test(self, x: int, y: int) -> UI | None:
+    def _hit_test(self, x: int, y: int) -> UIObject | None:
         if not self.visible:
             return None
 

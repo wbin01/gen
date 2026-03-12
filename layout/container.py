@@ -139,86 +139,86 @@ class Container(Margin, Size, Add, Layout):
         # Updates the width, fill, alignment, and position of cells.
         if self._orientation == 'POSITION': return
         if mode == 'UNIT': return
-        if not self._uis: return
+        if not self._objects: return
         
         if self._first:
             self._update_size(self)
             self._update_align(self)
             self._update_fill(self)
         
-        ui_x, ui_y = self._x, self._y  # Reset
+        obj_x, obj_y = self._x, self._y  # Reset
 
         if hasattr(self, '_scroll') and self._scroll:
-            ui_y += self._scroll._scroll_y
+            obj_y += self._scroll._scroll_y
         
-        for ui in self._uis:
-            if not ui.visible: continue
-            if not ui._dirty: continue
+        for obj in self._objects:
+            if not obj.visible: continue
+            if not obj._dirty: continue
 
-            ui._x = ui_x + ui.margin[3]  # Set current position
-            ui._y = ui_y + ui.margin[0]
+            obj._x = obj_x + obj.margin[3]  # Set current position
+            obj._y = obj_y + obj.margin[0]
 
             if self._orientation == 'VERTICAL':  # Prepare next position
-                ui_y += ui.height + ui._margin_y + self._spacing
+                obj_y += obj.height + obj._margin_y + self._spacing
             elif self._orientation == 'HORIZONTAL':
-                ui_x += ui.width + ui._margin_x + self._spacing
+                obj_x += obj.width + obj._margin_x + self._spacing
             
-            if isinstance(ui, Layout):  #  Repeat for all
-                ui._update()
+            if isinstance(obj, Layout):  #  Repeat for all
+                obj._update()
     
     def _update_align(self, layout: Box) -> None:
-        if not layout._uis: return
+        if not layout._objects: return
         
         if layout._orientation == 'VERTICAL':
             if layout.align == Align.START:
-                if isinstance(layout._uis[0], ColExpander):
-                    del(layout._uis[0])
+                if isinstance(layout._objects[0], ColExpander):
+                    del(layout._objects[0])
                 
-                if isinstance(layout._uis[-1], ColExpander):
-                    del(layout._uis[-1])
+                if isinstance(layout._objects[-1], ColExpander):
+                    del(layout._objects[-1])
             
             elif layout.align == Align.END:
-                if isinstance(layout._uis[-1], ColExpander):
-                    del(layout._uis[-1])
+                if isinstance(layout._objects[-1], ColExpander):
+                    del(layout._objects[-1])
                 
-                if not isinstance(layout._uis[0], ColExpander):
-                    layout._uis.insert(0, ColExpander())
+                if not isinstance(layout._objects[0], ColExpander):
+                    layout._objects.insert(0, ColExpander())
             
             elif layout.align == Align.CENTER:
-                if not isinstance(layout._uis[0], ColExpander):
-                    layout._uis.insert(0, ColExpander())
+                if not isinstance(layout._objects[0], ColExpander):
+                    layout._objects.insert(0, ColExpander())
 
-                if not isinstance(layout._uis[-1], ColExpander):
-                    layout._uis.insert(
-                        len(layout._uis), ColExpander())
+                if not isinstance(layout._objects[-1], ColExpander):
+                    layout._objects.insert(
+                        len(layout._objects), ColExpander())
         
         elif layout._orientation == 'HORIZONTAL':
             if layout.align == Align.START:
-                if isinstance(layout._uis[0], RowExpander):
-                    del(layout._uis[0])
+                if isinstance(layout._objects[0], RowExpander):
+                    del(layout._objects[0])
             
             elif layout.align == Align.END:
-                if isinstance(layout._uis[-1], RowExpander):
-                    del(layout._uis[-1])
+                if isinstance(layout._objects[-1], RowExpander):
+                    del(layout._objects[-1])
                 
-                if not isinstance(layout._uis[0], RowExpander):
-                    layout._uis.insert(0, RowExpander())
+                if not isinstance(layout._objects[0], RowExpander):
+                    layout._objects.insert(0, RowExpander())
             
             elif layout.align == Align.CENTER:
-                if not isinstance(layout._uis[0], RowExpander):
-                    layout._uis.insert(0, RowExpander())
+                if not isinstance(layout._objects[0], RowExpander):
+                    layout._objects.insert(0, RowExpander())
 
-                if not isinstance(layout._uis[-1], RowExpander):
-                    layout._uis.insert(
-                        len(layout._uis), RowExpander())
+                if not isinstance(layout._objects[-1], RowExpander):
+                    layout._objects.insert(
+                        len(layout._objects), RowExpander())
         
-        for ui in layout._uis:
-            if isinstance(ui, Layout):
-                self._update_align(ui)
+        for obj in layout._objects:
+            if isinstance(obj, Layout):
+                self._update_align(obj)
     
     def _update_fill(self, layout: Box) -> None:
         # Updates the fill of layouts and cells.
-        if not layout._uis: return
+        if not layout._objects: return
         
         if layout._first:
             layout._width = layout._parent.width
@@ -230,46 +230,47 @@ class Container(Margin, Size, Add, Layout):
         if layout._orientation == 'VERTICAL':
             # Width
             min_width = 0
-            for ui in layout._uis:  # Fill: Width equal to the layout
-                if not ui.visible: continue
-                if not ui._dirty: continue
+            for obj in layout._objects:  # Fill: Width equal to the layout
+                if not obj.visible: continue
+                if not obj._dirty: continue
 
-                if ui.fill in (Fill.X, Fill.XY):
-                    ui._width = total_width - ui._margin_x
+                if obj.fill in (Fill.X, Fill.XY):
+                    obj._width = total_width - obj._margin_x
                 
-                if isinstance(ui, Cell):
-                    if ui._width < ui._min_width:
-                        ui._width = ui._min_width
+                if isinstance(obj, Cell):
+                    if obj._width < obj._min_width:
+                        obj._width = obj._min_width
                 
-                if isinstance(ui, Cell) and ui.fill in (Fill.Y, Fill.NONE):
+                if isinstance(obj, Cell) and obj.fill in (Fill.Y, Fill.NONE):
                     if layout.base_align == Align.CENTER:
-                        dt = (total_width - ui.width) // 2
-                        ui.margin = ui.margin[0], dt, ui.margin[2], dt
+                        dt = (total_width - obj.width) // 2
+                        obj.margin = obj.margin[0], dt, obj.margin[2], dt
 
                     elif layout.base_align == Align.END:
-                        dt = (total_width - ui.width)
-                        ui.margin = ui.margin[0], ui.margin[1],ui.margin[2], dt
+                        dt = (total_width - obj.width)
+                        obj.margin = (
+                            obj.margin[0], obj.margin[1],obj.margin[2], dt)
                 
-                if min_width < ui._width + ui._margin_x:
-                    min_width = ui._width + ui._margin_x
+                if min_width < obj._width + obj._margin_x:
+                    min_width = obj._width + obj._margin_x
             
             if layout._width < min_width:
                 layout._width = min_width
             
             # Height
             min_height = 0
-            vertical, height, last = [], 0, len(layout._uis) - 1
-            for num, ui in enumerate(layout._uis):
-                if isinstance(ui, Cell) and not ui.visible: continue
+            vertical, height, last = [], 0, len(layout._objects) - 1
+            for num, obj in enumerate(layout._objects):
+                if isinstance(obj, Cell) and not obj.visible: continue
 
-                if isinstance(ui, Cell) and ui.height < ui._min_height:
-                    ui.height = ui._min_height
+                if isinstance(obj, Cell) and obj.height < obj._min_height:
+                    obj.height = obj._min_height
 
-                if hasattr(ui, 'fill'):  # Collects cells that expand
-                    if ui.fill in (Fill.Y, Fill.XY): vertical.append(ui)
+                if hasattr(obj, 'fill'):  # Collects cells that expand
+                    if obj.fill in (Fill.Y, Fill.XY): vertical.append(obj)
                 
-                height += ui.height + ui._margin_y  # Save height
-                min_height += ui._height
+                height += obj.height + obj._margin_y  # Save height
+                min_height += obj._height
                 if num != last:
                     height += layout.spacing
                     min_height += layout.spacing
@@ -278,10 +279,10 @@ class Container(Margin, Size, Add, Layout):
             free = total_height - height  # Discover available space
 
             delta = free / vertical_num if vertical_num > 1 else free
-            for ui in vertical:  # Distributes space to the cells that require
-                ui._height += delta
-                if isinstance(ui, Cell) and ui._height < ui._min_height:
-                    ui._height = ui._min_height
+            for obj in vertical:  # Distributes space to the cells that require
+                obj._height += delta
+                if isinstance(obj, Cell) and obj._height < obj._min_height:
+                    obj._height = obj._min_height
             
             if layout._height < min_height:
                 layout._height = min_height
@@ -289,49 +290,50 @@ class Container(Margin, Size, Add, Layout):
         elif layout._orientation == 'HORIZONTAL':
             # Height
             min_height = 0
-            for ui in layout._uis:
-                if isinstance(ui, Cell) and not ui.visible: continue
+            for obj in layout._objects:
+                if isinstance(obj, Cell) and not obj.visible: continue
 
-                if ui.fill in (Fill.Y, Fill.XY):
-                    ui._height = total_height - ui._margin_y
-                    if ui._height < ui._min_height:
-                        ui._height = ui._min_height
+                if obj.fill in (Fill.Y, Fill.XY):
+                    obj._height = total_height - obj._margin_y
+                    if obj._height < obj._min_height:
+                        obj._height = obj._min_height
 
-                if isinstance(ui, Cell) and ui.fill in (Fill.X, Fill.NONE):
+                if isinstance(obj, Cell) and obj.fill in (Fill.X, Fill.NONE):
                     if layout.base_align == Align.CENTER:
-                        dt = (total_height - ui.height) // 2
-                        ui.margin = dt, ui.margin[1], dt, ui.margin[3]
+                        dt = (total_height - obj.height) // 2
+                        obj.margin = dt, obj.margin[1], dt, obj.margin[3]
                     
                     elif layout.base_align == Align.END:
-                        dt = (total_height - ui.height)
-                        ui.margin = dt, ui.margin[1], ui.margin[2],ui.margin[3]
+                        dt = (total_height - obj.height)
+                        obj.margin = (
+                            dt, obj.margin[1], obj.margin[2],obj.margin[3])
                 
-                if isinstance(ui, Cell):
-                    if min_height < ui.height + ui._margin_y:
-                        min_height = ui.height + ui._margin_y
+                if isinstance(obj, Cell):
+                    if min_height < obj.height + obj._margin_y:
+                        min_height = obj.height + obj._margin_y
 
             if layout._height < min_height:
                 layout._height = min_height
         
             # Width
             min_width = 0
-            horizontal, width, last = [], 0, len(layout._uis) - 1
-            for num, ui in enumerate(layout._uis):
-                if isinstance(ui, Cell):
-                    if not ui.visible: continue
+            horizontal, width, last = [], 0, len(layout._objects) - 1
+            for num, obj in enumerate(layout._objects):
+                if isinstance(obj, Cell):
+                    if not obj.visible: continue
 
-                if ui._width < ui._min_width:
-                    ui._width = ui._min_width
-                    print(ui._min_width)
+                if obj._width < obj._min_width:
+                    obj._width = obj._min_width
+                    print(obj._min_width)
 
-                if ui.fill.value in (Fill.NONE, Fill.Y):  # Fixed width
-                    ui._width = ui._base_width
+                if obj.fill.value in (Fill.NONE, Fill.Y):  # Fixed width
+                    obj._width = obj._base_width
 
-                if hasattr(ui, 'fill'):
-                    if ui.fill in (Fill.X, Fill.XY): horizontal.append(ui)
+                if hasattr(obj, 'fill'):
+                    if obj.fill in (Fill.X, Fill.XY): horizontal.append(obj)
                 
-                width += ui.width + ui._margin_x
-                min_width += ui._min_width
+                width += obj.width + obj._margin_x
+                min_width += obj._min_width
                 if num != last:
                     width += layout.spacing
                     min_width += layout.spacing
@@ -340,22 +342,22 @@ class Container(Margin, Size, Add, Layout):
             free = total_width - width
             
             delta = free / horizontal_num if horizontal_num > 1 else free
-            for ui in horizontal:
-                ui._width += delta
-                if isinstance(ui, Cell) and ui._width < ui._min_width:
-                    ui._width = ui._min_width
+            for obj in horizontal:
+                obj._width += delta
+                if isinstance(obj, Cell) and obj._width < obj._min_width:
+                    obj._width = obj._min_width
             
             if layout._width < min_width:
                 layout._width = min_width
 
-        for ui in layout._uis:
-            if isinstance(ui, Layout):
-                self._update_fill(ui)
+        for obj in layout._objects:
+            if isinstance(obj, Layout):
+                self._update_fill(obj)
 
     def _update_size(self, layout: Box) -> None:
         # Make sure the layout size are compatible with the number 
         # of stacked cells.
-        if not layout._uis:
+        if not layout._objects:
             return
         
         layout._width = layout._base_width
@@ -368,36 +370,36 @@ class Container(Margin, Size, Add, Layout):
             layout._height = 0
             layout._base_height = 0
         
-        last = len(layout._uis) - 1  # To remove last extra 'spacing'
-        for num, ui in enumerate(layout._uis):
-            if not ui.visible: continue
-            if not ui._dirty: continue
+        last = len(layout._objects) - 1  # To remove last extra 'spacing'
+        for num, obj in enumerate(layout._objects):
+            if not obj.visible: continue
+            if not obj._dirty: continue
 
-            if isinstance(ui, Layout):
-                self._update_size(ui)
+            if isinstance(obj, Layout):
+                self._update_size(obj)
 
             if layout._orientation == 'VERTICAL':  # Set width height
                 if layout.fill in (Fill.X, Fill.XY):
-                    w = ui._width + ui._margin_x
+                    w = obj._width + obj._margin_x
                     if w > layout.width:
                         layout._width = w
                         layout._base_width = w
 
                 if layout.fill in (Fill.Y, Fill.XY):
-                    h = ui._base_height + ui._margin_y
+                    h = obj._base_height + obj._margin_y
                     if num != last: h += layout.spacing
                     layout._height += h
                     layout._base_height += h
 
             elif layout._orientation == 'HORIZONTAL':
                 if layout.fill in (Fill.X, Fill.XY):
-                    w = ui._base_width + ui._margin_x
+                    w = obj._base_width + obj._margin_x
                     if num != last: w += layout.spacing
                     layout._width += w
                     layout._base_width += w
                 
                 if layout.fill in (Fill.Y, Fill.XY):
-                    h = ui._height + ui._margin_y
+                    h = obj._height + obj._margin_y
                     if h > layout.height:
                         layout._height = h
                         layout._base_height = h

@@ -5,7 +5,7 @@ from ..control import Signal, Timer
 class Add(object):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
-        self._uis = []
+        self._objects = []
     
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}()'
@@ -13,39 +13,39 @@ class Add(object):
     def __str__(self) -> str:
         return self.__class__.__name__
 
-    def add(self, ui: UI) -> UI:
+    def add(self, obj: UIObject) -> UIObject:
         """..."""
-        return self._add(ui)
+        return self._add(obj)
 
-    def _add(self, ui: UI) -> UI:
-        if isinstance(ui, type):
-            ui = ui()
+    def _add(self, obj: UIObject) -> UIObject:
+        if isinstance(obj, type):
+            obj = obj()
         
-        if ui._base_class not in ('Layout', 'Cell', 'Control'):
+        if obj._base_class not in ('Layout', 'Cell', 'Control'):
             raise TypeError(
                 'Layout only accepts Cell, Layout or Control objects.')
         
-        ui._parent = self
-        ui._app = self._app
+        obj._parent = self
+        obj._app = self._app
 
-        if not isinstance(ui, Signal):
-            self._uis.append(ui)
+        if not isinstance(obj, Signal):
+            self._objects.append(obj)
         
-        if isinstance(ui, Timer):
-            self._app._timers.append(ui)
+        if isinstance(obj, Timer):
+            self._app._timers.append(obj)
             return
 
-        if ui._base_class == 'Cell':
-            ui._drawer = self._app._drawer
+        if obj._base_class == 'Cell':
+            obj._drawer = self._app._drawer
 
-            if hasattr(ui, '_timer') and isinstance(ui._timer, Timer):
-                self._app._timers.append(ui._timer)
-                ui._timer._parent = self
-                ui._timer._app = self._app
+            if hasattr(obj, '_timer') and isinstance(obj._timer, Timer):
+                self._app._timers.append(obj._timer)
+                obj._timer._parent = self
+                obj._timer._app = self._app
 
-            if ui._timer:
-                self._app._timers.append(ui._timer)
+            if obj._timer:
+                self._app._timers.append(obj._timer)
         
-        elif ui._base_class == 'Layout':
-            ui._drawer = self._app._drawer
-        return ui
+        elif obj._base_class == 'Layout':
+            obj._drawer = self._app._drawer
+        return obj

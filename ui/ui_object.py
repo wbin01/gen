@@ -4,14 +4,11 @@ from ..flag import State
 from ..mixin import Core
 
 
-class UI(Core):
+class UIObject(Core):
     """..."""
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         """..."""
-        # self._base_class = 'UI'
-        # self._app = None
-        # self._parent = None
         self._dirty = True
         self._state = State.BASE
         self._visible = True
@@ -56,35 +53,22 @@ class UI(Core):
     def visible(self, visible: bool) -> None:
         self._visible = visible
     
-    # @property
-    # def app(self) -> UI:
-    #     return self._app
-    
-    # @property
-    # def base_class(self) -> bool:
-    #     """..."""
-    #     return self._base_class
-    
     @property
     def dragging(self) -> bool:
         """..."""
         return self._dragging
     
-    # @property
-    # def parent(self) -> UI:
-    #     return self._parent
-    
-    def _rect_contains(self, ui: UI, x: int, y: int) -> bool:
-        ui_x, ui_y = int(ui._x), int(ui._y)
-        ui_w, ui_h = int(ui.width), int(ui.height)
-        if ui_x <= x.value <= ui_x + ui_w and ui_y <= y.value <= ui_y + ui_h:
+    def _rect_contains(self, obj: UIObject, x: int, y: int) -> bool:
+        obj_x, obj_y = int(obj._x), int(obj._y)
+        obj_w, obj_h = int(obj.width), int(obj.height)
+        if (obj_x <= x.value <= obj_x + obj_w and
+                obj_y <= y.value <= obj_y + obj_h):
             return True
         return False
     
     def _set_state(self, event: str) -> None:
         if self._container:
             self._container._set_state(event)
-        #     # self._container._invalidate()
 
         if event == 'ENTER':
             self._state = State.HOVER

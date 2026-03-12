@@ -4,7 +4,7 @@
 class Core(object):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
-        self._base_class = 'UI'
+        self._base_class = 'UIObject'
         self._app = None
         self._parent = None
     
@@ -15,7 +15,7 @@ class Core(object):
         return self.__class__.__name__
     
     @property
-    def app(self) -> UI:
+    def app(self) -> UIObject:
         return self._app
     
     @property
@@ -24,5 +24,5 @@ class Core(object):
         return self._base_class
     
     @property
-    def parent(self) -> UI:
+    def parent(self) -> UIObject:
         return self._parent

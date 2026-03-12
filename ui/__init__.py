@@ -2,4 +2,4 @@
 from .drawer import Drawer
 from .font_render import FontRender
 from .theme import Theme
-from .ui import UI
+from .ui_object import UIObject

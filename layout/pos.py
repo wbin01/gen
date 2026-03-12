@@ -28,19 +28,19 @@ class Pos(Add, Layout):
         if self._app and self._app._debug: self.__draw()
 
         num_color = -1
-        for ui in self._uis:
-            if isinstance(ui, Cell) and not ui.visible: continue
-            if not ui._dirty: continue
+        for obj in self._objects:
+            if isinstance(obj, Cell) and not obj.visible: continue
+            if not obj._dirty: continue
 
             num_color += 1
             if num_color == 9: num_color = -1
 
-            if isinstance(ui, Layout):
-                ui._debug_color_index = num_color
-                ui._redraw()
+            if isinstance(obj, Layout):
+                obj._debug_color_index = num_color
+                obj._redraw()
                 continue
 
-            ui._draw()
-            ui._dirty = False
+            obj._draw()
+            obj._dirty = False
 
         self._dirty = False

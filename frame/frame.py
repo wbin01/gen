@@ -10,10 +10,10 @@ import sdl3
 from ..cell import Input
 from ..flag import ResizeArea, Cursor, StyleClass
 from ..layout import Col
-from ..ui import UI, Drawer, Theme
+from ..ui import UIObject, Drawer, Theme
 
 
-class Frame(UI):
+class Frame(UIObject):
     """..."""
     _theme = Theme
 
@@ -188,9 +188,9 @@ class Frame(UI):
         self._y = int(y)
         sdl3.SDL_SetWindowPosition(self._frame, self._x, self._y)
     
-    def add(self, ui: Cell | Box, fill=None) -> Cell | Box:
-        ui._drawer = self._drawer
-        return self._container.add(ui)
+    def add(self, obj: Cell | Box, fill=None) -> Cell | Box:
+        obj._drawer = self._drawer
+        return self._container.add(obj)
         
     def run(self) -> int:
         self._draw('FRAME_BASE')
@@ -314,13 +314,13 @@ class Frame(UI):
 
         if mode == 'FRAME':
             self._frame_texture = self._drawer.build_texture(
-                self.width, self.height, self._draw_ui, mode)
+                self.width, self.height, self._draw_obj, mode)
         
         elif mode == 'FRAME_BASE':
             self._frame_base_texture = self._drawer.build_texture(
-                self.width, self.height, self._draw_ui, mode)
+                self.width, self.height, self._draw_obj, mode)
 
-    def _draw_ui(self, mode) -> None:
+    def _draw_obj(self, mode) -> None:
         self._drawer.rect(
             x=0, y=0, w=self.width, h=self.height,
             color=self._style.Frame['BASE']['border-color'],
@@ -332,7 +332,7 @@ class Frame(UI):
             r=self._style.Frame['BASE']['radius'])
 
         if mode == 'FRAME':
-            if self._container._uis:
+            if self._container._objects:
                 self._container._invalidate()
                 self._container._update()
                 self._container._redraw('REBUILD')
@@ -471,16 +471,16 @@ class Frame(UI):
                         self._render_update = True
 
             if resize_area == ResizeArea.NONE:
-                ui = None
+                obj = None
                 if not self._resizing:
-                    ui = self._container._hit_test(mx, my)
+                    obj = self._container._hit_test(mx, my)
                 
-                if ui and ui != self._hovered:
+                if obj and obj != self._hovered:
                     self._hovered._set_state('LEAVE')
                     if isinstance(self._hovered, Input):
                         self._cursor_update_shape('NONE')
 
-                    self._hovered = ui
+                    self._hovered = obj
                     self._hovered._set_state('ENTER')
 
                     self._render_mode = 'UNIT'

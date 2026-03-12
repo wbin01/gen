@@ -5,10 +5,10 @@ import ctypes
 import sdl3
 
 from ..cell import Cell
-from ..ui import UI
+from ..ui import UIObject
 
 
-class Layout(UI):
+class Layout(UIObject):
     """Organizes the positioning of the elements."""
     _instances = 0
 
@@ -32,54 +32,54 @@ class Layout(UI):
     def _get_instances(cls) -> int:
         return cls._instances
     
-    def _hit_test(self, x: int, y: int) -> UI | None:
+    def _hit_test(self, x: int, y: int) -> UIObject | None:
         if not self.visible:
             return None
 
         if not self._rect_contains(self, x, y):
             return None
 
-        for ui in self._uis:
-            if isinstance(ui, Layout):
-                hit_ui =  ui._hit_test(x, y)
-                if hit_ui: return hit_ui
+        for obj in self._objects:
+            if isinstance(obj, Layout):
+                hit_obj =  obj._hit_test(x, y)
+                if hit_obj: return hit_obj
                 continue
 
-            if isinstance(ui, Cell):  # or isinstance(ui, Layout):
-                hit_ui = ui._hit_test(x, y)
-                if hit_ui:
-                    return hit_ui
+            if isinstance(obj, Cell):  # or isinstance(obj, Layout):
+                hit_obj = obj._hit_test(x, y)
+                if hit_obj:
+                    return hit_obj
         
         return self
     
     def _invalidate(self) -> None:
         self._dirty = True
-        for ui in self._uis:
-            if isinstance(ui, Layout):
-                ui._invalidate()
+        for obj in self._objects:
+            if isinstance(obj, Layout):
+                obj._invalidate()
                 continue
-            ui._dirty = True
+            obj._dirty = True
     
     def _queue_list(self) -> list:
         self._dirty = True
 
-        for ui in self._uis:
-            if isinstance(ui, Layout):
-                self._queue.extend(ui._queue_list())
+        for obj in self._objects:
+            if isinstance(obj, Layout):
+                self._queue.extend(obj._queue_list())
                 continue
 
-            if ui not in self._queue:
-                ui._dirty = True
-                self._queue.append(ui)
+            if obj not in self._queue:
+                obj._dirty = True
+                self._queue.append(obj)
         
         return self._queue
     
     def _queue_list_clear(self) -> list:
         self._queue = []
 
-        for ui in self._uis:
-            if isinstance(ui, Layout):
-                ui._queue_list_clear()
+        for obj in self._objects:
+            if isinstance(obj, Layout):
+                obj._queue_list_clear()
                 continue
 
     def _redraw(self, mode: str = None) -> None:        
@@ -90,32 +90,32 @@ class Layout(UI):
             if self._app._focus and not self._app._focus._dirty:
                 self._app._focus._invalidate()
         
-        if not self._uis:
+        if not self._objects:
             return
         
-        for ui in self._uis:
+        for obj in self._objects:
 
-            if isinstance(ui, Layout):
-                if ui._scroll:
-                    self._viewport(ui)
+            if isinstance(obj, Layout):
+                if obj._scroll:
+                    self._viewport(obj)
                     if self._app and self._app._view_layout:
-                        ui._draw(mode)
-                    ui._redraw(mode)
+                        obj._draw(mode)
+                    obj._redraw(mode)
                     self._viewport()
                 else:
                     if self._app and self._app._view_layout:
-                        ui._draw(mode)
-                    ui._redraw(mode)
+                        obj._draw(mode)
+                    obj._redraw(mode)
                     
                 continue
-            ui._draw(mode)
+            obj._draw(mode)
 
         self._dirty = False
     
-    def _viewport(self, ui: Layout = None) -> None:
-        if ui:
+    def _viewport(self, obj: Layout = None) -> None:
+        if obj:
             sdl3.SDL_RenderClipEnabled(self._app._drawer._renderer)
-            clip = sdl3.SDL_Rect(ui._x, ui._y, 500, 200)
+            clip = sdl3.SDL_Rect(obj._x, obj._y, 500, 200)
             sdl3.SDL_SetRenderClipRect(
                 self._app._drawer._renderer, ctypes.byref(clip))
             return
@@ -131,13 +131,13 @@ class Layout(UI):
         
         start = time.perf_counter()
         while queue_list:
-            ui = queue_list.pop(0)
+            obj = queue_list.pop(0)
 
-            # if not ui.visible: continue
-            # if not ui._dirty: continue
+            # if not obj.visible: continue
+            # if not obj._dirty: continue
 
-            ui._draw('REBUILD')
-            # ui._dirty = False
+            obj._draw('REBUILD')
+            # obj._dirty = False
 
             if (time.perf_counter() - start) * 50 > budget_ms:
                 break
@@ -146,14 +146,14 @@ class Layout(UI):
     
     def _roll(self):
         if self._scroll:
-            # self._viewport(ui)
+            # self._viewport(obj)
             self._draw('REBUILD')
 
             self._scroll_y -= 20
-            for ui in self._scroll._uis:
-                ui._y -= 20
-                ui._invalidate()
-                ui._draw('POSITION')
+            for obj in self._scroll._objects:
+                obj._y -= 20
+                obj._invalidate()
+                obj._draw('POSITION')
             
             # self._app._render_mode = 'REBUILD'
             # self._app._render_update = True
