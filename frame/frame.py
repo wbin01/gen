@@ -85,9 +85,9 @@ class Frame(UIObject):
         self._first_render = True
 
         # Frame
-        self._frame_texture = None
+        self._tt_frame = None
 
-        # Frame - resize
+        # Resize
         self._resizing = False
         self._resizing_count = 0
         self._resize_area = ResizeArea.NONE
@@ -117,7 +117,7 @@ class Frame(UIObject):
         self._cursor_hit = sdl3.SDL_HitTest(self._cursor_hit_test)
         sdl3.SDL_SetWindowHitTest(self._frame, self._cursor_hit, None)
 
-        # Cell
+        # Objects
         self._hovered = self._container
         self._input = None
         self._focus = None
@@ -309,8 +309,8 @@ class Frame(UIObject):
         w = h = c_int()
         sdl3.SDL_GetWindowSize(self._frame, w, h)
 
-        self._frame_texture = self._drawer.build_texture(
-            self.width, self.height, self._draw_obj, 'FRAME')
+        self._tt_frame = self._drawer.build_texture(
+            self._tt_frame, self.width, self.height, self._draw_obj, 'FRAME')
         
         if self._container._objects:
             self._container._invalidate()
@@ -578,7 +578,7 @@ class Frame(UIObject):
             if self._resizing:
                 self._resizing_count += 1
                 sdl3.SDL_RenderTexture(
-                    self._renderer , self._frame_texture, None, None)
+                    self._renderer , self._tt_frame, None, None)
                 self._container._invalidate()
                 self._container._update(self._render_mode)
                 self._container._redraw('RESIZE')
@@ -587,15 +587,14 @@ class Frame(UIObject):
                 self._resizing_count = 0
                 self._draw()
                 sdl3.SDL_RenderTexture(
-                    self._renderer , self._frame_texture, None, None)
+                    self._renderer , self._tt_frame, None, None)
                 self._container._invalidate()
                 self._container._update(self._render_mode)
                 self._queue_list = self._container._queue_list()
                 self._container._queue_list_clear()
 
         if not self._resizing and self._render_mode == 'UNIT':
-            sdl3.SDL_RenderTexture(
-                self._renderer, self._frame_texture, None, None)
+            sdl3.SDL_RenderTexture(self._renderer, self._tt_frame, None, None)
 
             if self._first_render:
                 self._container._invalidate()

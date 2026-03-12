@@ -209,7 +209,9 @@ class Drawer(object):
             sdl3.SDL_RenderLine(
                 self._renderer, cx - dx, cy + dy, cx + dx, cy + dy)
     
-    def build_texture(self, w, h, draw, state = None) -> None:
+    def build_texture(self, texture, w, h, draw, state = None) -> None:
+        if texture: sdl3.SDL_DestroyTexture(texture)
+
         texture = sdl3.SDL_CreateTexture(
             self._renderer,
             sdl3.SDL_PIXELFORMAT_RGBA32,
@@ -237,6 +239,10 @@ class Drawer(object):
         sdl3.SDL_SetRenderTarget(self._renderer, old_target)
         
         return texture
+    
+    def reset(self, texture) -> None:
+        if texture: sdl3.SDL_DestroyTexture(texture)
+        return None
     
     def set_texture(self, texture, x, y, w, h) -> None:
         dest = sdl3.SDL_FRect(x, y, w, h)
