@@ -22,7 +22,7 @@ class Empty(Cell):
         self._tx_height = 0
 
         self._need_rebuild = False
-        self._log_rebuild = True
+        self._log_rebuild = False
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}()'
@@ -87,7 +87,9 @@ class Empty(Cell):
         bd_color = self.style[state]['border-color']
         bd_space = border * 2
 
-        self._drawer.rect(0, 0, self.width, self.height, bd_color, radius)
+        if border:
+            self._drawer.rect(0, 0, self.width, self.height, bd_color, radius)
+        
         self._drawer.rect(
             border, border, self.width - bd_space, self.height - bd_space,
             bg_color, radius - border)

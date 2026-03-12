@@ -164,7 +164,9 @@ class Button(Cell):
         bd_color = self.style[state]['border-color']
         bd_space = border * 2
 
-        self._drawer.rect(0, 0, self.width, self.height, bd_color, radius)
+        if border:
+            self._drawer.rect(0, 0, self.width, self.height, bd_color, radius)
+        
         self._drawer.rect(
             border, border, self.width - bd_space, self.height - bd_space,
             bg_color, radius - border)
