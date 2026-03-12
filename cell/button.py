@@ -45,7 +45,7 @@ class Button(Cell):
         self._tx_height = 0
 
         self._need_rebuild = False
-        self._log_rebuild = True
+        self._log_rebuild = False
     
     @property
     def text(self) -> str:
@@ -73,7 +73,7 @@ class Button(Cell):
                 self._font_name, self.style['BASE']['font-size'])
 
         if mode == 'UNIT' and self._invalidate_item:
-            self._build_text_textures()
+            self._build_text_textures('BASE')
             self._invalidate_item = None
             self._need_rebuild = True
             
@@ -81,8 +81,8 @@ class Button(Cell):
             self._need_rebuild = False
             self._set_state('BASE')
 
-            self._build_background_textures()
-            self._build_text_textures()
+            self._build_background_textures('BASE')
+            self._build_text_textures('BASE')
 
             self._resize_width = 0
             self._resize_height = 0
@@ -111,41 +111,51 @@ class Button(Cell):
         
         self._set_textures()
     
-    def _build_background_textures(self) -> None:
+    def _build_background_textures(self, mode: str) -> None:
         self._tx_width = int(self.width)
         self._tx_height = int(self.height)
 
-        self._tx_base = self._drawer.build_texture(
-            self._tx_width, self._tx_height, self._build_render, 'BASE')
+        if mode == 'BASE':
+            self._tx_base = self._drawer.build_texture(
+                self._tx_width, self._tx_height, self._build_render, 'BASE')
+            if self._log_rebuild: print('BASE bg', self, time.time())
         
-        self._tx_hover = self._drawer.build_texture(
-            self._tx_width, self._tx_height, self._build_render, 'HOVER')
+        elif mode == 'HOVER':
+            self._tx_hover = self._drawer.build_texture(
+                self._tx_width, self._tx_height, self._build_render, 'HOVER')
+            if self._log_rebuild: print('HOVER bg', self, time.time())
         
-        self._tx_pressed = self._drawer.build_texture(
-            self._tx_width, self._tx_height, self._build_render, 'PRESSED')
-        if self._log_rebuild: print('rebuild', self, time.time())
+        elif mode == 'PRESSED':
+            self._tx_pressed = self._drawer.build_texture(
+                self._tx_width, self._tx_height, self._build_render, 'PRESSED')
+            if self._log_rebuild: print('PRESSED bg', self, time.time())
     
-    def _build_text_textures(self) -> None:
+    def _build_text_textures(self, mode: str) -> None:
         padding = self.style['BASE']['padding'] * 2
         width = int(self.width - padding)
-        self._tx_base_text, self._text_w, self._text_h = self._drawer.font(
-            self._text, self._tx_base_text, self._font,
-            self.style['BASE']['font-size'],
-            self.style['BASE']['font-color'], self._elided, width)
-        
-        self._tx_hover_text, self._text_w, self._text_h = self._drawer.font(
-            self._text, self._tx_hover_text, self._font,
-            self.style['BASE']['font-size'],
-            self.style['HOVER']['font-color'], self._elided, width)
-        
-        self._tx_pressed_text, self._text_w, self._text_h = self._drawer.font(
-            self._text, self._tx_pressed_text, self._font,
-            self.style['BASE']['font-size'],
-            self.style['PRESSED']['font-color'], self._elided, width)
+        if mode == 'BASE':
+            self._tx_base_text, self._text_w, self._text_h = self._drawer.font(
+                self._text, self._tx_base_text, self._font,
+                self.style['BASE']['font-size'],
+                self.style['BASE']['font-color'], self._elided, width)
+            if self._log_rebuild: print('BASE text', self, time.time())
+
+        elif mode == 'HOVER':
+            self._tx_hover_text, self._text_w, self._text_h = self._drawer.font(
+                self._text, self._tx_hover_text, self._font,
+                self.style['BASE']['font-size'],
+                self.style['HOVER']['font-color'], self._elided, width)
+            if self._log_rebuild: print('HOVER text', self, time.time())
+
+        elif mode == 'PRESSED':
+            self._tx_pressed_text, self._text_w, self._text_h = self._drawer.font(
+                self._text, self._tx_pressed_text, self._font,
+                self.style['BASE']['font-size'],
+                self.style['PRESSED']['font-color'], self._elided, width)
+            if self._log_rebuild: print('PRESSED text', self, time.time())
         
         self._text_x = self._x + (self.width // 2) - (self._text_w // 2)
         self._text_y = self._y + (self.height // 2) - (self._text_h // 2)
-        if self._log_rebuild: print('rebuild', self, time.time())
     
     def _build_render(self, state: str = 'BASE'):
         radius = self.style['BASE']['radius']
@@ -170,6 +180,10 @@ class Button(Cell):
                 self._text_x, self._text_y, self._text_w, self._text_h)
 
         elif self._state.value == 'HOVER':
+            if not self._tx_hover:
+                self._build_background_textures('HOVER')
+                self._build_text_textures('HOVER')
+            
             self._drawer.set_texture(
                 self._tx_hover,
                 int(self._x), int(self._y), int(self.width), int(self.height))
@@ -179,6 +193,10 @@ class Button(Cell):
                 self._text_x, self._text_y, self._text_w, self._text_h)
         
         elif self._state.value == 'PRESSED':
+            if not self._tx_pressed:
+                self._build_background_textures('PRESSED')
+                self._build_text_textures('PRESSED')
+            
             self._drawer.set_texture(
                 self._tx_pressed,
                 int(self._x), int(self._y), int(self.width), int(self.height))

@@ -22,7 +22,7 @@ class Empty(Cell):
         self._tx_height = 0
 
         self._need_rebuild = False
-        self._log_rebuild = False
+        self._log_rebuild = True
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}()'
@@ -40,7 +40,7 @@ class Empty(Cell):
         elif mode == 'REBUILD':
             self._need_rebuild = False
             self._set_state('BASE')
-            self._build_background_textures()
+            self._build_background_textures('BASE')
             self._resize_width = 0
             self._resize_height = 0
         
@@ -61,19 +61,24 @@ class Empty(Cell):
         
         self._set_textures()
     
-    def _build_background_textures(self) -> None:
+    def _build_background_textures(self, mode: str) -> None:
         self._tx_width = int(self.width)
         self._tx_height = int(self.height)
 
-        self._tx_base = self._drawer.build_texture(
-            self._tx_width, self._tx_height, self._build_render, 'BASE')
+        if mode == 'BASE':
+            self._tx_base = self._drawer.build_texture(
+                self._tx_width, self._tx_height, self._build_render, 'BASE')
+            if self._log_rebuild: print('BASE bg', self, time.time())
         
-        self._tx_hover = self._drawer.build_texture(
-            self._tx_width, self._tx_height, self._build_render, 'HOVER')
-        
-        self._tx_pressed = self._drawer.build_texture(
-            self._tx_width, self._tx_height, self._build_render, 'PRESSED')
-        if self._log_rebuild: print('rebuild', self, time.time())
+        elif mode == 'HOVER':
+            self._tx_hover = self._drawer.build_texture(
+                self._tx_width, self._tx_height, self._build_render, 'HOVER')
+            if self._log_rebuild: print('HOVER bg', self, time.time())
+
+        elif mode == 'PRESSED':
+            self._tx_pressed = self._drawer.build_texture(
+                self._tx_width, self._tx_height, self._build_render, 'PRESSED')
+            if self._log_rebuild: print('PRESSED bg', self, time.time())
     
     def _build_render(self, state: str = 'BASE'):
         radius = self.style['BASE']['radius']
@@ -94,11 +99,17 @@ class Empty(Cell):
                 int(self._x), int(self._y), int(self.width), int(self.height))
 
         elif self._state.value == 'HOVER':
+            if not self._tx_hover:
+                self._build_background_textures('HOVER')
+
             self._drawer.set_texture(
                 self._tx_hover,
                 int(self._x), int(self._y), int(self.width), int(self.height))
         
         elif self._state.value == 'PRESSED':
+            if not self._tx_pressed:
+                self._build_background_textures('PRESSED')
+
             self._drawer.set_texture(
                 self._tx_pressed,
                 int(self._x), int(self._y), int(self.width), int(self.height))
