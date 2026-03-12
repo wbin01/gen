@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import time
 from PIL import ImageFont
 
 from .cell import Cell
@@ -44,6 +45,7 @@ class Button(Cell):
         self._tx_height = 0
 
         self._need_rebuild = False
+        self._log_rebuild = True
     
     @property
     def text(self) -> str:
@@ -64,7 +66,6 @@ class Button(Cell):
 
     def _draw(self, mode: str = None) -> None:
         if not self._dirty: return
-        self._dirty = False
 
         if self.style['BASE']['font'] != self._font_name:
             self._font_name = self.style['BASE']['font']
@@ -108,33 +109,21 @@ class Button(Cell):
                 self._text_x, self._text_y, self._text_w, self._text_h)
             return
         
-        if self._need_rebuild: self._dirty = True
         self._set_textures()
-    
-    def _render_bg(self, state: str = 'BASE'):
-        radius = self.style['BASE']['radius']
-        border = self.style['BASE']['border']
-        bg_color = self.style[state]['background-color']
-        bd_color = self.style[state]['border-color']
-        bd_space = border * 2
-
-        self._drawer.rect(0, 0, self.width, self.height, bd_color, radius)
-        self._drawer.rect(
-            border, border, self.width - bd_space, self.height - bd_space,
-            bg_color, radius - border)
     
     def _build_background_textures(self) -> None:
         self._tx_width = int(self.width)
         self._tx_height = int(self.height)
 
         self._tx_base = self._drawer.build_texture(
-            self._tx_width, self._tx_height, self._render_bg, 'BASE')
+            self._tx_width, self._tx_height, self._build_render, 'BASE')
         
         self._tx_hover = self._drawer.build_texture(
-            self._tx_width, self._tx_height, self._render_bg, 'HOVER')
+            self._tx_width, self._tx_height, self._build_render, 'HOVER')
         
         self._tx_pressed = self._drawer.build_texture(
-            self._tx_width, self._tx_height, self._render_bg, 'PRESSED')
+            self._tx_width, self._tx_height, self._build_render, 'PRESSED')
+        if self._log_rebuild: print('rebuild', self, time.time())
     
     def _build_text_textures(self) -> None:
         padding = self.style['BASE']['padding'] * 2
@@ -156,6 +145,19 @@ class Button(Cell):
         
         self._text_x = self._x + (self.width // 2) - (self._text_w // 2)
         self._text_y = self._y + (self.height // 2) - (self._text_h // 2)
+        if self._log_rebuild: print('rebuild', self, time.time())
+    
+    def _build_render(self, state: str = 'BASE'):
+        radius = self.style['BASE']['radius']
+        border = self.style['BASE']['border']
+        bg_color = self.style[state]['background-color']
+        bd_color = self.style[state]['border-color']
+        bd_space = border * 2
+
+        self._drawer.rect(0, 0, self.width, self.height, bd_color, radius)
+        self._drawer.rect(
+            border, border, self.width - bd_space, self.height - bd_space,
+            bg_color, radius - border)
     
     def _set_textures(self) -> None:
         if self._state.value == 'BASE':

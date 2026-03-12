@@ -85,7 +85,6 @@ class Frame(UIObject):
         self._first_render = True
 
         # Frame
-        self._frame_base_texture = None
         self._frame_texture = None
 
         # Frame - resize
@@ -129,15 +128,16 @@ class Frame(UIObject):
 
     def __str__(self) -> str:
         return self.__class__.__name__
-    
+
     @property
-    def view_layout(self) -> bool:
+    def default(self) -> Cell:
         """..."""
-        return self._view_layout
+        return self._default
     
-    @view_layout.setter
-    def view_layout(self, view_layout: bool) -> None:
-        self._view_layout = view_layout
+    @default.setter
+    def default(self, cell: Cell) -> None:
+        self._default = cell
+        self._default.style_class = StyleClass.DEFAULT
     
     @property
     def height(self) -> int:
@@ -157,6 +157,15 @@ class Frame(UIObject):
     @spacing.setter
     def spacing(self, spacing: int) -> None:
         self._container.spacing = spacing
+
+    @property
+    def view_layout(self) -> bool:
+        """..."""
+        return self._view_layout
+    
+    @view_layout.setter
+    def view_layout(self, view_layout: bool) -> None:
+        self._view_layout = view_layout
     
     @property
     def width(self) -> int:
@@ -193,22 +202,10 @@ class Frame(UIObject):
         return self._container.add(obj)
         
     def run(self) -> int:
-        self._draw('FRAME_BASE')
-        self._draw('FRAME')
-        
+        self._draw()
         self._event_loop()
         self._destroy()
         return 0
-    
-    @property
-    def default(self) -> Cell:
-        """..."""
-        return self._default
-    
-    @default.setter
-    def default(self, cell: Cell) -> None:
-        self._default = cell
-        self._default.style_class = StyleClass.DEFAULT
     
     def _cursor_hit_test(self, window, area, data):
         x = area.contents.x
@@ -308,17 +305,17 @@ class Frame(UIObject):
         # sdl3.SDL_DestroySurface(self.__font_surface)
         sdl3.SDL_Quit()
     
-    def _draw(self, mode: str = 'FRAME') -> None:
+    def _draw(self) -> None:
         w = h = c_int()
         sdl3.SDL_GetWindowSize(self._frame, w, h)
 
-        if mode == 'FRAME':
-            self._frame_texture = self._drawer.build_texture(
-                self.width, self.height, self._draw_obj, mode)
+        self._frame_texture = self._drawer.build_texture(
+            self.width, self.height, self._draw_obj, 'FRAME')
         
-        elif mode == 'FRAME_BASE':
-            self._frame_base_texture = self._drawer.build_texture(
-                self.width, self.height, self._draw_obj, mode)
+        if self._container._objects:
+            self._container._invalidate()
+            self._container._update()
+            self._container._redraw('REBUILD')
 
     def _draw_obj(self, mode) -> None:
         self._drawer.rect(
@@ -330,12 +327,6 @@ class Frame(UIObject):
             x=1, y=1, w=self.width - 2, h=self.height - 2,
             color=self._style.Frame['BASE']['background-color'],
             r=self._style.Frame['BASE']['radius'])
-
-        if mode == 'FRAME':
-            if self._container._objects:
-                self._container._invalidate()
-                self._container._update()
-                self._container._redraw('REBUILD')
 
     def _event_loop(self) -> None:
         while self._running:
@@ -587,16 +578,16 @@ class Frame(UIObject):
             if self._resizing:
                 self._resizing_count += 1
                 sdl3.SDL_RenderTexture(
-                    self._renderer , self._frame_base_texture, None, None)
+                    self._renderer , self._frame_texture, None, None)
                 self._container._invalidate()
                 self._container._update(self._render_mode)
                 self._container._redraw('RESIZE')
 
             if not self._resizing:
                 self._resizing_count = 0
-                self._draw('FRAME')
+                self._draw()
                 sdl3.SDL_RenderTexture(
-                    self._renderer , self._frame_base_texture, None, None)
+                    self._renderer , self._frame_texture, None, None)
                 self._container._invalidate()
                 self._container._update(self._render_mode)
                 self._queue_list = self._container._queue_list()

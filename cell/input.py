@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+import time
+
 from PIL import ImageFont
 import sdl3
 
@@ -72,6 +74,8 @@ class Input(Cell):
         self._cursor_tx_on = None
         self._cursor_tx_off = None
         self._timer = Timer(call=self._cursor_tick)
+
+        self._log_rebuild = False
     
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}(text="{self._text}")'
@@ -315,8 +319,8 @@ class Input(Cell):
             x += w
 
     def _draw(self, mode: str = None) -> None:
-        if not self._dirty: return
-        self._dirty = False
+        # if not self._dirty: return
+        # self._dirty = False
 
         if self.style['BASE']['font'] != self._font_name:
             self._font_name = self.style['BASE']['font']
@@ -332,6 +336,7 @@ class Input(Cell):
                 if self._selection[1]:
                     self._selection_tx = self._drawer.build_texture(
                         self._selw, self._selh, self._draw_obj, 'HOVER')
+                if self._log_rebuild: print('rebuild', self, time.time())
 
             elif self._invalidate_item == 'TEXT':
                 self._invalidate_item = None
@@ -339,6 +344,7 @@ class Input(Cell):
                     self._text, self._text_tx,
                     self._font, font_size, font_color)
                 self._texty = self._y + (self.height / 2) - (self._texth / 2)
+                if self._log_rebuild: print('rebuild', self, time.time())
             
             self._invalidate_item = None
             self._need_rebuild = True
@@ -372,6 +378,7 @@ class Input(Cell):
             
             self._resise_w = 0
             self._resise_h = 0
+            if self._log_rebuild: print('rebuild', self, time.time())
         
         if mode in ('RESIZE', 'POSITION'):
             if mode == 'POSITION': self._need_rebuild = True
@@ -431,8 +438,8 @@ class Input(Cell):
                     self._textx + self._get_cursor_x(),
                     self._texty, self._cursor_w, font_size)
         
-        if mode == 'REBUILD':
-            self._dirty = False
+        # if mode == 'REBUILD':
+        #     self._dirty = False
     
     def _cursor_tick(self) -> None:
         if self._app and self._app._input:

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
+import time
+
 from .cell import Cell
-from ..flag import Fill
 
 
 class Empty(Cell):
@@ -21,19 +22,18 @@ class Empty(Cell):
         self._tx_height = 0
 
         self._need_rebuild = False
+        self._log_rebuild = False
 
     def __repr__(self) -> str:
-        return f'{self.__class__.__name__}(text="{self._text}")'
+        return f'{self.__class__.__name__}()'
     
     def __str__(self) -> str:
-        return f'{self.__class__.__name__}("{self._text}")'
+        return f'{self.__class__.__name__}()'
 
     def _draw(self, mode: str = None) -> None:
         if not self._dirty: return
-        self._dirty = False
 
         if mode == 'UNIT' and self._invalidate_item:
-            # build...
             self._invalidate_item = None
             self._need_rebuild = True
             
@@ -41,7 +41,6 @@ class Empty(Cell):
             self._need_rebuild = False
             self._set_state('BASE')
             self._build_background_textures()
-
             self._resize_width = 0
             self._resize_height = 0
         
@@ -60,10 +59,23 @@ class Empty(Cell):
                 self._resize_width, self._resize_height)
             return
         
-        if self._need_rebuild: self._dirty = True
         self._set_textures()
     
-    def _render_bg(self, state: str = 'BASE'):
+    def _build_background_textures(self) -> None:
+        self._tx_width = int(self.width)
+        self._tx_height = int(self.height)
+
+        self._tx_base = self._drawer.build_texture(
+            self._tx_width, self._tx_height, self._build_render, 'BASE')
+        
+        self._tx_hover = self._drawer.build_texture(
+            self._tx_width, self._tx_height, self._build_render, 'HOVER')
+        
+        self._tx_pressed = self._drawer.build_texture(
+            self._tx_width, self._tx_height, self._build_render, 'PRESSED')
+        if self._log_rebuild: print('rebuild', self, time.time())
+    
+    def _build_render(self, state: str = 'BASE'):
         radius = self.style['BASE']['radius']
         border = self.style['BASE']['border']
         bg_color = self.style[state]['background-color']
@@ -74,19 +86,6 @@ class Empty(Cell):
         self._drawer.rect(
             border, border, self.width - bd_space, self.height - bd_space,
             bg_color, radius - border)
-    
-    def _build_background_textures(self) -> None:
-        self._tx_width = int(self.width)
-        self._tx_height = int(self.height)
-
-        self._tx_base = self._drawer.build_texture(
-            self._tx_width, self._tx_height, self._render_bg, 'BASE')
-        
-        self._tx_hover = self._drawer.build_texture(
-            self._tx_width, self._tx_height, self._render_bg, 'HOVER')
-        
-        self._tx_pressed = self._drawer.build_texture(
-            self._tx_width, self._tx_height, self._render_bg, 'PRESSED')
     
     def _set_textures(self) -> None:
         if self._state.value == 'BASE':

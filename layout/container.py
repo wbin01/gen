@@ -55,6 +55,7 @@ class Container(Margin, Size, Add, Layout):
         self._fill = fill
         self._first = False
         self._orientation = 'VERTICAL'
+        self._tx_background = None
 
         self._x = 0
         self._y = 0
@@ -119,6 +120,34 @@ class Container(Margin, Size, Add, Layout):
     def spacing(self, spacing: int) -> None:
         self._spacing = spacing
     
+    def _draw_tx(self) -> None:
+        if not self._tx_background:
+            self._tx_background = self._drawer.build_texture(
+                self.width + self.margin[3] + self.margin[1] - 2,
+                self.height + self.margin[0] + self.margin[2] - 2,
+                self._draw_obj, 'BASE')
+
+        self._drawer.set_texture(
+            self._tx_background,
+            self._x - self.margin[3], self._y - self.margin[0],
+            self.width + self.margin[3] + self.margin[1] - 2,
+            self.height + self.margin[0] + self.margin[2] - 2)
+    
+    def _draw_obj(self, mode: str = None) -> None:
+        self._drawer.rect(
+            0, 0,
+            self.width + self.margin[3] + self.margin[1],
+            self.height + self.margin[0] + self.margin[2],
+            Theme.Frame['BASE']['accent-color'],
+            Theme.Frame['BASE']['radius'])
+        
+        color = Theme.Frame['BASE']['background-color']
+        self._drawer.rect(
+            0, 0,
+            self.width + self.margin[3] + self.margin[1] - 2,
+            self.height + self.margin[0] + self.margin[2] - 2,
+            (color[0], color[1], color[2], 255), Theme.Frame['BASE']['radius'])
+        
     def _draw(self, mode: str = None) -> None:
         if not self._first and mode == 'REBUILD':
             self._drawer.rect(
@@ -147,9 +176,7 @@ class Container(Margin, Size, Add, Layout):
             self._update_fill(self)
         
         obj_x, obj_y = self._x, self._y  # Reset
-
-        if hasattr(self, '_scroll') and self._scroll:
-            obj_y += self._scroll._scroll_y
+        if self._scroll: obj_y += self._scroll_y
         
         for obj in self._objects:
             if not obj.visible: continue
