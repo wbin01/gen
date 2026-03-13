@@ -1,16 +1,13 @@
 #!/usr/bin/env python3
+import ctypes
 import io
 import math
 
 # python3 -m pip install --upgrade Pillow
-from PIL import Image, ImageDraw, ImageFont, ImageFilter, ImageEnhance, ImageDraw2
+from PIL import Image, ImageDraw
 import pyscreenshot as ImageGrab
 
 import sdl3
-
-
-class FontRender:
-    pass
 
 
 class Drawer(object):
@@ -24,34 +21,15 @@ class Drawer(object):
 
     def __str__(self) -> str:
         return self.__class__.__name__
-
-    def image(self) -> None:
-        """..."""
-        pass
-
-    def rect(
-            self, x: int, y: int, w: int, h: int,
-            color=(0, 0, 0, 255), r: int = 8, aa: int = 1) -> None:
-        """..."""
-        if self._visual_level >= 1:
-            self._rounded_rect_antialiasing(x, y, w, h, color, r)
-        else:
-            self._rounded_rect(x, y, w, h, color, r)
     
-    def text(self, x: int, y: int, texture, text: FontRender) -> None:
-        """..."""
-        surface = sdl3.SDL_CreateSurfaceFrom(
-            text.width, text.height, sdl3.SDL_PIXELFORMAT_RGBA32,
-            text._bytes, text.width * 4)
-        
-        if texture:
-            sdl3.SDL_DestroyTexture(texture)
-        
-        texture = sdl3.SDL_CreateTextureFromSurface(self._renderer, surface)
-        sdl3.SDL_DestroySurface(surface)
+    def clip_start(self, obj) -> None:
+        sdl3.SDL_RenderClipEnabled(self._renderer)
+        clip = sdl3.SDL_Rect(obj._x, obj._y, 500, 200)
+        sdl3.SDL_SetRenderClipRect(self._renderer, ctypes.byref(clip))
 
-        dst = sdl3.SDL_FRect(x, y, text.width, text.height)
-        sdl3.SDL_RenderTexture(self._renderer, texture, None, dst)
+    def clip_end(self) -> None:
+        sdl3.SDL_SetRenderClipRect(
+            self._renderer, ctypes.POINTER(sdl3.SDL_Rect)())
     
     def font(
             self, text, texture, font, size, color, elided=False, total_width=0
@@ -94,6 +72,19 @@ class Drawer(object):
         cursor_x = x + cursor_x
         sdl3.SDL_RenderLine(
             self._renderer, cursor_x, y, cursor_x, y + size)
+
+    def image(self) -> None:
+        """..."""
+        pass
+
+    def rect(
+            self, x: int, y: int, w: int, h: int,
+            color=(0, 0, 0, 255), r: int = 8, aa: int = 1) -> None:
+        """..."""
+        if self._visual_level >= 1:
+            self._rounded_rect_antialiasing(x, y, w, h, color, r)
+        else:
+            self._rounded_rect(x, y, w, h, color, r)
 
     def _rounded_rect_antialiasing(
             self, x: int, y: int, w: int, h: int,

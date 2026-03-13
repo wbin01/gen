@@ -19,7 +19,7 @@ class ViewPort(object):
 
     def roll_up(self, auto: bool = True, step: int = 20) -> None:
         if self._parent:
-            # self._parent._draw_viewport(obj)
+            # self._parent._drawer.clip_start(obj)
             self._parent._draw('REBUILD')
 
             self._y -= step
@@ -31,12 +31,12 @@ class ViewPort(object):
             # self._parent._app._render_mode = 'REBUILD'
             # self._parent._app._render_update = True
             self._parent._invalidate()
-            # self._parent._draw_viewport()
+            # self._parent._drawer.clip_end()
 
 
 class Layout(UIObject):
     """Organizes the positioning of the elements."""
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, scroll: bool = False, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self._base_class = 'Layout'
 
@@ -46,22 +46,15 @@ class Layout(UIObject):
 
         self._x = 0
         self._y = 0
-        self._scroll = None
+        self._scroll = scroll
         self._viewport = ViewPort(self)
+    
+    @property
+    def viewport(self) -> ViewPort:
+        return self._viewport
 
     def _update(self) -> None:
         pass
-    
-    def _draw_viewport(self, obj: Layout = None) -> None:
-        if obj:
-            sdl3.SDL_RenderClipEnabled(self._app._drawer._renderer)
-            clip = sdl3.SDL_Rect(obj._x, obj._y, 500, 200)
-            sdl3.SDL_SetRenderClipRect(
-                self._app._drawer._renderer, ctypes.byref(clip))
-            return
-        
-        sdl3.SDL_SetRenderClipRect(
-            self._app._drawer._renderer, ctypes.POINTER(sdl3.SDL_Rect)())
     
     def _hit_test(self, x: int, y: int) -> UIObject | None:
         if not self.visible:
@@ -128,11 +121,11 @@ class Layout(UIObject):
 
             if isinstance(obj, Layout):
                 if obj._scroll:
-                    self._draw_viewport(obj)
+                    self._drawer.clip_start(obj)
                     if self._app and self._app._view_layout:
                         obj._draw(mode)
                     obj._redraw(mode)
-                    self._draw_viewport()
+                    self._drawer.clip_end()
                 else:
                     if self._app and self._app._view_layout:
                         obj._draw(mode)

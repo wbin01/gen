@@ -7,7 +7,6 @@ import sdl3
 from .cell import Cell
 from ..control import Timer
 from ..flag import Fill
-from ..ui import FontRender
 
 
 class Input(Cell):
