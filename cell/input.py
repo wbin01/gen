@@ -334,7 +334,7 @@ class Input(Cell):
             if self._invalidate_item == 'SELECT':
                 self._invalidate_item = None
                 if self._selection[1]:
-                    self._tt_selection = self._drawer.build_texture(
+                    self._tt_selection = self._drawer.texture(
                         self._tt_selection,
                         self._selw, self._selh, self._draw_obj, 'HOVER')
                 if self._log_rebuild: print('rebuild', self, time.time())
@@ -357,15 +357,15 @@ class Input(Cell):
             self._tt_w = int(self.width)
             self._tt_h = int(self.height)
 
-            self._tt_default = self._drawer.build_texture(
+            self._tt_default = self._drawer.texture(
                 self._tt_default,
                 self._tt_w, self._tt_h, self._draw_obj, 'BASE')
             
-            self._tt_hover = self._drawer.build_texture(
+            self._tt_hover = self._drawer.texture(
                 self._tt_hover,
                 self._tt_w, self._tt_h, self._draw_obj, 'HOVER')
             
-            self._tt_pressed = self._drawer.build_texture(
+            self._tt_pressed = self._drawer.texture(
                 self._tt_pressed,
                 self._tt_w, self._tt_h, self._draw_obj, 'CLICKED')
             
@@ -374,11 +374,11 @@ class Input(Cell):
                 self._font, font_size, font_color)
             self._texty = self._y + (self.height / 2) - (self._texth / 2)
 
-            self._tt_cursor_on = self._drawer.build_texture(
+            self._tt_cursor_on = self._drawer.texture(
                 self._tt_cursor_on,
                 self._cursor_w, font_size, self._draw_obj, 'CURSOR_ON')
             
-            self._tt_cursor_off = self._drawer.build_texture(
+            self._tt_cursor_off = self._drawer.texture(
                 self._tt_cursor_off,
                 self._cursor_w, font_size, self._draw_obj, 'CURSOR_OFF')
             
@@ -396,11 +396,11 @@ class Input(Cell):
             # if self.fill.value == 'X':
             self._resise_w = int(self.width)
 
-            self._drawer.set_texture(
+            self._drawer.apply_texture(
                 self._tt_default,
                 int(self._x), int(self._y), self._resise_w, self._resise_h)
             
-            self._drawer.set_texture(
+            self._drawer.apply_texture(
                 self._tt_text,
                 self._textx, self._texty, self._textw, self._texth)
             return
@@ -409,37 +409,37 @@ class Input(Cell):
         self._textx = self._x + self.style['BASE']['padding'] + 5
 
         if self._state.value == 'BASE':
-            self._drawer.set_texture(
+            self._drawer.apply_texture(
                 self._tt_default,
                 int(self._x), int(self._y), int(self.width), int(self.height))
 
         elif self._state.value == 'HOVER':
-            self._drawer.set_texture(
+            self._drawer.apply_texture(
                 self._tt_hover,
                 int(self._x), int(self._y), int(self.width), int(self.height))
         
         elif self._state.value == 'PRESSED':
-            self._drawer.set_texture(
+            self._drawer.apply_texture(
                 self._tt_pressed,
                 int(self._x), int(self._y), int(self.width), int(self.height))
         
         if self._selection[1]:
-            self._drawer.set_texture(
+            self._drawer.apply_texture(
                 self._tt_selection,
                 self._selx, self._sely, self._selw, self._selh)
 
-        self._drawer.set_texture(
+        self._drawer.apply_texture(
             self._tt_text,
             self._textx, self._texty, self._textw, self._texth)
 
         if self._app and self._app._focus == self:
             if self._cursor_visible:
-                self._drawer.set_texture(
+                self._drawer.apply_texture(
                     self._tt_cursor_on,
                     self._textx + self._get_cursor_x(),
                     self._texty, self._cursor_w, font_size)
             else:
-                self._drawer.set_texture(
+                self._drawer.apply_texture(
                     self._tt_cursor_off,
                     self._textx + self._get_cursor_x(),
                     self._texty, self._cursor_w, font_size)

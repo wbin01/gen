@@ -22,6 +22,10 @@ class Drawer(object):
     def __str__(self) -> str:
         return self.__class__.__name__
     
+    def apply_texture(self, texture, x, y, w, h) -> None:
+        dest = sdl3.SDL_FRect(x, y, w, h)
+        sdl3.SDL_RenderTexture(self._renderer, texture, None, dest)
+    
     def clip_start(self, obj) -> None:
         sdl3.SDL_RenderClipEnabled(self._renderer)
         clip = sdl3.SDL_Rect(obj._x, obj._y, 500, 200)
@@ -85,6 +89,85 @@ class Drawer(object):
             self._rounded_rect_antialiasing(x, y, w, h, color, r)
         else:
             self._rounded_rect(x, y, w, h, color, r)
+    
+    def texture(self, texture, w, h, draw, state = None) -> None:
+        if texture: sdl3.SDL_DestroyTexture(texture)
+
+        texture = sdl3.SDL_CreateTexture(
+            self._renderer,
+            sdl3.SDL_PIXELFORMAT_RGBA32,
+            sdl3.SDL_TEXTUREACCESS_TARGET,
+            w, h)
+        
+        sdl3.SDL_SetTextureScaleMode(texture, sdl3.SDL_SCALEMODE_LINEAR)
+
+        old_target = sdl3.SDL_GetRenderTarget(self._renderer)
+        sdl3.SDL_SetRenderTarget(self._renderer, texture)
+
+        sdl3.SDL_SetRenderDrawColor(self._renderer, 0, 0, 0, 0)
+        sdl3.SDL_RenderClear(self._renderer)
+
+        # if blend:
+        #     sdl3.SDL_SetRenderDrawBlendMode(
+        #         self._renderer, sdl3.SDL_BLENDMODE_AD)
+        if state:
+            draw(state)
+        else:
+            draw()
+        # sdl3.SDL_SetRenderDrawBlendMode(
+        #     self._renderer, sdl3.SDL_BLENDMODE_NONE)
+
+        sdl3.SDL_SetRenderTarget(self._renderer, old_target)
+        
+        return texture
+    
+    def reset_texture(self, texture) -> None:
+        if texture: sdl3.SDL_DestroyTexture(texture)
+        return None
+    
+    def _corner_filled_circle(self, cx, cy, r):
+        r = int(r)
+        for dy in range(-r, r + 1):
+            dx = int((r*r - dy*dy) ** 0.5)
+            sdl3.SDL_RenderLine(
+                self._renderer, cx - dx, cy + dy, cx + dx, cy + dy)
+    
+    def _rounded_rect(
+            self, x, y, w, h, color, r: int = 0,
+            top_left: int = None, top_right: int = None,
+            bottom_right: int = None, bottom_left: int = None):
+
+        tl = tr = br = bl = r
+        rmax = min(w // 2, h // 2)
+        tl = min(tl, rmax)
+        tr = min(tr, rmax)
+        br = min(br, rmax)
+        bl = min(bl, rmax)
+
+        sdl3.SDL_SetRenderDrawColor(self._renderer, *color)
+
+        # Middle
+        sdl3.SDL_RenderFillRect(
+            self._renderer, sdl3.SDL_FRect(x + tl, y, w - tl - tr, h))
+        
+        # Left
+        sdl3.SDL_RenderFillRect(
+            self._renderer, sdl3.SDL_FRect(x, y + tl, tl, h - tl - bl))
+        
+        # Right
+        sdl3.SDL_RenderFillRect(
+            self._renderer,
+            sdl3.SDL_FRect(x + w - tr, y + tr, tr, h - tr - br))
+
+        # Corners circles
+        if tl:
+            self._corner_filled_circle(x + tl, y + tl, tl)
+        if tr:
+            self._corner_filled_circle(x + w - tr - 1, y + tr, tr)
+        if br:
+            self._corner_filled_circle(x + w - br - 1, y + h - br - 1, br)
+        if bl:
+            self._corner_filled_circle(x + bl, y + h - bl - 1, bl)
 
     def _rounded_rect_antialiasing(
             self, x: int, y: int, w: int, h: int,
@@ -155,86 +238,3 @@ class Drawer(object):
         #     SDL_RenderPoint
         #     SDL_RenderLines
         #     SDL_RenderPoints
-
-    def _rounded_rect(
-            self, x, y, w, h, color, r: int = 0,
-            top_left: int = None, top_right: int = None,
-            bottom_right: int = None, bottom_left: int = None):
-
-        tl = tr = br = bl = r
-        rmax = min(w // 2, h // 2)
-        tl = min(tl, rmax)
-        tr = min(tr, rmax)
-        br = min(br, rmax)
-        bl = min(bl, rmax)
-
-        sdl3.SDL_SetRenderDrawColor(self._renderer, *color)
-
-        # Middle
-        sdl3.SDL_RenderFillRect(
-            self._renderer, sdl3.SDL_FRect(x + tl, y, w - tl - tr, h))
-        
-        # Left
-        sdl3.SDL_RenderFillRect(
-            self._renderer, sdl3.SDL_FRect(x, y + tl, tl, h - tl - bl))
-        
-        # Right
-        sdl3.SDL_RenderFillRect(
-            self._renderer,
-            sdl3.SDL_FRect(x + w - tr, y + tr, tr, h - tr - br))
-
-        # Corners circles
-        if tl:
-            self._corner_filled_circle(x + tl, y + tl, tl)
-        if tr:
-            self._corner_filled_circle(x + w - tr - 1, y + tr, tr)
-        if br:
-            self._corner_filled_circle(x + w - br - 1, y + h - br - 1, br)
-        if bl:
-            self._corner_filled_circle(x + bl, y + h - bl - 1, bl)
-    
-    def _corner_filled_circle(self, cx, cy, r):
-        r = int(r)
-        for dy in range(-r, r + 1):
-            dx = int((r*r - dy*dy) ** 0.5)
-            sdl3.SDL_RenderLine(
-                self._renderer, cx - dx, cy + dy, cx + dx, cy + dy)
-    
-    def build_texture(self, texture, w, h, draw, state = None) -> None:
-        if texture: sdl3.SDL_DestroyTexture(texture)
-
-        texture = sdl3.SDL_CreateTexture(
-            self._renderer,
-            sdl3.SDL_PIXELFORMAT_RGBA32,
-            sdl3.SDL_TEXTUREACCESS_TARGET,
-            w, h)
-        
-        sdl3.SDL_SetTextureScaleMode(texture, sdl3.SDL_SCALEMODE_LINEAR)
-
-        old_target = sdl3.SDL_GetRenderTarget(self._renderer)
-        sdl3.SDL_SetRenderTarget(self._renderer, texture)
-
-        sdl3.SDL_SetRenderDrawColor(self._renderer, 0, 0, 0, 0)
-        sdl3.SDL_RenderClear(self._renderer)
-
-        # if blend:
-        #     sdl3.SDL_SetRenderDrawBlendMode(
-        #         self._renderer, sdl3.SDL_BLENDMODE_AD)
-        if state:
-            draw(state)
-        else:
-            draw()
-        # sdl3.SDL_SetRenderDrawBlendMode(
-        #     self._renderer, sdl3.SDL_BLENDMODE_NONE)
-
-        sdl3.SDL_SetRenderTarget(self._renderer, old_target)
-        
-        return texture
-    
-    def reset(self, texture) -> None:
-        if texture: sdl3.SDL_DestroyTexture(texture)
-        return None
-    
-    def set_texture(self, texture, x, y, w, h) -> None:
-        dest = sdl3.SDL_FRect(x, y, w, h)
-        sdl3.SDL_RenderTexture(self._renderer, texture, None, dest)

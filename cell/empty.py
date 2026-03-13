@@ -32,7 +32,7 @@ class Empty(Cell):
     
     def _apply_textures(self) -> None:
         if self._state.value == 'BASE':
-            self._drawer.set_texture(
+            self._drawer.apply_texture(
                 self._tt_base,
                 int(self._x), int(self._y), int(self.width), int(self.height))
 
@@ -40,7 +40,7 @@ class Empty(Cell):
             if not self._tt_hover:
                 self._draw_background_textures(state='HOVER')
 
-            self._drawer.set_texture(
+            self._drawer.apply_texture(
                 self._tt_hover,
                 int(self._x), int(self._y), int(self.width), int(self.height))
         
@@ -48,7 +48,7 @@ class Empty(Cell):
             if not self._tt_pressed:
                 self._draw_background_textures(state='PRESSED')
 
-            self._drawer.set_texture(
+            self._drawer.apply_texture(
                 self._tt_pressed,
                 int(self._x), int(self._y), int(self.width), int(self.height))
 
@@ -63,9 +63,9 @@ class Empty(Cell):
             self._need_rebuild = False
             self._set_state('BASE')
 
-            self._tt_base = self._drawer.reset(self._tt_base)
-            self._tt_hover = self._drawer.reset(self._tt_hover)
-            self._tt_pressed = self._drawer.reset(self._tt_pressed)
+            self._tt_base = self._drawer.reset_texture(self._tt_base)
+            self._tt_hover = self._drawer.reset_texture(self._tt_hover)
+            self._tt_pressed = self._drawer.reset_texture(self._tt_pressed)
 
             self._draw_background_textures(state='BASE')
             self._resize_width = 0
@@ -81,7 +81,7 @@ class Empty(Cell):
             # if self.fill.value == 'X':
             #     self._resize_width = int(self.width)
 
-            self._drawer.set_texture(
+            self._drawer.apply_texture(
                 self._tt_base, int(self._x), int(self._y),
                 self._resize_width, self._resize_height)
             return
@@ -93,17 +93,17 @@ class Empty(Cell):
         self._tt_height = int(self.height)
 
         if state == 'BASE':
-            self._tt_base = self._drawer.build_texture(self._tt_base,
+            self._tt_base = self._drawer.texture(self._tt_base,
                 self._tt_width, self._tt_height, self._draw_rects, 'BASE')
             if self._log_rebuild: print('BASE bg', self, time.time())
         
         elif state == 'HOVER':
-            self._tt_hover = self._drawer.build_texture(self._tt_hover,
+            self._tt_hover = self._drawer.texture(self._tt_hover,
                 self._tt_width, self._tt_height, self._draw_rects, 'HOVER')
             if self._log_rebuild: print('HOVER bg', self, time.time())
 
         elif state == 'PRESSED':
-            self._tt_pressed = self._drawer.build_texture(self._tt_pressed,
+            self._tt_pressed = self._drawer.texture(self._tt_pressed,
                 self._tt_width, self._tt_height, self._draw_rects, 'CLICKED')
             if self._log_rebuild: print('PRESSED bg', self, time.time())
     

@@ -309,7 +309,7 @@ class Frame(UIObject):
         w = h = c_int()
         sdl3.SDL_GetWindowSize(self._frame, w, h)
 
-        self._tt_frame = self._drawer.build_texture(
+        self._tt_frame = self._drawer.texture(
             self._tt_frame, self.width, self.height, self._draw_obj, 'FRAME')
         
         if self._container._objects:
