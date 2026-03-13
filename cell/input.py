@@ -367,7 +367,7 @@ class Input(Cell):
             
             self._tt_pressed = self._drawer.build_texture(
                 self._tt_pressed,
-                self._tt_w, self._tt_h, self._draw_obj, 'PRESSED')
+                self._tt_w, self._tt_h, self._draw_obj, 'CLICKED')
             
             self._tt_text, self._textw, self._texth = self._drawer.font(
                 self._text, self._tt_text,

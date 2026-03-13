@@ -74,6 +74,8 @@ class Button(Cell):
 
         if mode == 'UNIT' and self._invalidate_item:
             self._build_text_textures('BASE')
+            self._build_text_textures('HOVER')
+            self._build_text_textures('PRESSED')
             self._invalidate_item = None
             self._need_rebuild = True
             
@@ -134,7 +136,7 @@ class Button(Cell):
         
         elif mode == 'PRESSED':
             self._tt_pressed = self._drawer.build_texture(self._tt_pressed,
-                self._tt_width, self._tt_height, self._build_render, 'PRESSED')
+                self._tt_width, self._tt_height, self._build_render, 'CLICKED')
             if self._log_rebuild: print('PRESSED bg', self, time.time())
     
     def _build_text_textures(self, mode: str) -> None:
@@ -158,7 +160,7 @@ class Button(Cell):
             self._tt_pressed_text, self._text_w, self._text_h = self._drawer.font(
                 self._text, self._tt_pressed_text, self._font,
                 self.style['BASE']['font-size'],
-                self.style['PRESSED']['font-color'], self._elided, width)
+                self.style['CLICKED']['font-color'], self._elided, width)
             if self._log_rebuild: print('PRESSED text', self, time.time())
         
         self._text_x = self._x + (self.width // 2) - (self._text_w // 2)

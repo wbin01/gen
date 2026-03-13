@@ -80,7 +80,7 @@ class Cell(Margin, Size, UIObject):
 
         theme = copy.deepcopy(theme)
         if theme and class_theme:
-            for state in ('BASE', 'HOVER', 'PRESSED'):
+            for state in ('BASE', 'HOVER', 'CLICKED'):
                 for key in (
                         'font-color', 'background-color',
                         'border-color', 'border'):

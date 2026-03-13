@@ -31,7 +31,7 @@ class Theme:
             'background-color': (40, 45, 55, 255),
             'border-color': (60, 100, 150, 255),
             },
-        'PRESSED': {
+        'CLICKED': {
             'font-color': (200, 200, 200, 255),
             'background-color': (50, 63, 88, 255),
             'border-color': (60, 100, 150, 255),
@@ -49,7 +49,7 @@ class Theme:
             'background-color': (50, 50, 50, 255),
             'border-color': (60, 100, 150, 255),
             },
-        'PRESSED': {
+        'CLICKED': {
             'background-color': (60, 100, 150, 255),
             'border-color': (60, 100, 150, 255),
             },
@@ -72,7 +72,7 @@ class Theme:
             'background-color': (30, 30, 30, 255),
             'border-color': (60, 100, 150, 255),
             },
-        'PRESSED': {
+        'CLICKED': {
             'font-color': (200, 200, 200, 255),
             'background-color': (30, 30, 30, 255),
             'border-color': (80, 120, 170, 255),
@@ -91,7 +91,7 @@ class Theme:
                 'background-color': (30, 35, 40, 255),
                 'border-color': (60, 100, 150, 255),
                 },
-            'PRESSED': {
+            'CLICKED': {
                 'font-color': (200, 200, 200, 255),
                 'background-color': (50, 63, 88, 255),
                 'border-color': (60, 100, 150, 255),
@@ -110,7 +110,7 @@ class Theme:
                 'background-color': (50, 63, 88, 255),
                 'border-color': (60, 100, 150, 255),
                 },
-            'PRESSED': {
+            'CLICKED': {
                 'font-color': (200, 200, 200, 255),
                 'background-color': (60, 80, 100, 255),
                 'border-color': (60, 100, 150, 255),
@@ -128,7 +128,7 @@ class Theme:
                 'background-color': (40, 40, 40, 255),
                 'border-color': (60, 60, 60, 255),
                 },
-            'PRESSED': {
+            'CLICKED': {
                 'font-color': (100, 100, 100, 255),
                 'background-color': (40, 40, 40, 255),
                 'border-color': (60, 60, 60, 255),
@@ -146,7 +146,7 @@ class Theme:
                 'background-color': (98, 52, 60, 255),
                 'border-color': (150, 70, 70, 255),
                 },
-            'PRESSED': {
+            'CLICKED': {
                 'font-color': (200, 200, 200, 255),
                 'background-color': (120, 60, 75, 255),
                 'border-color': (150, 70, 70, 255),
@@ -164,7 +164,7 @@ class Theme:
                 'background-color': (50, 88, 63, 255),
                 'border-color': (60, 150, 100, 255),
                 },
-            'PRESSED': {
+            'CLICKED': {
                 'font-color': (200, 200, 200, 255),
                 'background-color': (60, 100, 80, 255),
                 'border-color': (60, 150, 100, 255),
@@ -182,7 +182,7 @@ class Theme:
                 'background-color': (65, 65, 32, 255),
                 'border-color': (110, 95, 35, 255),
                 },
-            'PRESSED': {
+            'CLICKED': {
                 'font-color': (200, 200, 200, 255),
                 'background-color': (80, 80, 40, 255),
                 'border-color': (110, 95, 35, 255),

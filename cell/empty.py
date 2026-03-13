@@ -82,7 +82,7 @@ class Empty(Cell):
 
         elif mode == 'PRESSED':
             self._tt_pressed = self._drawer.build_texture(self._tt_pressed,
-                self._tt_width, self._tt_height, self._build_render, 'PRESSED')
+                self._tt_width, self._tt_height, self._build_render, 'CLICKED')
             if self._log_rebuild: print('PRESSED bg', self, time.time())
     
     def _build_render(self, state: str = 'BASE'):
