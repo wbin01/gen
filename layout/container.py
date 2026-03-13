@@ -175,7 +175,6 @@ class Container(Margin, Size, Add, Layout):
             self._update_fill(self)
         
         obj_x, obj_y = self._x, self._y  # Reset
-        # if self._scroll: obj_y += self._scroll_y
         if self._scroll: obj_y += self._viewport._y
         
         for obj in self._objects:

@@ -10,6 +10,10 @@ from ..ui import UIObject, Theme
 from ..flag import StyleClass
 
 
+class ViewPort:
+    pass
+
+
 class Cell(Margin, Size, UIObject):
     """..."""
     def __init__(
@@ -98,11 +102,14 @@ class Cell(Margin, Size, UIObject):
         self._style_class = style_class
         self._style = theme
     
-    def _hit_test(self, x: int, y: int) -> UIObject | None:
+    def _hit_test(
+            self, x: int, y: int, viewport: ViewPort = None
+            ) -> UIObject | None:
+        
         if not self.visible:
             return None
 
-        if self._rect_contains(self, x, y):
+        if self._rect_contains(self, x, y, viewport):
             return self
         
         return None

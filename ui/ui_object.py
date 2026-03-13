@@ -4,6 +4,10 @@ from ..flag import State
 from ..mixin import Core
 
 
+class ViewPort:
+    pass
+
+
 class UIObject(Core):
     """..."""
     def __init__(self, *args, **kwargs) -> None:
@@ -58,9 +62,20 @@ class UIObject(Core):
         """..."""
         return self._dragging
     
-    def _rect_contains(self, obj: UIObject, x: int, y: int) -> bool:
+    def _rect_contains(
+            self, obj: UIObject, x: int, y: int, viewport: ViewPort = None
+            ) -> bool:
         obj_x, obj_y = int(obj._x), int(obj._y)
         obj_w, obj_h = int(obj.width), int(obj.height)
+        
+        if viewport:
+            vp_x, vp_y = int(viewport._parent._x), int(viewport._parent._y)
+            vp_w, vp_h = int(viewport.width), int(viewport.height)
+        
+            if not (vp_x <= x.value <= vp_x + vp_w and
+                vp_y <= y.value <= vp_y + vp_h):
+                return False
+        
         if (obj_x <= x.value <= obj_x + obj_w and
                 obj_y <= y.value <= obj_y + obj_h):
             return True

@@ -14,8 +14,11 @@ class ViewPort(object):
         self._x = self._parent._x
         self._y = self._parent._y
 
+        self._init_x = self._parent._x
+        self._init_y = self._parent._y
+
         self.width = 300
-        self.height = 200
+        self.height = 100
 
     def roll_up(self, auto: bool = True, step: int = 20) -> None:
         if self._parent:
@@ -70,7 +73,8 @@ class Layout(UIObject):
                 continue
 
             if isinstance(obj, Cell):
-                hit_obj = obj._hit_test(x, y)
+                view = obj._parent._viewport if obj.parent._scroll else None
+                hit_obj = obj._hit_test(x, y, view)
                 if hit_obj:
                     return hit_obj
         
@@ -121,7 +125,7 @@ class Layout(UIObject):
 
             if isinstance(obj, Layout):
                 if obj._scroll:
-                    self._drawer.clip_start(obj)
+                    self._drawer.clip_start(obj, self._viewport)
                     if self._app and self._app._view_layout:
                         obj._draw(mode)
                     obj._redraw(mode)
