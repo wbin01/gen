@@ -8,10 +8,34 @@ from ..cell import Cell
 from ..ui import UIObject
 
 
+class ViewPort(object):
+    def __init__(self, parent) -> None:
+        self._parent = parent
+        self._x = self._parent._x
+        self._y = self._parent._y
+
+        self.width = 300
+        self.height = 200
+
+    def roll_up(self, auto: bool = True, step: int = 20) -> None:
+        if self._parent:
+            # self._parent._draw_viewport(obj)
+            self._parent._draw('REBUILD')
+
+            self._y -= step
+            for obj in self._parent._objects:
+                obj._y -= 20
+                obj._invalidate()
+                obj._draw('POSITION')
+            
+            # self._parent._app._render_mode = 'REBUILD'
+            # self._parent._app._render_update = True
+            self._parent._invalidate()
+            # self._parent._draw_viewport()
+
+
 class Layout(UIObject):
     """Organizes the positioning of the elements."""
-    _instances = 0
-
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self._base_class = 'Layout'
@@ -19,18 +43,25 @@ class Layout(UIObject):
         self._drawer = None
         self._first_redraw = True
         self._queue = []
+
+        self._x = 0
+        self._y = 0
         self._scroll = None
-    
+        self._viewport = ViewPort(self)
+
     def _update(self) -> None:
         pass
     
-    @classmethod
-    def _reg_instances(cls) -> None:
-        cls._instances += 1
-    
-    @classmethod
-    def _get_instances(cls) -> int:
-        return cls._instances
+    def _draw_viewport(self, obj: Layout = None) -> None:
+        if obj:
+            sdl3.SDL_RenderClipEnabled(self._app._drawer._renderer)
+            clip = sdl3.SDL_Rect(obj._x, obj._y, 500, 200)
+            sdl3.SDL_SetRenderClipRect(
+                self._app._drawer._renderer, ctypes.byref(clip))
+            return
+        
+        sdl3.SDL_SetRenderClipRect(
+            self._app._drawer._renderer, ctypes.POINTER(sdl3.SDL_Rect)())
     
     def _hit_test(self, x: int, y: int) -> UIObject | None:
         if not self.visible:
@@ -45,7 +76,7 @@ class Layout(UIObject):
                 if hit_obj: return hit_obj
                 continue
 
-            if isinstance(obj, Cell):  # or isinstance(obj, Layout):
+            if isinstance(obj, Cell):
                 hit_obj = obj._hit_test(x, y)
                 if hit_obj:
                     return hit_obj
@@ -97,11 +128,11 @@ class Layout(UIObject):
 
             if isinstance(obj, Layout):
                 if obj._scroll:
-                    self._viewport(obj)
+                    self._draw_viewport(obj)
                     if self._app and self._app._view_layout:
                         obj._draw(mode)
                     obj._redraw(mode)
-                    self._viewport()
+                    self._draw_viewport()
                 else:
                     if self._app and self._app._view_layout:
                         obj._draw(mode)
@@ -112,50 +143,16 @@ class Layout(UIObject):
 
         self._dirty = False
     
-    def _viewport(self, obj: Layout = None) -> None:
-        if obj:
-            sdl3.SDL_RenderClipEnabled(self._app._drawer._renderer)
-            clip = sdl3.SDL_Rect(obj._x, obj._y, 500, 200)
-            sdl3.SDL_SetRenderClipRect(
-                self._app._drawer._renderer, ctypes.byref(clip))
-            return
-        
-        sdl3.SDL_SetRenderClipRect(
-            self._app._drawer._renderer, ctypes.POINTER(sdl3.SDL_Rect)())
-    
     def _redraw_queue(
             self, queue_list: list, budget_ms: float = 3.0) -> None:
-        
         if not queue_list:
             return
         
         start = time.perf_counter()
         while queue_list:
             obj = queue_list.pop(0)
-
-            # if not obj.visible: continue
-            # if not obj._dirty: continue
-
             obj._draw('REBUILD')
-            # obj._dirty = False
-
             if (time.perf_counter() - start) * 50 > budget_ms:
                 break
         
         return True if not queue_list else False
-    
-    def _roll(self):
-        if self._scroll:
-            # self._viewport(obj)
-            self._draw('REBUILD')
-
-            self._scroll_y -= 20
-            for obj in self._scroll._objects:
-                obj._y -= 20
-                obj._invalidate()
-                obj._draw('POSITION')
-            
-            # self._app._render_mode = 'REBUILD'
-            # self._app._render_update = True
-            self._scroll._invalidate()
-            # self._viewport()
