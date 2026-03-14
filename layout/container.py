@@ -176,20 +176,20 @@ class Container(Margin, Size, Add, Layout):
             self._update_align(self)
             self._update_fill(self)
         
-        obj_x, obj_y = self._x, self._y  # Reset
-        if self._scroll: obj_y += self._viewport._y
+        x, y = self._x, self._y  # Reset
+        if self._scroll: y += self._viewport._y
         
         for obj in self._objects:
             if not obj.visible: continue
             if not obj._dirty: continue
 
-            obj._x = obj_x + obj.margin[3]  # Set current position
-            obj._y = obj_y + obj.margin[0]
+            obj._x = x + obj.margin[3]  # Set current position
+            obj._y = y + obj.margin[0]
 
             if self._orientation == 'VERTICAL':  # Prepare next position
-                obj_y += obj.height + obj._margin_y + self._spacing
+                y += obj.height + obj._margin_y + self._spacing
             elif self._orientation == 'HORIZONTAL':
-                obj_x += obj.width + obj._margin_x + self._spacing
+                x += obj.width + obj._margin_x + self._spacing
             
             if isinstance(obj, Layout):  #  Repeat for all
                 obj._update()

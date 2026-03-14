@@ -43,32 +43,45 @@ class ViewPort(object):
     
     def roll_down(self, auto: bool = True, step: int = 20) -> None:
         if self._parent:
-            if self._parent._objects[0]._y <= self._parent._y - step:
-                self._parent._draw('REBUILD')
+            layout = self._get_layout()
+        
+            if layout._objects[0]._y <= layout._y - step:
+                layout._draw('REBUILD')
                 
                 self._y += step
-                for obj in self._parent._objects:
+                for obj in layout._objects:
                     obj._y += 20
                     obj._invalidate()
                     obj._draw('POSITION')
                 
-                self._parent._invalidate()
+                layout._invalidate()
 
     def roll_up(self, auto: bool = True, step: int = 20) -> None:
         if self._parent:
-            obj = self._parent._objects[-1]
-            if obj._y + obj._height > self._parent._y + self.height:
-                self._parent._draw('REBUILD')
+            layout = self._get_layout()
+
+            last_obj = layout._objects[-1]
+            if last_obj._y + last_obj._height > layout._y + self.height:
+                layout._draw('REBUILD')
 
                 self._y -= step
-                for obj in self._parent._objects:
+                # for obj in self._parent._objects:
+                for obj in layout._objects:
                     obj._y -= 20
                     obj._invalidate()
                     obj._draw('POSITION')
                 
                 # self._parent._app._render_mode = 'REBUILD'
                 # self._parent._app._render_update = True
-                self._parent._invalidate()
+                layout._invalidate()
+    
+    def _get_layout(self) -> Layout:
+        layout = self._parent
+        if not isinstance(self._parent.parent, Layout):
+            for obj in self._parent._objects:
+                if hasattr(obj, '_scroll') and obj._scroll:
+                    layout = obj
+        return layout
 
 
 class Layout(UIObject):
