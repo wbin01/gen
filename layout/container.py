@@ -315,6 +315,9 @@ class Container(Margin, Size, Add, Layout):
             
             if layout._height < min_height:
                 layout._height = min_height
+            
+            if layout._scroll:
+                layout._height = layout._base_height
         
         elif layout._orientation == 'HORIZONTAL':
             # Height
@@ -419,6 +422,9 @@ class Container(Margin, Size, Add, Layout):
                     if num != last: h += layout.spacing
                     layout._height += h
                     layout._base_height += h
+
+                if layout._scroll:
+                    layout._base_height = layout._viewport._height
 
             elif layout._orientation == 'HORIZONTAL':
                 if layout.fill in (Fill.X, Fill.XY):

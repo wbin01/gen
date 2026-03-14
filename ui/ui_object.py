@@ -69,12 +69,8 @@ class UIObject(Core):
         obj_w, obj_h = int(obj.width), int(obj.height)
         
         if viewport:
-            mg = viewport._parent.margin
-            vp_x = int(viewport._parent._x)#  - mg[3]
-            vp_y = int(viewport._parent._y)#  - mg[0]
-            vp_w = int(viewport.width)#  + mg[3] + mg[1]
-            vp_h = int(viewport.height)#  + mg[0] + mg[2]
-            print(f'{vp_x}x{vp_y} {vp_w}x{vp_h}')
+            vp_x, vp_y = int(viewport._parent._x), int(viewport._parent._y)
+            vp_w, vp_h = int(viewport.width), int(viewport.height)
         
             if not (vp_x <= x.value <= vp_x + vp_w and
                 vp_y <= y.value <= vp_y + vp_h):
