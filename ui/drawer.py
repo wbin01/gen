@@ -53,6 +53,8 @@ class Drawer(object):
         if elided:
             if w > total_width: w = total_width
         
+        if h < 1: h = 1
+        if w < 1: w = 1
         img = Image.new('RGBA', (w, h), (0, 0, 0, 0))
         draw = ImageDraw.Draw(img)
 
@@ -87,12 +89,17 @@ class Drawer(object):
             self, x: int, y: int, w: int, h: int,
             color=(0, 0, 0, 255), r: int = 8, aa: int = 1) -> None:
         """..."""
+        if h < 1: h = 1
+        if w < 1: w = 1
         if self._visual_level >= 1:
             self._rounded_rect_antialiasing(x, y, w, h, color, r)
         else:
             self._rounded_rect(x, y, w, h, color, r)
     
     def texture(self, texture, w, h, draw, state = None) -> None:
+        if h < 1: h = 1
+        if w < 1: w = 1
+
         if texture: sdl3.SDL_DestroyTexture(texture)
 
         texture = sdl3.SDL_CreateTexture(
