@@ -173,9 +173,8 @@ class Layout(UIObject):
 
             if isinstance(obj, Layout):
                 if obj._scroll:
+                    obj._draw(mode)
                     self._drawer.clip_start(obj, self._viewport)
-                    if self._app and self._app._view_layout:
-                        obj._draw(mode)
                     obj._redraw(mode)
                     self._drawer.clip_end()
                 else:

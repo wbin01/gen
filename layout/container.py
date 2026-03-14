@@ -148,15 +148,16 @@ class Container(Margin, Size, Add, Layout):
             (color[0], color[1], color[2], 255), Theme.Frame['BASE']['radius'])
         
     def _draw(self, mode: str = None) -> None:
-        if not self._first and mode == 'REBUILD' or self._scroll:
+        if self._scroll or not self._first and mode == 'REBUILD':
             bd = self.style['BASE']['border']
+            bd_color = self.style['BASE']['border-color']
+            if not self._scroll: bd_color = Theme.Frame['BASE']['accent-color']
 
             self._drawer.rect(
                 self._x - self.margin[3], self._y - self.margin[0],
                 self.width + self.margin[3] + self.margin[1],
                 self.height + self.margin[0] + self.margin[2],
-                Theme.Frame['BASE']['accent-color'],
-                self.style['BASE']['radius'])
+                bd_color, self.style['BASE']['radius'])
             
             self._drawer.rect(
                 self._x - self.margin[3] + bd, self._y - self.margin[0] + bd,

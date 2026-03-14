@@ -122,6 +122,7 @@ class Frame(UIObject):
         self._input = None
         self._focus = None
         self._default = None
+        self._scroll = None
     
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}()'
@@ -569,16 +570,20 @@ class Frame(UIObject):
         
         elif event.type == sdl3.SDL_EVENT_MOUSE_WHEEL:
             obj = self._container._hit_test(mx, my)
+            
+            scroll = None
             if hasattr(obj, '_scroll'):
                 scroll = obj
             elif hasattr(obj._parent, '_scroll'):
                 scroll = obj._parent
+            self._scroll = scroll
             
-            if event.wheel.y > 0:
-                scroll.viewport.roll_down()
+            if self._scroll:
+                if event.wheel.y > 0:
+                    self._scroll.viewport.roll_down()
 
-            elif event.wheel.y < 0:
-                scroll.viewport.roll_up()
+                elif event.wheel.y < 0:
+                    self._scroll.viewport.roll_up()
     
     def _render(self) -> None:
         self._render_update = False
