@@ -148,20 +148,22 @@ class Container(Margin, Size, Add, Layout):
             (color[0], color[1], color[2], 255), Theme.Frame['BASE']['radius'])
         
     def _draw(self, mode: str = None) -> None:
-        if not self._first and mode == 'REBUILD':
+        if not self._first and mode == 'REBUILD' or self._scroll:
+            bd = self.style['BASE']['border']
+
             self._drawer.rect(
                 self._x - self.margin[3], self._y - self.margin[0],
                 self.width + self.margin[3] + self.margin[1],
                 self.height + self.margin[0] + self.margin[2],
                 Theme.Frame['BASE']['accent-color'],
-                Theme.Frame['BASE']['radius'])
+                self.style['BASE']['radius'])
             
             self._drawer.rect(
-                self._x - self.margin[3] + 1, self._y - self.margin[0] + 1,
-                self.width + self.margin[3] + self.margin[1] - 2,
-                self.height + self.margin[0] + self.margin[2] - 2,
-                Theme.Frame['BASE']['background-color'],
-                Theme.Frame['BASE']['radius'])
+                self._x - self.margin[3] + bd, self._y - self.margin[0] + bd,
+                self.width + self.margin[3] + self.margin[1] - (bd * 2),
+                self.height + self.margin[0] + self.margin[2] - (bd * 2),
+                self.style['BASE']['background-color'],
+                self.style['BASE']['radius'])
     
     def _update(self, mode: str = 'REBUILD') -> None:
         # Updates the width, fill, alignment, and position of cells.

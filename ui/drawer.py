@@ -27,8 +27,10 @@ class Drawer(object):
         sdl3.SDL_RenderTexture(self._renderer, texture, None, dest)
     
     def clip_start(self, obj, viewport) -> None:
+        x = obj._x - obj._margin[1]
+        y = obj._y - obj._margin[0]
         sdl3.SDL_RenderClipEnabled(self._renderer)
-        clip = sdl3.SDL_Rect(obj._x, obj._y, viewport.width, viewport.height)
+        clip = sdl3.SDL_Rect(x, y, viewport.width, viewport.height)
         sdl3.SDL_SetRenderClipRect(self._renderer, ctypes.byref(clip))
 
     def clip_end(self) -> None:

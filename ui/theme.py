@@ -15,6 +15,15 @@ class Theme:
             },
         }
     
+    Layout = {
+        'BASE': {
+            'background-color': (20, 20, 20, 240),
+            'border': 1,
+            'border-color': (55, 55, 55, 200),
+            'radius': 8,
+            },
+        }
+    
     Button = {
         'BASE': {
             'font-color': (200, 200, 200, 255),

@@ -1,16 +1,18 @@
 #!/usr/bin/env python3
-import time
+import copy
 import ctypes
+import time
 
 import sdl3
 
 from ..cell import Cell
-from ..ui import UIObject
+from ..ui import UIObject, Theme
 
 
 class ViewPort(object):
-    def __init__(self, parent) -> None:
+    def __init__(self, parent, fill: str = 'X') -> None:
         self._parent = parent
+        self._fill = fill
         self._x = self._parent._x
         self._y = self._parent._y
         self._width = 300
@@ -19,6 +21,8 @@ class ViewPort(object):
     @property
     def height(self) -> int:
         """..."""
+        if self._fill == 'Y':
+            return self._parent._height
         return self._height
     
     @height.setter
@@ -28,6 +32,9 @@ class ViewPort(object):
     @property
     def width(self) -> int:
         """..."""
+        if self._fill == 'X':
+            return self._parent._width
+        
         return self._width
     
     @width.setter
@@ -78,6 +85,7 @@ class Layout(UIObject):
         self._y = 0
         self._scroll = scroll
         self._viewport = ViewPort(self)
+        self.style = copy.deepcopy(Theme.Layout)
     
     @property
     def viewport(self) -> ViewPort:
