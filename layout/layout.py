@@ -13,28 +13,55 @@ class ViewPort(object):
         self._parent = parent
         self._x = self._parent._x
         self._y = self._parent._y
-
-        self._init_x = self._parent._x
-        self._init_y = self._parent._y
-
-        self.width = 300
-        self.height = 100
+        self._width = 300
+        self._height = 200
+    
+    @property
+    def height(self) -> int:
+        """..."""
+        return self._height
+    
+    @height.setter
+    def height(self, height: int) -> None:
+        self._height = height
+    
+    @property
+    def width(self) -> int:
+        """..."""
+        return self._width
+    
+    @width.setter
+    def width(self, width: int) -> None:
+        self._width = width
+    
+    def roll_down(self, auto: bool = True, step: int = 20) -> None:
+        if self._parent:
+            if self._parent._objects[0]._y <= self._parent._y - step:
+                self._parent._draw('REBUILD')
+                
+                self._y += step
+                for obj in self._parent._objects:
+                    obj._y += 20
+                    obj._invalidate()
+                    obj._draw('POSITION')
+                
+                self._parent._invalidate()
 
     def roll_up(self, auto: bool = True, step: int = 20) -> None:
         if self._parent:
-            # self._parent._drawer.clip_start(obj)
-            self._parent._draw('REBUILD')
+            obj = self._parent._objects[-1]
+            if obj._y + obj._height > self._parent._y + self.height:
+                self._parent._draw('REBUILD')
 
-            self._y -= step
-            for obj in self._parent._objects:
-                obj._y -= 20
-                obj._invalidate()
-                obj._draw('POSITION')
-            
-            # self._parent._app._render_mode = 'REBUILD'
-            # self._parent._app._render_update = True
-            self._parent._invalidate()
-            # self._parent._drawer.clip_end()
+                self._y -= step
+                for obj in self._parent._objects:
+                    obj._y -= 20
+                    obj._invalidate()
+                    obj._draw('POSITION')
+                
+                # self._parent._app._render_mode = 'REBUILD'
+                # self._parent._app._render_update = True
+                self._parent._invalidate()
 
 
 class Layout(UIObject):

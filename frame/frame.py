@@ -566,6 +566,19 @@ class Frame(UIObject):
 
             if not shift:
                 if self._input: self._input._anchor = None
+        
+        elif event.type == sdl3.SDL_EVENT_MOUSE_WHEEL:
+            obj = self._container._hit_test(mx, my)
+            if hasattr(obj, '_scroll'):
+                scroll = obj
+            elif hasattr(obj._parent, '_scroll'):
+                scroll = obj._parent
+            
+            if event.wheel.y > 0:
+                scroll.viewport.roll_down()
+
+            elif event.wheel.y < 0:
+                scroll.viewport.roll_up()
     
     def _render(self) -> None:
         self._render_update = False
