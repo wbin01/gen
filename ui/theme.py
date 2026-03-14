@@ -17,9 +17,9 @@ class Theme:
     
     Layout = {
         'BASE': {
-            'background-color': (20, 20, 20, 240),
+            'background-color': (0, 0, 0, 240),
             'border': 1,
-            'border-color': (55, 55, 55, 200),
+            'border-color': (255, 255, 255, 255),
             'radius': 8,
             },
         }
