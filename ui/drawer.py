@@ -151,7 +151,7 @@ class Drawer(object):
             bottom_right: int = None, bottom_left: int = None):
 
         tl = tr = br = bl = r
-        rmax = min(w // 2, h // 2)
+        rmax = min(w / 2, h / 2)
         tl = min(tl, rmax)
         tr = min(tr, rmax)
         br = min(br, rmax)
@@ -187,11 +187,11 @@ class Drawer(object):
             color=(0, 0, 0, 255), r: int = 8, aa: int = 1) -> None:
 
         w, h = int(w), int(h)
-        r = min(r, (w - 1)//2, (h - 1)//2)
+        r = min(r, (w - 1)/2, (h - 1)/2)
         if (w - 2*r) % 2 != 0: w -= 1
 
         cr, cg, cb, ca = color
-        r = min(r, w // 2, h // 2)
+        r = min(r, w / 2, h / 2)
         sdl3.SDL_SetRenderDrawColor(self._renderer, cr, cg, cb, ca)
 
         # Body

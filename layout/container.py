@@ -179,20 +179,21 @@ class Container(Margin, Padding, Size, Add, Layout):
         
         x, y = self._x + self.padding[3], self._y + self.padding[0] # Reset
         if self._scroll: y += self._viewport._y
-        
+
         for obj in self._objects:
             if not obj.visible: continue
             if not obj._dirty: continue
 
-            obj._x = x + obj.margin[3]  # Set current position
+            obj._x = x + obj.margin[3]  # Current position
             obj._y = y + obj.margin[0]
 
-            if self._orientation == 'VERTICAL':  # Prepare next position
+            if self._orientation == 'VERTICAL':  # Next position
                 y += obj.height + obj._margin_y + self._spacing
             elif self._orientation == 'HORIZONTAL':
                 x += obj.width + obj._margin_x + self._spacing
             
-            if isinstance(obj, Layout):  #  Repeat for all
+            if isinstance(obj, Layout):
+                obj._y += 1
                 obj._update()
     
     def _update_align(self, layout) -> None:
@@ -246,7 +247,6 @@ class Container(Margin, Padding, Size, Add, Layout):
                 self._update_align(obj)
     
     def _update_fill(self, layout) -> None:
-        # Updates the fill of layouts and cells.
         if not layout._objects: return
         
         if layout._first:
@@ -265,7 +265,7 @@ class Container(Margin, Padding, Size, Add, Layout):
                 if not obj._dirty: continue
 
                 if obj.fill in (Fill.X, Fill.XY):
-                    obj._width = total_width - obj._margin_x ###### - layout._padding_x
+                    obj._width = total_width - obj._margin_x
                 
                 if isinstance(obj, Cell):
                     if obj._width < obj._min_width:
@@ -273,7 +273,7 @@ class Container(Margin, Padding, Size, Add, Layout):
                 
                 if isinstance(obj, Cell) and obj.fill in (Fill.Y, Fill.NONE):
                     if layout.base_align == Align.CENTER:
-                        dt = (total_width - obj.width) // 2
+                        dt = (total_width - obj.width) / 2
                         obj.margin = mg[0], dt, mg[2], dt
 
                     elif layout.base_align == Align.END:
@@ -333,7 +333,7 @@ class Container(Margin, Padding, Size, Add, Layout):
 
                 if isinstance(obj, Cell) and obj.fill in (Fill.X, Fill.NONE):
                     if layout.base_align == Align.CENTER:
-                        dt = (total_height - obj.height) // 2
+                        dt = (total_height - obj.height) / 2
                         obj.margin = dt, mg[1], dt, mg[3]
                     
                     elif layout.base_align == Align.END:
