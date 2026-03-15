@@ -10,9 +10,9 @@ from ..ui import UIObject, Theme
 
 
 class ViewPort(object):
-    def __init__(self, parent, fill: str = 'X') -> None:
+    def __init__(self, parent) -> None:
         self._parent = parent
-        self._fill = fill
+        self._fill = 'X' if parent._orientation == 'VERTICAL' else 'Y'
         self._x = self._parent._x
         self._y = self._parent._y
         self._width = 300
@@ -41,47 +41,28 @@ class ViewPort(object):
     def width(self, width: int) -> None:
         self._width = width
     
-    def roll_down(self, auto: bool = True, step: int = 20) -> None:
-        if self._parent:
-            layout = self._get_layout()
-        
-            if layout._objects[0]._y <= layout._y - step:
-                layout._draw('REBUILD')
-                
-                self._y += step
-                for obj in layout._objects:
-                    obj._y += 20
-                    obj._invalidate()
-                    obj._draw('POSITION')
-                
-                layout._invalidate()
+    def roll_down(self, layout: Layout = None, step: int = 20) -> None:
+        if not self._parent: return
+        if not self._parent._scroll: return
 
-    def roll_up(self, auto: bool = True, step: int = 20) -> None:
-        if self._parent:
-            layout = self._get_layout()
+        if self._parent._objects[0]._y <= self._parent._y - step:
+            # self._parent._draw('REBUILD')
+            self._y += step
+            self._parent._invalidate()
+            self._parent._app._render_mode = 'POSITION'
+            self._parent._app._render_update = True
 
-            last_obj = layout._objects[-1]
-            if last_obj._y + last_obj._height > layout._y + self.height:
-                layout._draw('REBUILD')
+    def roll_up(self, layout: Layout = None, step: int = 20) -> None:
+        if not self._parent: return
+        if not self._parent._scroll: return
 
-                self._y -= step
-                # for obj in self._parent._objects:
-                for obj in layout._objects:
-                    obj._y -= 20
-                    obj._invalidate()
-                    obj._draw('POSITION')
-                
-                # self._parent._app._render_mode = 'REBUILD'
-                # self._parent._app._render_update = True
-                layout._invalidate()
-    
-    def _get_layout(self) -> Layout:
-        layout = self._parent
-        if not isinstance(self._parent.parent, Layout):
-            for obj in self._parent._objects:
-                if hasattr(obj, '_scroll') and obj._scroll:
-                    layout = obj
-        return layout
+        last_obj = self._parent._objects[-1]
+        if last_obj._y + last_obj._height > self._parent._y + self.height:
+            # self._parent._draw('REBUILD')
+            self._y -= step
+            self._parent._invalidate()
+            self._parent._app._render_mode = 'POSITION'
+            self._parent._app._render_update = True
 
 
 class Layout(UIObject):
@@ -89,6 +70,7 @@ class Layout(UIObject):
     def __init__(self, scroll: bool = False, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self._base_class = 'Layout'
+        self._orientation = 'VERTICAL'
 
         self._drawer = None
         self._first_redraw = True

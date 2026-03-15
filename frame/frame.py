@@ -611,6 +611,13 @@ class Frame(UIObject):
                 self._queue_list = self._container._queue_list()
                 self._container._queue_list_clear()
 
+        if self._render_mode == 'POSITION':
+            sdl3.SDL_RenderTexture(
+                self._renderer , self._tt_frame, None, None)
+            self._container._invalidate()
+            self._container._update(self._render_mode)
+            self._container._redraw('POSITION')
+
         if not self._resizing and self._render_mode == 'UNIT':
             sdl3.SDL_RenderTexture(self._renderer, self._tt_frame, None, None)
 
