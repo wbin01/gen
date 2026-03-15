@@ -15,13 +15,13 @@ class ViewPort(object):
         self._fill = 'X' if parent._orientation == 'VERTICAL' else 'Y'
         self._x = self._parent._x
         self._y = self._parent._y
-        self._width = 300
+        self._width = 200
         self._height = 200
     
     @property
     def height(self) -> int:
         """..."""
-        if self._fill == 'Y':
+        if 'Y' in self._fill:
             return self._parent._height
         return self._height
     
@@ -32,7 +32,7 @@ class ViewPort(object):
     @property
     def width(self) -> int:
         """..."""
-        if self._fill == 'X':
+        if 'X' in self._fill:
             return self._parent._width
         
         return self._width

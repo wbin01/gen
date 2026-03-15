@@ -5,7 +5,7 @@ import ctypes
 import sdl3
 
 from ..flag import Fill
-from ..mixin import Margin, Size
+from ..mixin import Margin, Padding, Size
 from ..ui import UIObject, Theme
 from ..flag import StyleClass
 
@@ -14,7 +14,7 @@ class ViewPort:
     pass
 
 
-class Cell(Margin, Size, UIObject):
+class Cell(Margin, Padding, Size, UIObject):
     """..."""
     def __init__(
             self, style_class: str = None, fill: Fill = Fill.XY,

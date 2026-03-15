@@ -2,15 +2,16 @@
 from .layout import Layout
 from ..cell import Cell, ColExpander, RowExpander
 from ..flag import Align, Fill
-from ..mixin import Add, Margin, Size
+from ..mixin import Add, Margin, Padding, Size
 from ..ui import Theme
 
 
-class Container(Margin, Size, Add, Layout):
+class Container(Margin, Padding, Size, Add, Layout):
     """Organizes the positioning of the elements."""
     def __init__(
             self,
-            spacing: int = 0, margin: tuple | int = 0, fill: Fill = Fill.XY,
+            spacing: int = 0, fill: Fill = Fill.XY,
+            margin: tuple | int = 0, padding: tuple | int = 0,
             align: Align = Align.START, base_align: Align = Align.CENTER,
             width: int = None, height: int = None,
             *args, **kwargs) -> None:
@@ -49,6 +50,7 @@ class Container(Margin, Size, Add, Layout):
         if width: self.width = width
         if height: self.height = height
         self.margin = margin
+        self.padding = padding
         self._spacing = spacing
         self._align = align
         self._base_align = base_align
@@ -148,21 +150,19 @@ class Container(Margin, Size, Add, Layout):
             (color[0], color[1], color[2], 255), Theme.Frame['BASE']['radius'])
         
     def _draw(self, mode: str = None) -> None:
-        if self._scroll or not self._first and mode == 'REBUILD':
-            bd = self.style['BASE']['border']
+        # if self._scroll or not self._first and mode == 'REBUILD':
+        if True:
             bd_color = self.style['BASE']['border-color']
             if not self._scroll: bd_color = Theme.Frame['BASE']['accent-color']
-
-            self._drawer.rect(
-                self._x - self.margin[3], self._y - self.margin[0],
-                self.width + self.margin[3] + self.margin[1],
-                self.height + self.margin[0] + self.margin[2],
-                bd_color, self.style['BASE']['radius'])
             
             self._drawer.rect(
-                self._x - self.margin[3] + bd, self._y - self.margin[0] + bd,
-                self.width + self.margin[3] + self.margin[1] - (bd * 2),
-                self.height + self.margin[0] + self.margin[2] - (bd * 2),
+                self._x, self._y, self.width, self.height,
+                bd_color, self.style['BASE']['radius'])
+            
+            bd = self.style['BASE']['border']
+            self._drawer.rect(
+                self._x + bd, self._y + bd,
+                self.width - (bd * 2), self.height - (bd * 2),
                 self.style['BASE']['background-color'],
                 self.style['BASE']['radius'])
     
@@ -260,11 +260,12 @@ class Container(Margin, Size, Add, Layout):
             # Width
             min_width = 0
             for obj in layout._objects:  # Fill: Width equal to the layout
+                mg, pd = obj.margin, obj.padding
                 if not obj.visible: continue
                 if not obj._dirty: continue
 
                 if obj.fill in (Fill.X, Fill.XY):
-                    obj._width = total_width - obj._margin_x
+                    obj._width = total_width - obj._margin_x # - layout._padding_x
                 
                 if isinstance(obj, Cell):
                     if obj._width < obj._min_width:
@@ -273,12 +274,11 @@ class Container(Margin, Size, Add, Layout):
                 if isinstance(obj, Cell) and obj.fill in (Fill.Y, Fill.NONE):
                     if layout.base_align == Align.CENTER:
                         dt = (total_width - obj.width) // 2
-                        obj.margin = obj.margin[0], dt, obj.margin[2], dt
+                        obj.margin = mg[0], dt, mg[2], dt
 
                     elif layout.base_align == Align.END:
                         dt = (total_width - obj.width)
-                        obj.margin = (
-                            obj.margin[0], obj.margin[1],obj.margin[2], dt)
+                        obj.margin = (mg[0], mg[1], mg[2], dt)
                 
                 if min_width < obj._width + obj._margin_x:
                     min_width = obj._width + obj._margin_x
@@ -323,6 +323,7 @@ class Container(Margin, Size, Add, Layout):
             # Height
             min_height = 0
             for obj in layout._objects:
+                mg, pd = obj.margin, obj.padding
                 if isinstance(obj, Cell) and not obj.visible: continue
 
                 if obj.fill in (Fill.Y, Fill.XY):
@@ -333,12 +334,11 @@ class Container(Margin, Size, Add, Layout):
                 if isinstance(obj, Cell) and obj.fill in (Fill.X, Fill.NONE):
                     if layout.base_align == Align.CENTER:
                         dt = (total_height - obj.height) // 2
-                        obj.margin = dt, obj.margin[1], dt, obj.margin[3]
+                        obj.margin = dt, mg[1], dt, mg[3]
                     
                     elif layout.base_align == Align.END:
                         dt = (total_height - obj.height)
-                        obj.margin = (
-                            dt, obj.margin[1], obj.margin[2],obj.margin[3])
+                        obj.margin = (dt, mg[1], mg[2], mg[3])
                 
                 if isinstance(obj, Cell):
                     if min_height < obj.height + obj._margin_y:
