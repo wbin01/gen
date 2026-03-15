@@ -33,7 +33,8 @@ class Drawer(object):
 
         sdl3.SDL_RenderClipEnabled(self._renderer)
         clip = sdl3.SDL_Rect(
-            obj._x, obj._y, viewport.width - mx, viewport.height - my)
+            obj._x, obj._y + obj.padding[0],
+            viewport.width - mx, viewport.height - my)
         sdl3.SDL_SetRenderClipRect(self._renderer, ctypes.byref(clip))
 
     def clip_end(self) -> None:

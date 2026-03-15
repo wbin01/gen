@@ -177,7 +177,7 @@ class Container(Margin, Padding, Size, Add, Layout):
             self._update_align(self)
             self._update_fill(self)
         
-        x, y = self._x, self._y  # Reset
+        x, y = self._x + self.padding[3], self._y + self.padding[0] # Reset
         if self._scroll: y += self._viewport._y
         
         for obj in self._objects:
@@ -195,7 +195,7 @@ class Container(Margin, Padding, Size, Add, Layout):
             if isinstance(obj, Layout):  #  Repeat for all
                 obj._update()
     
-    def _update_align(self, layout: Box) -> None:
+    def _update_align(self, layout) -> None:
         if not layout._objects: return
         
         if layout._orientation == 'VERTICAL':
@@ -245,7 +245,7 @@ class Container(Margin, Padding, Size, Add, Layout):
             if isinstance(obj, Layout):
                 self._update_align(obj)
     
-    def _update_fill(self, layout: Box) -> None:
+    def _update_fill(self, layout) -> None:
         # Updates the fill of layouts and cells.
         if not layout._objects: return
         
@@ -253,7 +253,7 @@ class Container(Margin, Padding, Size, Add, Layout):
             layout._width = layout._parent.width
             layout._height = layout._parent.height
         
-        total_width = layout.width
+        total_width = layout.width - layout._padding_x
         total_height = layout.height
 
         if layout._orientation == 'VERTICAL':
@@ -265,7 +265,7 @@ class Container(Margin, Padding, Size, Add, Layout):
                 if not obj._dirty: continue
 
                 if obj.fill in (Fill.X, Fill.XY):
-                    obj._width = total_width - obj._margin_x # - layout._padding_x
+                    obj._width = total_width - obj._margin_x ###### - layout._padding_x
                 
                 if isinstance(obj, Cell):
                     if obj._width < obj._min_width:
@@ -356,7 +356,6 @@ class Container(Margin, Padding, Size, Add, Layout):
 
                 if obj._width < obj._min_width:
                     obj._width = obj._min_width
-                    print(obj._min_width)
 
                 if obj.fill.value in (Fill.NONE, Fill.Y):  # Fixed width
                     obj._width = obj._base_width
@@ -385,8 +384,10 @@ class Container(Margin, Padding, Size, Add, Layout):
         for obj in layout._objects:
             if isinstance(obj, Layout):
                 self._update_fill(obj)
+        
+        layout._height += layout._padding_y
 
-    def _update_size(self, layout: Box) -> None:
+    def _update_size(self, layout) -> None:
         # Make sure the layout size are compatible with the number 
         # of stacked cells.
         if not layout._objects:

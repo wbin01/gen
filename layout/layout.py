@@ -45,7 +45,7 @@ class ViewPort(object):
         if not self._parent: return
         if not self._parent._scroll: return
 
-        if self._parent._objects[0]._y <= self._parent._y - step:
+        if self._parent._objects[0]._y < self._parent._y:
             # self._parent._draw('REBUILD')
             self._y += step
             self._parent._invalidate()
@@ -57,7 +57,7 @@ class ViewPort(object):
         if not self._parent._scroll: return
 
         last_obj = self._parent._objects[-1]
-        if last_obj._y + last_obj._height > self._parent._y + self.height:
+        if last_obj._y + last_obj._height >= self._parent._y + self.height:
             # self._parent._draw('REBUILD')
             self._y -= step
             self._parent._invalidate()
