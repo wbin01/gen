@@ -438,6 +438,7 @@ class Frame(UIObject):
                         self._render_update = True
                     
                     if self._input: self._input._selecting = False
+                    if self._scrollable: self._scrollable.scroll._offset = None
             
             elif event.button.button == sdl3.SDL_BUTTON_RIGHT:
                 item = self._container._hit_test(mx, my)
