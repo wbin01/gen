@@ -46,7 +46,6 @@ class ViewPort(object):
         if not self._parent._scroll: return
 
         if self._parent._objects[0]._y < self._parent._y:
-            # self._parent._draw('REBUILD')
             self._y += step
             self._parent._invalidate()
             self._parent._app._render_mode = 'POSITION'
@@ -58,14 +57,21 @@ class ViewPort(object):
 
         last_obj = self._parent._objects[-1]
         if last_obj._y + last_obj._height >= self._parent._y + self.height:
-            # self._parent._draw('REBUILD')
             self._y -= step
             self._parent._invalidate()
             self._parent._app._render_mode = 'POSITION'
             self._parent._app._render_update = True
     
     def _dragging(self, mx, my) -> None:
-        print(f"SCROLL DRAG {mx}X{my}")
+        size = 10
+        mx, my = int(mx.value), int(my.value)
+        w = self._parent._x + self.width
+        h = self._parent._y + self.height + self._parent._padding_y
+        
+        if h - size < my < h and self._parent._x < mx < w:
+            print(f'H_BAR {mx}X{my}')
+        elif w - size < mx < w and self._parent._y < my < h:
+            print(f'V_BAR {mx}X{my}')
 
 
 class Layout(UIObject):
