@@ -71,6 +71,7 @@ class UIObject(Core):
         if viewport:
             vp_x, vp_y = int(viewport._parent._x), int(viewport._parent._y)
             vp_w, vp_h = int(viewport.width), int(viewport.height)
+            vp_y += + int(viewport._parent.padding[0])
         
             if not (vp_x <= x.value <= vp_x + vp_w and
                 vp_y <= y.value <= vp_y + vp_h):

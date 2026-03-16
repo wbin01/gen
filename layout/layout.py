@@ -63,6 +63,9 @@ class ViewPort(object):
             self._parent._invalidate()
             self._parent._app._render_mode = 'POSITION'
             self._parent._app._render_update = True
+    
+    def _dragging(self, mx, my) -> None:
+        print(f"SCROLL DRAG {mx}X{my}")
 
 
 class Layout(UIObject):

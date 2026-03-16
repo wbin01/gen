@@ -9,7 +9,7 @@ import sdl3
 
 from ..cell import Input
 from ..flag import ResizeArea, Cursor, StyleClass
-from ..layout import Col
+from ..layout import Layout, Col
 from ..ui import UIObject, Drawer, Theme
 
 
@@ -480,6 +480,11 @@ class Frame(UIObject):
                 
                 if isinstance(self._hovered, Input):
                     self._cursor_update_shape('BEAM')
+
+                elif isinstance(self._hovered, Layout):
+                    if self._hovered._scroll:
+                        if self._hovered._state.value == 'PRESSED':
+                            self._hovered.viewport._dragging(mx, my)
         
         elif event.type == sdl3.SDL_EVENT_TEXT_INPUT:
             if self._input:
