@@ -122,7 +122,7 @@ class Frame(UIObject):
         self._input = None
         self._focus = None
         self._default = None
-        self._scroll = None
+        self._scrollable = None
     
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}()'
@@ -482,11 +482,11 @@ class Frame(UIObject):
                     self._cursor_update_shape('BEAM')
 
                 elif isinstance(self._hovered, Layout):
-                    if self._hovered._scroll:
-                        self._hovered.viewport._hovering(mx, my)
+                    if self._hovered._scrollable:
+                        self._hovered.scroll._hovering(mx, my)
                         
                         if self._hovered._state.value == 'PRESSED':
-                            self._hovered.viewport._dragging(mx, my)
+                            self._hovered.scroll._dragging(mx, my)
         
         elif event.type == sdl3.SDL_EVENT_TEXT_INPUT:
             if self._input:
@@ -579,18 +579,18 @@ class Frame(UIObject):
             obj = self._container._hit_test(mx, my)
             
             scroll = None
-            if hasattr(obj, '_scroll'):
+            if hasattr(obj, '_scrollable'):
                 scroll = obj
-            elif hasattr(obj._parent, '_scroll'):
+            elif hasattr(obj._parent, '_scrollable'):
                 scroll = obj._parent
-            self._scroll = scroll
+            self._scrollable = scroll
             
-            if self._scroll:
+            if self._scrollable:
                 if event.wheel.y > 0:
-                    self._scroll.viewport.roll_down()
+                    self._scrollable.scroll._roll_down()
 
                 elif event.wheel.y < 0:
-                    self._scroll.viewport.roll_up()
+                    self._scrollable.scroll._roll_up()
     
     def _render(self) -> None:
         self._render_update = False

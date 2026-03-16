@@ -9,12 +9,12 @@ from ..cell import Cell
 from ..ui import UIObject, Theme
 
 
-class ViewPort(object):
+class Scroll(object):
     def __init__(self, parent) -> None:
         self._parent = parent
         self._fill = 'X' if parent._orientation == 'VERTICAL' else 'Y'
-        self._x = self._parent._x
-        self._y = self._parent._y
+        self._control_x = self._parent._x
+        self._control_y = self._parent._y
         self._width = 200
         self._height = 200
         self._hbar_rect = None
@@ -43,28 +43,36 @@ class ViewPort(object):
     def width(self, width: int) -> None:
         self._width = width
     
-    def roll_down(self, layout: Layout = None, step: int = 20) -> None:
+    @property
+    def x(self) -> int:
+        return self._parent._x
+    
+    @property
+    def y(self) -> int:
+        return self._parent._y
+    
+    def _roll_down(self, layout: Layout = None, step: int = 20) -> None:
         if not self._parent: return
-        if not self._parent._scroll: return
+        if not self._parent._scrollable: return
 
         if self._parent._objects[0]._y < self._parent._y:
-            self._y += step
+            self._control_y += step
             self._parent._invalidate()
             self._parent._app._render_mode = 'POSITION'
             self._parent._app._render_update = True
 
-    def roll_up(self, layout: Layout = None, step: int = 20) -> None:
+    def _roll_up(self, layout: Layout = None, step: int = 20) -> None:
         if not self._parent: return
-        if not self._parent._scroll: return
+        if not self._parent._scrollable: return
 
         last_obj = self._parent._objects[-1]
         if last_obj._y + last_obj._height >= self._parent._y + self.height:
-            self._y -= step
+            self._control_y -= step
             self._parent._invalidate()
             self._parent._app._render_mode = 'POSITION'
             self._parent._app._render_update = True
     
-    def _bar_area(self, mx, my) -> str | None:
+    def _bar_area(self, mx, my) -> tuple | None:
         w = self._parent._x + self.width
         h = self._parent._y + self.height + self._parent._padding_y
         
@@ -82,6 +90,8 @@ class ViewPort(object):
         
         elif w - self._bar_thickness < mx < w and self._parent._y < my < h:
             return ('V', self._vbar_rect)
+        
+        return None
 
     def _hovering(self, mx, my) -> None:
         bar = self._bar_area(mx, my)
@@ -94,7 +104,7 @@ class ViewPort(object):
 
 class Layout(UIObject):
     """Organizes the positioning of the elements."""
-    def __init__(self, scroll: bool = False, *args, **kwargs) -> None:
+    def __init__(self, scrollable: bool = False, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self._base_class = 'Layout'
         self._orientation = 'VERTICAL'
@@ -105,13 +115,13 @@ class Layout(UIObject):
 
         self._x = 0
         self._y = 0
-        self._scroll = scroll
-        self._viewport = ViewPort(self)
+        self._scrollable = scrollable
+        self._scroll = Scroll(self)
         self.style = copy.deepcopy(Theme.Layout)
     
     @property
-    def viewport(self) -> ViewPort:
-        return self._viewport
+    def scroll(self) -> Scroll:
+        return self._scroll
 
     def _update(self) -> None:
         pass
@@ -130,7 +140,7 @@ class Layout(UIObject):
                 continue
 
             if isinstance(obj, Cell):
-                view = obj._parent._viewport if obj.parent._scroll else None
+                view = obj._parent._scroll if obj.parent._scrollable else None
                 hit_obj = obj._hit_test(x, y, view)
                 if hit_obj:
                     return hit_obj
@@ -181,9 +191,9 @@ class Layout(UIObject):
         for obj in self._objects:
 
             if isinstance(obj, Layout):
-                if obj._scroll:
+                if obj._scrollable:
                     obj._draw(mode)
-                    self._drawer.clip_start(obj, self._viewport)
+                    self._drawer.clip_start(obj, obj._scroll)
                     obj._redraw(mode)
                     self._drawer.clip_end()
                 else:
