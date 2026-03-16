@@ -17,6 +17,8 @@ class ViewPort(object):
         self._y = self._parent._y
         self._width = 200
         self._height = 200
+        self._bar_size = 10
+        self._is_dragging = False
     
     @property
     def height(self) -> int:
@@ -62,17 +64,23 @@ class ViewPort(object):
             self._parent._app._render_mode = 'POSITION'
             self._parent._app._render_update = True
     
-    def _dragging(self, mx, my) -> None:
-        size = 10
+    def _bar_area(self, mx, my) -> str | None:
         mx, my = int(mx.value), int(my.value)
         w = self._parent._x + self.width
         h = self._parent._y + self.height + self._parent._padding_y
         
-        if h - size < my < h and self._parent._x < mx < w:
-            print(f'H_BAR {mx}X{my}')
-        elif w - size < mx < w and self._parent._y < my < h:
-            print(f'V_BAR {mx}X{my}')
+        if h - self._bar_size < my < h and self._parent._x < mx < w:
+            return 'H'
+        elif w - self._bar_size < mx < w and self._parent._y < my < h:
+            return 'V'
+    
+    def _hovering(self, mx, my) -> None:
+        bar = self._bar_area(mx, my)
+        if bar: print('BAR HOVER', bar, mx, my)
 
+    def _dragging(self, mx, my) -> None:
+        bar = self._bar_area(mx, my)
+        if bar: print('BAR DRAG', bar, mx, my)
 
 class Layout(UIObject):
     """Organizes the positioning of the elements."""

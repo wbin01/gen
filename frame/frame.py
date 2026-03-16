@@ -483,6 +483,8 @@ class Frame(UIObject):
 
                 elif isinstance(self._hovered, Layout):
                     if self._hovered._scroll:
+                        self._hovered.viewport._hovering(mx, my)
+                        
                         if self._hovered._state.value == 'PRESSED':
                             self._hovered.viewport._dragging(mx, my)
         
