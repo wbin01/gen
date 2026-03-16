@@ -17,8 +17,9 @@ class ViewPort(object):
         self._y = self._parent._y
         self._width = 200
         self._height = 200
-        self._bar_size = 10
-        self._is_dragging = False
+        self._hbar_rect = None
+        self._vbar_rect = None
+        self._bar_thickness = 10
     
     @property
     def height(self) -> int:
@@ -36,7 +37,6 @@ class ViewPort(object):
         """..."""
         if 'X' in self._fill:
             return self._parent._width
-        
         return self._width
     
     @width.setter
@@ -65,15 +65,24 @@ class ViewPort(object):
             self._parent._app._render_update = True
     
     def _bar_area(self, mx, my) -> str | None:
-        mx, my = int(mx.value), int(my.value)
         w = self._parent._x + self.width
         h = self._parent._y + self.height + self._parent._padding_y
         
-        if h - self._bar_size < my < h and self._parent._x < mx < w:
-            return 'H'
-        elif w - self._bar_size < mx < w and self._parent._y < my < h:
-            return 'V'
-    
+        self._vbar_rect = (
+            w - self._bar_thickness, self._parent._y,
+            w - (w - self._bar_thickness), h - self._parent._y)
+
+        self._hbar_rect = (
+            self._parent._x, h - self._bar_thickness,
+            w - self._parent._x, h - (h - self._bar_thickness))
+
+        mx, my = mx.value, my.value
+        if h - self._bar_thickness < my < h and self._parent._x < mx < w:
+            return ('H', self._hbar_rect)
+        
+        elif w - self._bar_thickness < mx < w and self._parent._y < my < h:
+            return ('V', self._vbar_rect)
+
     def _hovering(self, mx, my) -> None:
         bar = self._bar_area(mx, my)
         if bar: print('BAR HOVER', bar, mx, my)
@@ -81,6 +90,7 @@ class ViewPort(object):
     def _dragging(self, mx, my) -> None:
         bar = self._bar_area(mx, my)
         if bar: print('BAR DRAG', bar, mx, my)
+
 
 class Layout(UIObject):
     """Organizes the positioning of the elements."""
