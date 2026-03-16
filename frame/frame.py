@@ -456,12 +456,12 @@ class Frame(UIObject):
             if self._hovered:
                 self._hovered._set_state('MOVE')
 
-                if self._input:
-                    if self._input._state.value == 'PRESSED':
-                        self._input._mouse_selection(mx.value)
-                        self._render_mode = 'UNIT'
-                        self._render_update = True
-
+            if self._input:
+                if self._input._state.value == 'PRESSED':
+                    self._input._mouse_selection(mx.value)
+                    self._render_mode = 'UNIT'
+                    self._render_update = True
+            
             if resize_area == ResizeArea.NONE:
                 obj = None
                 if not self._resizing:
@@ -471,6 +471,10 @@ class Frame(UIObject):
                     self._hovered._set_state('LEAVE')
                     if isinstance(self._hovered, Input):
                         self._cursor_update_shape('NONE')
+                    
+                    elif isinstance(self._hovered, Layout):
+                        if self._hovered._scrollable:
+                            self._hovered.scroll._bar_side = None
 
                     self._hovered = obj
                     self._hovered._set_state('ENTER')

@@ -17,9 +17,12 @@ class Scroll(object):
         self._control_y = self._parent._y
         self._width = 200
         self._height = 200
+        self._bar_side = None
         self._hbar_rect = None
         self._vbar_rect = None
         self._bar_thickness = 10
+        self._tt_bar = None
+        self._tt_base_bar = None
     
     @property
     def height(self) -> int:
@@ -95,11 +98,45 @@ class Scroll(object):
 
     def _hovering(self, mx, my) -> None:
         bar = self._bar_area(mx, my)
-        if bar: print('BAR HOVER', bar, mx, my)
+        if not bar:
+            self._bar_side = None
+            return
+        
+        self._bar_side = bar[0]
+        if self._bar_side == 'V':
+            self._vbar_rect = bar[1]
+        else:
+            self._hbar_rect = bar[1]
+        
+        self._tt_bar = self._parent._drawer.texture(self._tt_bar,
+            bar[1][2], bar[1][3], self._draw_bar, self._bar_side)
+        
+        self._tt_base_bar = self._parent._drawer.texture(
+            self._tt_base_bar, bar[1][2], bar[1][3], self._draw_bar, 'BASE')
 
     def _dragging(self, mx, my) -> None:
         bar = self._bar_area(mx, my)
-        if bar: print('BAR DRAG', bar, mx, my)
+    
+    def _draw(self):
+        bar = self._vbar_rect if self._bar_side == 'V' else self._hbar_rect
+
+        if not self._bar_side:
+            self._parent._drawer.apply_texture(
+                self._tt_base_bar, bar[0], bar[1], bar[2], bar[3])
+            return
+        
+        self._parent._drawer.apply_texture(
+            self._tt_bar, bar[0], bar[1], bar[2], bar[3])
+    
+    def _draw_bar(self, mode) -> None:
+        bar = self._vbar_rect if self._bar_side == 'V' else self._hbar_rect
+
+        if mode == 'BASE':
+            self._parent._drawer.rect(0, 0, bar[2], bar[3], (0, 0, 0, 0), 2)
+            return
+        
+        self._parent._drawer.rect(
+            0, 0, bar[2], bar[3], (255, 255, 255, 255), 2)
 
 
 class Layout(UIObject):
@@ -196,6 +233,9 @@ class Layout(UIObject):
                     self._drawer.clip_start(obj, obj._scroll)
                     obj._redraw(mode)
                     self._drawer.clip_end()
+
+                    if obj.scroll._vbar_rect:
+                        obj.scroll._draw()
                 else:
                     if self._app and self._app._view_layout:
                         obj._draw(mode)
