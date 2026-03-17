@@ -25,7 +25,7 @@ class Scroll(object):
         self._tt_bar = None
         self._tt_base_bar = None
 
-        self._bar_thickness = 10
+        self._bar_thickness = 50
         self._roll_step = 20
         self._offset = None
 
@@ -84,14 +84,18 @@ class Scroll(object):
         w = self._parent._x + self.width
         h = self._parent._y + self.height + self._parent._padding_y
 
-
         height_delta = h - self._parent._y
+        y_delta = self.y
         if self._parent._objects_height > self.height:
-            height_delta = self._parent._objects_height // self.height
-            height_delta = self.height // height_delta
+            x = self._parent._objects_height // self.height
+            height_delta = self.height // x
+
+            y_delta = self.y - (self.y + self._control_y)
+            y_delta = y_delta // x
+            # y_delta = my - self.y
         
         self._vbar_rect = (
-            w - self._bar_thickness, self._parent._y,
+            w - self._bar_thickness, self._parent._y + y_delta, # self._parent._y,
             w - (w - self._bar_thickness), height_delta)
         
         width_delta = w - self._parent._x
