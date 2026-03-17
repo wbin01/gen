@@ -6,6 +6,10 @@ class Add(object):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self._objects = []
+        self._objects_height = 0
+        self._objects_width = 0
+        self._height_free = 0
+        self._width_free = 0
     
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}()'

@@ -425,6 +425,8 @@ class Container(Margin, Padding, Size, Add, Layout):
                     layout._height += h
                     layout._base_height += h
 
+                layout._objects_width = layout._width
+                layout._objects_height = layout._height
                 if layout._scrollable:
                     layout._base_height = layout._scroll._height
 
@@ -440,3 +442,6 @@ class Container(Margin, Padding, Size, Add, Layout):
                     if h > layout.height:
                         layout._height = h
                         layout._base_height = h
+                
+                layout._objects_width = layout._width
+                layout._objects_height = layout._height
