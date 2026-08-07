@@ -25,7 +25,7 @@ class Scroll(object):
         self._tt_bar = None
         self._tt_base_bar = None
 
-        self._bar_thickness = 50
+        self._bar_thickness = 10
         self._roll_step = 20
         self._offset = None
 
@@ -59,28 +59,28 @@ class Scroll(object):
     def y(self) -> int:
         return self._parent._y
     
-    def _roll_down(self) -> None:
+    def _roll_down(self, step: float = None) -> None:
         if not self._parent: return
         if not self._parent._scrollable: return
 
         if self._parent._objects[0]._y < self._parent._y:
-            self._control_y += self._roll_step
+            self._control_y += step if step else self._roll_step
             self._parent._invalidate()
             self._parent._app._render_mode = 'POSITION'
             self._parent._app._render_update = True
 
-    def _roll_up(self) -> None:
+    def _roll_up(self, step: float = None) -> None:
         if not self._parent: return
         if not self._parent._scrollable: return
 
         last_obj = self._parent._objects[-1]
         if last_obj._y + last_obj._height >= self._parent._y + self.height:
-            self._control_y -= self._roll_step
+            self._control_y -= step if step else self._roll_step
             self._parent._invalidate()
             self._parent._app._render_mode = 'POSITION'
             self._parent._app._render_update = True
     
-    def _bar_area(self, mx, my) -> tuple | None:
+    def _bar_area(self, mx: float, my: float) -> tuple | None:
         w = self._parent._x + self.width
         h = self._parent._y + self.height + self._parent._padding_y
 
@@ -92,10 +92,9 @@ class Scroll(object):
 
             y_delta = self.y - (self.y + self._control_y)
             y_delta = y_delta // x
-            # y_delta = my - self.y
         
         self._vbar_rect = (
-            w - self._bar_thickness, self._parent._y + y_delta, # self._parent._y,
+            w - self._bar_thickness, self._parent._y + y_delta,
             w - (w - self._bar_thickness), height_delta)
         
         width_delta = w - self._parent._x
@@ -116,7 +115,7 @@ class Scroll(object):
         return None
 
     def _hovering(self, mx, my) -> None:
-        mx, my = int(mx.value), int(my.value)
+        mx, my = float(mx.value), float(my.value)
         bar = self._bar_area(mx, my)
         if not bar:
             self._side = None
@@ -135,7 +134,7 @@ class Scroll(object):
             self._tt_base_bar, bar[1][2], bar[1][3], self._draw_bar, 'BASE')
 
     def _dragging(self, mx, my) -> None:
-        mx, my = int(mx.value), int(my.value)
+        mx, my = float(mx.value), float(my.value)
         if not self._offset:
             self._offset = mx, my
         
@@ -144,9 +143,9 @@ class Scroll(object):
 
         if self._side == 'V':
             if my < self._offset[1]:
-                self._roll_down()
+                self._roll_down(self._offset[1] - my)
             elif my > self._offset[1]:
-                self._roll_up()
+                self._roll_up(my - self._offset[1])
         # else:
         #     self._roll_down()
 
@@ -208,11 +207,11 @@ class Layout(UIObject):
         for obj in self._objects:
             if isinstance(obj, Layout):
                 hit_obj =  obj._hit_test(x, y)
-                if hit_obj: return hit_obj
-                continue
+                if hit_obj:
+                    return hit_obj
 
-            if isinstance(obj, Cell):
-                view = obj._parent._scroll if obj.parent._scrollable else None
+            elif isinstance(obj, Cell):
+                view = obj._parent._scroll if obj._parent._scrollable else None
                 hit_obj = obj._hit_test(x, y, view)
                 if hit_obj:
                     return hit_obj

@@ -426,6 +426,9 @@ class Frame(UIObject):
 
         elif event.type == sdl3.SDL_EVENT_MOUSE_BUTTON_UP:
             if event.button.button == sdl3.SDL_BUTTON_LEFT:
+                self._scrollable = None
+                print('Scroll: stop')
+
                 if self._resizing:
                     self._resize_stop()
                     self._render_mode = 'RESIZE'
@@ -440,8 +443,8 @@ class Frame(UIObject):
                     if self._input:
                         self._input._selecting = False
                     
-                    if self._scrollable:
-                        self._scrollable.scroll._offset = None
+                    # if self._scrollable:
+                    #     self._scrollable.scroll._offset = None
             
             elif event.button.button == sdl3.SDL_BUTTON_RIGHT:
                 item = self._container._hit_test(mx, my)
@@ -451,6 +454,9 @@ class Frame(UIObject):
                     self._render_update = True
 
         elif event.type == sdl3.SDL_EVENT_MOUSE_MOTION:
+            if self._scrollable:
+                self._scrollable.scroll._dragging(mx, my)
+            
             if not self._resize_wm:
                 if self._resize_area != ResizeArea.NONE:
                     self._render_mode = 'RESIZE'
@@ -467,24 +473,25 @@ class Frame(UIObject):
                     self._render_update = True
             
             if resize_area == ResizeArea.NONE:
-                obj = None
-                if not self._resizing:
-                    obj = self._container._hit_test(mx, my)
-                
-                if obj and obj != self._hovered:
-                    self._hovered._set_state('LEAVE')
-                    if isinstance(self._hovered, Input):
-                        self._cursor_update_shape('NONE')
+                if not self._scrollable:
+                    obj = None
+                    if not self._resizing:
+                        obj = self._container._hit_test(mx, my)
                     
-                    elif isinstance(self._hovered, Layout):
-                        if self._hovered._scrollable:
-                            self._hovered.scroll._side = None
+                    if obj and obj != self._hovered:
+                        self._hovered._set_state('LEAVE')
+                        if isinstance(self._hovered, Input):
+                            self._cursor_update_shape('NONE')
+                        
+                        elif isinstance(self._hovered, Layout):
+                            if self._hovered._scrollable:
+                                self._hovered.scroll._side = None
 
-                    self._hovered = obj
-                    self._hovered._set_state('ENTER')
+                        self._hovered = obj
+                        self._hovered._set_state('ENTER')
 
-                    self._render_mode = 'UNIT'
-                    self._render_update = True
+                        self._render_mode = 'UNIT'
+                        self._render_update = True
                 
                 if isinstance(self._hovered, Input):
                     self._cursor_update_shape('BEAM')
@@ -495,6 +502,8 @@ class Frame(UIObject):
                         
                         if self._hovered._state.value == 'PRESSED':
                             self._hovered.scroll._dragging(mx, my)
+                            self._scrollable = self._hovered
+                            print('Scroll: drag')
         
         elif event.type == sdl3.SDL_EVENT_TEXT_INPUT:
             if self._input:
@@ -591,14 +600,12 @@ class Frame(UIObject):
                 scroll = obj
             elif hasattr(obj._parent, '_scrollable'):
                 scroll = obj._parent
-            self._scrollable = scroll
             
-            if self._scrollable:
+            if scroll:
                 if event.wheel.y > 0:
-                    self._scrollable.scroll._roll_down()
-
+                    scroll.scroll._roll_down()
                 elif event.wheel.y < 0:
-                    self._scrollable.scroll._roll_up()
+                    scroll.scroll._roll_up()
     
     def _render(self) -> None:
         self._render_update = False
