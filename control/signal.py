@@ -3,7 +3,9 @@
 
 class Signal:
     """..."""
-    def __init__(self):
+    def __init__(self, parent = None) -> None:
+        """..."""
+        self._parent = parent
         self._slots = []
     
     def __repr__(self) -> str:
@@ -18,5 +20,6 @@ class Signal:
 
     def emit(self, *args, **kwargs):
         """..."""
+        if not args: args = (self._parent,)
         for func in self._slots:
             func(*args, **kwargs)

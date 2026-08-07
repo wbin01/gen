@@ -18,15 +18,15 @@ class UIObject(Core):
         self._visible = True
         self._timer = None
 
-        self.enter = Signal()
-        self.leave = Signal()
-        self.pressed = Signal()
-        self.released = Signal()
-        self.right_pressed = Signal()
-        self.right_released = Signal()
-        self.move = Signal()
-        self.drag_start = Signal()
-        self.drag_end = Signal()
+        self.enter = Signal(self)
+        self.leave = Signal(self)
+        self.pressed = Signal(self)
+        self.released = Signal(self)
+        self.right_pressed = Signal(self)
+        self.right_released = Signal(self)
+        self.move = Signal(self)
+        self.drag_start = Signal(self)
+        self.drag_end = Signal(self)
 
         self._dragging = False
         self._accept_move = False

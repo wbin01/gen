@@ -426,8 +426,10 @@ class Frame(UIObject):
 
         elif event.type == sdl3.SDL_EVENT_MOUSE_BUTTON_UP:
             if event.button.button == sdl3.SDL_BUTTON_LEFT:
-                self._scrollable = None
-                print('Scroll: stop')
+                if self._scrollable:
+                    self._scrollable.scroll.drag_end.emit()
+                    self._scrollable.scroll._dragging = False
+                    self._scrollable = None
 
                 if self._resizing:
                     self._resize_stop()
@@ -455,7 +457,7 @@ class Frame(UIObject):
 
         elif event.type == sdl3.SDL_EVENT_MOUSE_MOTION:
             if self._scrollable:
-                self._scrollable.scroll._dragging(mx, my)
+                self._scrollable.scroll._bar_drag(mx, my)
             
             if not self._resize_wm:
                 if self._resize_area != ResizeArea.NONE:
@@ -501,9 +503,13 @@ class Frame(UIObject):
                         self._hovered.scroll._hovering(mx, my)
                         
                         if self._hovered._state.value == 'PRESSED':
-                            self._hovered.scroll._dragging(mx, my)
-                            self._scrollable = self._hovered
-                            print('Scroll: drag')
+                            self._hovered.scroll._bar_drag(mx, my)
+                            if not self._scrollable:
+                                self._scrollable = self._hovered
+                                self._scrollable.scroll.drag_start.emit()
+                                self._scrollable.scroll._dragging = True
+                            else:
+                                self._scrollable.scroll._dragging = True
         
         elif event.type == sdl3.SDL_EVENT_TEXT_INPUT:
             if self._input:

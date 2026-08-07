@@ -15,7 +15,8 @@ class Layout(object):
 
 class Scroll(UIObject):
     """..."""
-    def __init__(self, parent: Cell | Layout) -> None:
+    def __init__(self, parent: Cell | Layout, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
         """..."""
         self._parent = parent
         self._fill = 'X' if parent._orientation == 'VERTICAL' else 'Y'
@@ -149,7 +150,7 @@ class Scroll(UIObject):
         self._tt_base_bar = self._parent._drawer.texture(
             self._tt_base_bar, bar[1][2], bar[1][3], self._draw_bar, 'BASE')
 
-    def _dragging(self, mx: c_float, my: c_float) -> None:
+    def _bar_drag(self, mx: c_float, my: c_float) -> None:
         mx, my = mx.value, my.value
 
         if not self._offset:
