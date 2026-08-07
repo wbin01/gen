@@ -13,7 +13,7 @@ class Layout(object):
     pass
 
 
-class Scroll(object):
+class Scroll(UIObject):
     """..."""
     def __init__(self, parent: Cell | Layout) -> None:
         """..."""
@@ -34,6 +34,7 @@ class Scroll(object):
         self._bar_thickness = 10
         self._roll_step = 20
         self._offset = None
+        self.style = copy.deepcopy(Theme.Scroll)
     
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}()'
@@ -182,11 +183,13 @@ class Scroll(object):
         bar = self._vbar_rect if self._side == 'V' else self._hbar_rect
 
         if mode == 'BASE':
-            self._parent._drawer.rect(0, 0, bar[2], bar[3], (0, 0, 0, 0), 2)
+            self._parent._drawer.rect(0, 0, bar[2], bar[3], (0, 0, 0, 0), 0)
             return
         
         self._parent._drawer.rect(
-            0, 0, bar[2], bar[3], (255, 255, 255, 255), 2)
+            0, 0, bar[2], bar[3],
+            self.style['BASE']['background-color'],
+            self.style['BASE']['radius'])
 
 
 class Layout(UIObject):

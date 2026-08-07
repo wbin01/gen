@@ -25,6 +25,14 @@ class Theme:
             },
         }
     
+    Scroll = {
+        'BASE': {
+            'background-color': (127, 127, 127, 127),
+            'border-color': (150, 150, 150, 200),
+            'radius': 0,
+            },
+        }
+    
     Button = {
         'BASE': {
             'font-color': (200, 200, 200, 255),
