@@ -5,7 +5,6 @@ from .container import Container
 class Col(Container):
     """..."""
     def __init__(self, *args, **kwargs) -> None:
-        """..."""
         super().__init__(*args, **kwargs)
     
     def __repr__(self) -> str:

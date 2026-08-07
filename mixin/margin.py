@@ -2,6 +2,7 @@
 
 
 class Margin(object):
+    """..."""
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self._margin = (0, 0, 0, 0)

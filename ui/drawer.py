@@ -13,6 +13,7 @@ import sdl3
 class Drawer(object):
     """..."""
     def __init__(self, renderer, *args, **kwargs) -> None:
+        """..."""
         self._renderer = renderer
         self._visual_level = 2
 

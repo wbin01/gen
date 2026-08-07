@@ -2,6 +2,7 @@
 
 
 class Core(object):
+    """..."""
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self._base_class = 'UIObject'

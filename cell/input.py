@@ -85,6 +85,7 @@ class Input(Cell):
     
     @property
     def text(self) -> str:
+        """..."""
         return self._text
     
     @text.setter
@@ -94,6 +95,7 @@ class Input(Cell):
         self._invalidate()
 
     def backspace(self) -> str:
+        """..."""
         del_char = ''
         if self._selection[1]:
             del_char = self._selection[1]
@@ -111,6 +113,7 @@ class Input(Cell):
         return del_char
     
     def clear_selection(self) -> None:
+        """..."""
         self._selection[0] = self._left
         self._selection[1] = ''
         self._selection[2] = self._right
@@ -118,9 +121,11 @@ class Input(Cell):
         self._invalidate()
     
     def copy(self) -> str:
+        """..."""
         return self._selection[1]
     
     def cut(self) -> str:
+        """..."""
         start, selected_text, end = self._selection
 
         self._left = list(start)
@@ -138,6 +143,7 @@ class Input(Cell):
         return selected_text
 
     def delete(self) -> str:
+        """..."""
         del_char = ''
         if self._selection[1]:
             del_char = self._selection[1]
@@ -155,6 +161,7 @@ class Input(Cell):
         return del_char
     
     def insert(self, text) -> None:
+        """..."""
         for char in text:
             self._left.append(str(char))
         
@@ -167,12 +174,14 @@ class Input(Cell):
         self._invalidate()
 
     def move_left(self) -> int:
+        """..."""
         if self._left:
             self._right.insert(0, self._left.pop())
             self._cursor = len(self._left)
         return self._cursor
 
     def move_left_by_jump(self) -> int:
+        """..."""
         while self._left and self._left[-1] == ' ':
             self._right.insert(0, self._left.pop())
 
@@ -183,12 +192,14 @@ class Input(Cell):
         return self._cursor
     
     def move_right(self) -> int:
+        """..."""
         if self._right:
             self._left.append(self._right.pop(0))
             self._cursor = len(self._left)
         return self._cursor
     
     def move_right_by_jump(self) -> int:
+        """..."""
         while self._right and self._right[0] == ' ':
             self._left.append(self._right.pop(0))
 
@@ -199,6 +210,7 @@ class Input(Cell):
         return self._cursor
     
     def past(self, text) -> str:
+        """..."""
         for c in text:
             self._left.append(c)
         
@@ -211,6 +223,7 @@ class Input(Cell):
         return text
     
     def select_all(self) -> str:
+        """..."""
         self._selection[0] = ''
         self._selection[1] = self._text
         self._selection[2] = ''
@@ -220,6 +233,7 @@ class Input(Cell):
         return self._selection[1]
     
     def select_left(self) -> str:
+        """..."""
         self._select_direction = 'LEFT'
         if self._anchor is None:
             self._anchor = self._cursor
@@ -242,6 +256,7 @@ class Input(Cell):
         return self._selection[1]
     
     def select_right(self) -> str:
+        """..."""
         self._select_direction = 'RIGHT'
         if self._anchor is None:
             self._anchor = self._cursor

@@ -50,6 +50,7 @@ class Cell(Margin, Padding, Size, UIObject):
     
     @property
     def style(self) -> dict:
+        """..."""
         return self._style
     
     @style.setter
@@ -58,6 +59,7 @@ class Cell(Margin, Padding, Size, UIObject):
     
     @property
     def style_class(self) -> str:
+        """..."""
         return self._style_class
     
     @style_class.setter

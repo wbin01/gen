@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 class Theme:
+    """..."""
     Frame = {
         'BASE': {
             'background-color': (20, 20, 20, 240),

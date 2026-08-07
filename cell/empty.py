@@ -7,7 +7,6 @@ from .cell import Cell
 class Empty(Cell):
     """..."""
     def __init__(self, *args, **kwargs) -> None:
-        """..."""
         super().__init__(*args, **kwargs)
         self._invalidate_item = None
 
@@ -28,7 +27,7 @@ class Empty(Cell):
         return f'{self.__class__.__name__}()'
     
     def __str__(self) -> str:
-        return f'{self.__class__.__name__}()'
+        return self.__class__.__name__
     
     def _apply_textures(self) -> None:
         if self._state.value == 'BASE':

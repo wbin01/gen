@@ -3,9 +3,11 @@ from .control import Control
 
 
 class Timer(Control):
+    """..."""
     def __init__(
             self, call: callable, interval: int = 0.5, cell: Cell = None,
             *args, **kwargs) -> None:
+        """..."""
         super().__init__(*args, **kwargs)
         self._call = call
         self._interval = interval
@@ -20,10 +22,11 @@ class Timer(Control):
             f'cell={self.__cell.__class__.__name__})')
     
     def __str__(self) -> str:
-        return f'{self.__class__.__name__}()'
+        return self.__class__.__name__
     
     @property
     def cell(self) -> Cell:
+        """..."""
         return self._cell
     
     @cell.setter
@@ -32,6 +35,7 @@ class Timer(Control):
     
     @property
     def interval(self) -> int:
+        """..."""
         return self._interval
     
     @interval.setter
@@ -40,6 +44,7 @@ class Timer(Control):
 
     @property
     def call(self) -> callable:
+        """..."""
         return self._call
     
     @call.setter

@@ -6,7 +6,6 @@ from ..flag import Fill
 class RowExpander(Cell):
     """..."""
     def __init__(self, *args, **kwargs) -> None:
-        """..."""
         super().__init__(*args, **kwargs)
         self.margin = 0, 0, 0, 0
         self.width = 0

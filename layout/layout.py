@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import copy
-import ctypes
+from ctypes import c_float, c_int
 import time
 
 import sdl3
@@ -9,8 +9,14 @@ from ..cell import Cell
 from ..ui import UIObject, Theme
 
 
+class Layout(object):
+    pass
+
+
 class Scroll(object):
-    def __init__(self, parent) -> None:
+    """..."""
+    def __init__(self, parent: Cell | Layout) -> None:
+        """..."""
         self._parent = parent
         self._fill = 'X' if parent._orientation == 'VERTICAL' else 'Y'
         self._control_x = self._parent._x
@@ -28,6 +34,12 @@ class Scroll(object):
         self._bar_thickness = 10
         self._roll_step = 20
         self._offset = None
+    
+    def __repr__(self) -> str:
+        return f'{self.__class__.__name__}()'
+
+    def __str__(self) -> str:
+        return self.__class__.__name__
 
     @property
     def height(self) -> int:
@@ -53,10 +65,12 @@ class Scroll(object):
     
     @property
     def x(self) -> int:
+        """..."""
         return self._parent._x
     
     @property
     def y(self) -> int:
+        """..."""
         return self._parent._y
     
     def _roll_down(self, step: float = None) -> None:
@@ -107,15 +121,16 @@ class Scroll(object):
             width_delta, h - (h - self._bar_thickness))
 
         if h - self._bar_thickness < my < h and self._parent._x < mx < w:
-            return ('H', self._hbar_rect)
+            # return ('H', self._hbar_rect)
+            return None
         
         elif w - self._bar_thickness < mx < w and self._parent._y < my < h:
             return ('V', self._vbar_rect)
         
         return None
 
-    def _hovering(self, mx, my) -> None:
-        mx, my = float(mx.value), float(my.value)
+    def _hovering(self, mx: c_float, my: c_float) -> None:
+        mx, my = mx.value, my.value
         bar = self._bar_area(mx, my)
         if not bar:
             self._side = None
@@ -133,8 +148,9 @@ class Scroll(object):
         self._tt_base_bar = self._parent._drawer.texture(
             self._tt_base_bar, bar[1][2], bar[1][3], self._draw_bar, 'BASE')
 
-    def _dragging(self, mx, my) -> None:
-        mx, my = float(mx.value), float(my.value)
+    def _dragging(self, mx: c_float, my: c_float) -> None:
+        mx, my = mx.value, my.value
+
         if not self._offset:
             self._offset = mx, my
         
@@ -162,7 +178,7 @@ class Scroll(object):
         self._parent._drawer.apply_texture(
             self._tt_bar, bar[0], bar[1], bar[2], bar[3])
     
-    def _draw_bar(self, mode) -> None:
+    def _draw_bar(self, mode: str) -> None:
         bar = self._vbar_rect if self._side == 'V' else self._hbar_rect
 
         if mode == 'BASE':
@@ -176,6 +192,7 @@ class Scroll(object):
 class Layout(UIObject):
     """Organizes the positioning of the elements."""
     def __init__(self, scrollable: bool = False, *args, **kwargs) -> None:
+        """..."""
         super().__init__(*args, **kwargs)
         self._base_class = 'Layout'
         self._orientation = 'VERTICAL'
@@ -190,8 +207,15 @@ class Layout(UIObject):
         self._scroll = Scroll(self)
         self.style = copy.deepcopy(Theme.Layout)
     
+    def __repr__(self) -> str:
+        return f'{self.__class__.__name__}()'
+
+    def __str__(self) -> str:
+        return self.__class__.__name__
+    
     @property
     def scroll(self) -> Scroll:
+        """..."""
         return self._scroll
 
     def _update(self) -> None:
