@@ -110,8 +110,12 @@ class Scroll(UIObject):
             y_delta = self.y - (self.y + self._control_y)
             y_delta = y_delta // x
         
+        bar_y = self._parent._y + y_delta
+        if bar_y + height_delta > h: bar_y = h - height_delta
+        if bar_y < self._parent._y: bar_y = self._parent._y
+
         self._vbar_rect = (
-            w - self._bar_thickness, self._parent._y + y_delta,
+            w - self._bar_thickness, bar_y,
             w - (w - self._bar_thickness), height_delta)
         
         width_delta = w - self._parent._x
