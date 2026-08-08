@@ -85,6 +85,12 @@ class Frame(UIObject):
         self._first_render = True
 
         # Frame
+        self._start_cursor_x = c_float()
+        self._start_cursor_y = c_float()
+        self._start_x = c_int()
+        self._start_y = c_int()
+        self._start_w = c_int()
+        self._start_h = c_int()
         self._tt_frame = None
 
         # Resize
@@ -245,32 +251,27 @@ class Frame(UIObject):
 
         return sdl3.SDL_HITTEST_NORMAL
     
-    def _cursor_resize_area(self, mouse_x, mouse_y) -> ResizeArea:
-        # mx = c_float()
-        # my = c_float()
-        # sdl3.SDL_GetGlobalMouseState(mx, my)
-        mx = mouse_x
-        my = mouse_y
+    def _cursor_resize_area(self, cursor_x, cursor_y) -> ResizeArea:
+        # cursor_x = c_float()
+        # cursor_y = c_float()
+        # sdl3.SDL_GetGlobalMouseState(cursor_x, cursor_y)
+        frame_x = c_int()
+        frame_y = c_int()
+        sdl3.SDL_GetWindowPosition(self._frame, frame_x, frame_y)
 
-        wx = c_int()
-        wy = c_int()
-        sdl3.SDL_GetWindowPosition(self._frame, wx, wy)
+        frame_w = c_int()
+        frame_h = c_int()
+        sdl3.SDL_GetWindowSize(self._frame, frame_w, frame_h)
 
-        ww = c_int()
-        wh = c_int()
-        sdl3.SDL_GetWindowSize(self._frame, ww, wh)
+        x = cursor_x.value - frame_x.value
+        y = cursor_y.value - frame_y.value
+        w = frame_w.value
+        h = frame_h.value
 
-        x = mx.value - wx.value
-        y = my.value - wy.value
-
-        b = self._resize_border
-        w = ww.value
-        h = wh.value
-
-        left   = x < b
-        right  = x > w - b
-        top    = y < b
-        bottom = y > h - b
+        left = x < self._resize_border
+        right = x > w - self._resize_border
+        top = y < self._resize_border
+        bottom = y > h - self._resize_border
 
         if top and left:
             return ResizeArea.TOP_LEFT
@@ -333,21 +334,22 @@ class Frame(UIObject):
         while self._running:
             event = sdl3.SDL_Event()
             
-            mouse_x = c_float()
-            mouse_y = c_float()
-            sdl3.SDL_GetGlobalMouseState(mouse_x, mouse_y)
-            resize_area = self._cursor_resize_area(mouse_x, mouse_y)
+            cursor_x = c_float()
+            cursor_y = c_float()
+            sdl3.SDL_GetGlobalMouseState(cursor_x, cursor_y)
+            resize_area = self._cursor_resize_area(cursor_x, cursor_y)
 
-            mx = c_float()
-            my = c_float()
-            sdl3.SDL_GetMouseState(mx, my)
+            cursor_x = c_float()
+            cursor_y = c_float()
+            sdl3.SDL_GetMouseState(cursor_x, cursor_y)
 
             if sdl3.SDL_WaitEventTimeout(event, 16):
                 if event.type != 0:
-                    self._handle_events(event, resize_area, mx, my)
+                    self._handle_events(event, resize_area, cursor_x, cursor_y)
 
                     while sdl3.SDL_PollEvent(event):
-                        self._handle_events(event, resize_area, mx, my)
+                        self._handle_events(
+                            event, resize_area, cursor_x, cursor_y)
 
             current_time = time.monotonic()
             for timer in self._timers:
@@ -367,7 +369,7 @@ class Frame(UIObject):
                 self._render()
                 self._render_count += 1
     
-    def _handle_events(self, event, resize_area, mx, my) -> None:
+    def _handle_events(self, event, resize_area, cursor_x, cursor_y) -> None:
         if resize_area.value != self._last_resize_cursor_on_hover:
             self._cursor_update_shape(resize_area.value)
             self._last_resize_cursor_on_hover = resize_area.value
@@ -384,7 +386,7 @@ class Frame(UIObject):
                 self._resize_area = resize_area
 
                 if self._resize_area == ResizeArea.NONE:
-                    item = self._container._hit_test(mx, my)
+                    item = self._container._hit_test(cursor_x, cursor_y)
                     if item:
                         item._set_state('PRESSED')
                         self._render_mode = 'UNIT'
@@ -394,7 +396,7 @@ class Frame(UIObject):
                             self._input = item
                             sdl3.SDL_StartTextInput(self._frame)
                             self._focus = self._input
-                            self._input._click_update_cursor(mx.value)
+                            self._input._click_update_cursor(cursor_x.value)
                         else:
                             if self._input:
                                 input_item = self._input
@@ -415,7 +417,7 @@ class Frame(UIObject):
                         self._resize_settings()
             
             elif event.button.button == sdl3.SDL_BUTTON_RIGHT:
-                item = self._container._hit_test(mx, my)
+                item = self._container._hit_test(cursor_x, cursor_y)
                 if item:
                     item._set_state('RIGHT_PRESSED')
                     self._render_mode = 'UNIT'
@@ -437,7 +439,7 @@ class Frame(UIObject):
                     self._render_mode = 'RESIZE'
                     self._render_update = True
                 else:
-                    item = self._container._hit_test(mx, my)
+                    item = self._container._hit_test(cursor_x, cursor_y)
                     if item:
                         item._set_state('RELEASED')
                         self._render_mode = 'UNIT'
@@ -450,7 +452,7 @@ class Frame(UIObject):
                     #     self._scrollable.scroll._offset = None
             
             elif event.button.button == sdl3.SDL_BUTTON_RIGHT:
-                item = self._container._hit_test(mx, my)
+                item = self._container._hit_test(cursor_x, cursor_y)
                 if item:
                     item._set_state('RIGHT_RELEASED')
                     self._render_mode = 'UNIT'
@@ -458,7 +460,7 @@ class Frame(UIObject):
 
         elif event.type == sdl3.SDL_EVENT_MOUSE_MOTION:
             if self._scrollable:
-                self._scrollable.scroll._bar_drag(mx, my)
+                self._scrollable.scroll._bar_drag(cursor_x, cursor_y)
                 return
             
             if not self._resize_wm:
@@ -472,7 +474,7 @@ class Frame(UIObject):
 
             if self._input:
                 if self._input._state.value == 'PRESSED':
-                    self._input._mouse_selection(mx.value)
+                    self._input._mouse_selection(cursor_x.value)
                     self._render_mode = 'UNIT'
                     self._render_update = True
             
@@ -480,7 +482,7 @@ class Frame(UIObject):
                 if not self._scrollable:
                     obj = None
                     if not self._resizing:
-                        obj = self._container._hit_test(mx, my)
+                        obj = self._container._hit_test(cursor_x, cursor_y)
                     
                     if obj and obj != self._hovered:
                         self._hovered._set_state('LEAVE')
@@ -502,10 +504,10 @@ class Frame(UIObject):
 
                 elif isinstance(self._hovered, Layout):
                     if self._hovered._scrollable:
-                        self._hovered.scroll._hovering(mx, my)
+                        self._hovered.scroll._hovering(cursor_x, cursor_y)
                         
                         if self._hovered._state.value == 'PRESSED':
-                            self._hovered.scroll._bar_drag(mx, my)
+                            self._hovered.scroll._bar_drag(cursor_x, cursor_y)
                             if not self._scrollable:
                                 self._scrollable = self._hovered
                                 self._scrollable.scroll.drag_start.emit()
@@ -601,7 +603,7 @@ class Frame(UIObject):
                 if self._input: self._input._anchor = None
         
         elif event.type == sdl3.SDL_EVENT_MOUSE_WHEEL:
-            obj = self._container._hit_test(mx, my)
+            obj = self._container._hit_test(cursor_x, cursor_y)
             
             scroll = None
             if hasattr(obj, '_scrollable'):
@@ -611,10 +613,10 @@ class Frame(UIObject):
             
             if event.wheel.y > 0:
                 obj.wheel_up.emit()
-                if scroll: scroll.scroll._roll_down(my.value)
+                if scroll: scroll.scroll._roll_down(cursor_y.value)
             elif event.wheel.y < 0:
                 obj.wheel_down.emit()
-                if scroll: scroll.scroll._roll_up(my.value)
+                if scroll: scroll.scroll._roll_up(cursor_y.value)
     
     def _render(self) -> None:
         self._render_update = False
@@ -664,34 +666,25 @@ class Frame(UIObject):
     
     def _resize_settings(self) -> None:
         self._resizing = True
-
-        self.__start_mx = c_float()
-        self.__start_my = c_float()
-        sdl3.SDL_GetGlobalMouseState(self.__start_mx, self.__start_my)
-
-        self.__start_x = c_int()
-        self.__start_y = c_int()
-        sdl3.SDL_GetWindowPosition(self._frame, self.__start_x, self.__start_y)
-
-        self.__start_w = c_int()
-        self.__start_h = c_int()
-        sdl3.SDL_GetWindowSize(self._frame, self.__start_w, self.__start_h)
+        sdl3.SDL_GetGlobalMouseState(self._start_cursor_x, self._start_cursor_y)
+        sdl3.SDL_GetWindowPosition(self._frame, self._start_x, self._start_y)
+        sdl3.SDL_GetWindowSize(self._frame, self._start_w, self._start_h)
 
     def _resize_start(self) -> None:
         if not self._resizing:
             return
 
-        mx = c_float()
-        my = c_float()
-        sdl3.SDL_GetGlobalMouseState(mx, my)
+        cursor_x = c_float()
+        cursor_y = c_float()
+        sdl3.SDL_GetGlobalMouseState(cursor_x, cursor_y)
 
-        dx = mx.value - self.__start_mx.value
-        dy = my.value - self.__start_my.value
+        dx = cursor_x.value - self._start_cursor_x.value
+        dy = cursor_y.value - self._start_cursor_y.value
 
-        x = self.__start_x.value
-        y = self.__start_y.value
-        w = self.__start_w.value
-        h = self.__start_h.value
+        x = self._start_x.value
+        y = self._start_y.value
+        w = self._start_w.value
+        h = self._start_h.value
 
         r = self._resize_area.value
 

@@ -167,28 +167,28 @@ class Scroll(UIObject):
         self._tt_base_bar = self._parent._drawer.texture(
             self._tt_base_bar, bar[1][2], bar[1][3], self._draw_bar, 'BASE')
 
-    def _bar_drag(self, mx: c_float, my: c_float) -> None:
-        mx, my = mx.value, my.value
+    def _bar_drag(self, cursor_x: c_float, cursor_y: c_float) -> None:
+        cursor_x, cursor_y = cursor_x.value, cursor_y.value
 
         if not self._offset:
-            self._offset = mx, my
+            self._offset = cursor_x, cursor_y
         
-        bar = self._bar_area(mx, my)
+        bar = self._bar_area(cursor_x, cursor_y)
         if not self._side and bar: self._side = bar[0]
 
         if self._side == 'V':
             if not self._cursor_point:
-                self._cursor_point = my - self._vbar_rect[1]
-            point = (my - self._cursor_point)
+                self._cursor_point = cursor_y - self._vbar_rect[1]
+            point = (cursor_y - self._cursor_point)
 
-            if my < self._offset[1]:
-                self._roll_down(my, self._vbar_rect[1] - point)
-            elif my > self._offset[1]:
-                self._roll_up(my, point - self._vbar_rect[1])
+            if cursor_y < self._offset[1]:
+                self._roll_down(cursor_y, self._vbar_rect[1] - point)
+            elif cursor_y > self._offset[1]:
+                self._roll_up(cursor_y, point - self._vbar_rect[1])
         # else:
         #     self._roll_down()
 
-        self._offset = mx, my
+        self._offset = cursor_x, cursor_y
 
     def _draw(self):
         bar = self._vbar_rect if self._side == 'V' else self._hbar_rect
