@@ -76,21 +76,33 @@ class Scroll(UIObject):
         """..."""
         return self._parent._y
     
-    def _roll_down(self, step: float = None) -> None:
+    def _roll_down(self, cursor_y: float, step: float = 0) -> None:
         if not self._parent: return
         if not self._parent._scrollable: return
 
-        if self._parent._objects[0]._y < self._parent._y:
+        stop = (
+            cursor_y < self._parent._y,
+            cursor_y > self._parent._y + self.height,
+            self._parent._objects[0]._y > self._parent._y)
+        if any(stop): return
+        
+        if self._parent._objects[0]._y <= self._parent._y:
             self._control_y += step if step else self._roll_step
             self._parent._invalidate()
             self._parent._app._render_mode = 'POSITION'
             self._parent._app._render_update = True
 
-    def _roll_up(self, step: float = None) -> None:
+    def _roll_up(self, cursor_y: float, step: float = 0) -> None:
         if not self._parent: return
         if not self._parent._scrollable: return
-
         last_obj = self._parent._objects[-1]
+
+        stop = (
+            cursor_y < self._parent._y,
+            cursor_y > self._parent._y + self.height,
+            last_obj._y + last_obj._height < self._parent._y + self.height)
+        if any(stop): return
+        
         if last_obj._y + last_obj._height >= self._parent._y + self.height:
             self._control_y -= step if step else self._roll_step
             self._parent._invalidate()
@@ -170,9 +182,9 @@ class Scroll(UIObject):
             point = (my - self._cursor_point)
 
             if my < self._offset[1]:
-                self._roll_down(self._vbar_rect[1] - point)
+                self._roll_down(my, self._vbar_rect[1] - point)
             elif my > self._offset[1]:
-                self._roll_up(point - self._vbar_rect[1])
+                self._roll_up(my, point - self._vbar_rect[1])
         # else:
         #     self._roll_down()
 

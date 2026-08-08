@@ -459,6 +459,7 @@ class Frame(UIObject):
         elif event.type == sdl3.SDL_EVENT_MOUSE_MOTION:
             if self._scrollable:
                 self._scrollable.scroll._bar_drag(mx, my)
+                return
             
             if not self._resize_wm:
                 if self._resize_area != ResizeArea.NONE:
@@ -610,10 +611,10 @@ class Frame(UIObject):
             
             if event.wheel.y > 0:
                 obj.wheel_up.emit()
-                if scroll: scroll.scroll._roll_down()
+                if scroll: scroll.scroll._roll_down(my.value)
             elif event.wheel.y < 0:
                 obj.wheel_down.emit()
-                if scroll: scroll.scroll._roll_up()
+                if scroll: scroll.scroll._roll_up(my.value)
     
     def _render(self) -> None:
         self._render_update = False
