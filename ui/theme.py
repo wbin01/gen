@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
-class Theme:
+
+class Theme(object):
     """..."""
     Frame = {
         'BASE': {
@@ -27,9 +28,8 @@ class Theme:
     
     Scroll = {
         'BASE': {
-            'background-color': (127, 127, 127, 127),
-            'border-color': (150, 150, 150, 200),
-            'radius': 0,
+            'background-color': (127, 127, 127, 80),
+            'radius': 1,
             },
         }
     

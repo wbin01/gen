@@ -184,7 +184,7 @@ class Drawer(object):
             color=(0, 0, 0, 255), r: int = 8, aa: int = 1) -> None:
 
         w, h = int(w), int(h)
-        r = min(r, (w - 1)/2, (h - 1)/2)
+        r = int(min(r, (w - 1)/2, (h - 1)/2))
         if (w - 2*r) % 2 != 0: w -= 1
 
         cr, cg, cb, ca = color

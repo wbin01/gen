@@ -161,9 +161,9 @@ class Scroll(UIObject):
 
         if self._side == 'V':
             if my < self._offset[1]:
-                self._roll_down(self._offset[1] - my)
+                self._roll_down(self._vbar_rect[1] - my)
             elif my > self._offset[1]:
-                self._roll_up(my - self._offset[1])
+                self._roll_up(my - self._vbar_rect[1])
         # else:
         #     self._roll_down()
 
