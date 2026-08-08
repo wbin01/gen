@@ -428,6 +428,7 @@ class Frame(UIObject):
             if event.button.button == sdl3.SDL_BUTTON_LEFT:
                 if self._scrollable:
                     self._scrollable.scroll.drag_end.emit()
+                    self._scrollable.scroll._cursor_point = None
                     self._scrollable.scroll._dragging = False
                     self._scrollable = None
 

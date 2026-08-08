@@ -35,6 +35,7 @@ class Scroll(UIObject):
         self._bar_thickness = 10
         self._roll_step = 20
         self._offset = None
+        self._cursor_point = None
         self.style = copy.deepcopy(Theme.Scroll)
     
     def __repr__(self) -> str:
@@ -160,10 +161,14 @@ class Scroll(UIObject):
         if not self._side and bar: self._side = bar[0]
 
         if self._side == 'V':
+            if not self._cursor_point:
+                self._cursor_point = my - self._vbar_rect[1]
+            point = (my - self._cursor_point)
+
             if my < self._offset[1]:
-                self._roll_down(self._vbar_rect[1] - my)
+                self._roll_down(self._vbar_rect[1] - point)
             elif my > self._offset[1]:
-                self._roll_up(my - self._vbar_rect[1])
+                self._roll_up(point - self._vbar_rect[1])
         # else:
         #     self._roll_down()
 
