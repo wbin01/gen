@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
+from .control import Control
 
 
-class Signal:
+class Signal(Control):
     """..."""
-    def __init__(self, parent = None) -> None:
+    def __init__(self, parent = None, *args, **kwargs) -> None:
         """..."""
+        super().__init__(*args, **kwargs)
         self._parent = parent
         self._slots = []
     

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from ..control.control import Control
 from ..control import Signal, Timer
 
 
@@ -7,6 +8,7 @@ class Add(object):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self._objects = []
+        self._control_objects = []
         self._objects_height = 0
         self._objects_width = 0
         self._height_free = 0
@@ -33,7 +35,7 @@ class Add(object):
         obj._parent = self
         obj._app = self._app
 
-        if not isinstance(obj, Signal):
+        if not isinstance(obj, Control):
             self._objects.append(obj)
         
         if isinstance(obj, Timer):
