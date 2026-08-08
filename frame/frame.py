@@ -607,11 +607,12 @@ class Frame(UIObject):
             elif hasattr(obj._parent, '_scrollable'):
                 scroll = obj._parent
             
-            if scroll:
-                if event.wheel.y > 0:
-                    scroll.scroll._roll_down()
-                elif event.wheel.y < 0:
-                    scroll.scroll._roll_up()
+            if event.wheel.y > 0:
+                obj.wheel_up.emit()
+                if scroll: scroll.scroll._roll_down()
+            elif event.wheel.y < 0:
+                obj.wheel_down.emit()
+                if scroll: scroll.scroll._roll_up()
     
     def _render(self) -> None:
         self._render_update = False

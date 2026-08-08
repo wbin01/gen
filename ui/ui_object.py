@@ -27,6 +27,8 @@ class UIObject(Core):
         self.move = Signal(self)
         self.drag_start = Signal(self)
         self.drag_end = Signal(self)
+        self.wheel_up = Signal(self)
+        self.wheel_down = Signal(self)
 
         self._dragging = False
         self._accept_move = False
