@@ -109,7 +109,7 @@ class Scroll(UIObject):
             self._parent._app._render_mode = 'POSITION'
             self._parent._app._render_update = True
     
-    def _bar_area(self, mx: float, my: float) -> tuple | None:
+    def _bar_area(self, cursor_x: float, cursor_y: float) -> tuple | None:
         w = self._parent._x + self.width
         h = self._parent._y + self.height + self._parent._padding_y
 
@@ -139,18 +139,19 @@ class Scroll(UIObject):
             self._parent._x, h - self._bar_thickness,
             width_delta, h - (h - self._bar_thickness))
 
-        if h - self._bar_thickness < my < h and self._parent._x < mx < w:
+        if (h - self._bar_thickness < cursor_y < h and
+                self._parent._x < cursor_x < w):
             # return ('H', self._hbar_rect)
             return None
         
-        elif w - self._bar_thickness < mx < w and self._parent._y < my < h:
+        elif (w - self._bar_thickness < cursor_x < w and
+                self._parent._y < cursor_y < h):
             return ('V', self._vbar_rect)
         
         return None
 
-    def _hovering(self, mx: c_float, my: c_float) -> None:
-        mx, my = mx.value, my.value
-        bar = self._bar_area(mx, my)
+    def _hovering(self, cursor_x: c_float, cursor_y: c_float) -> None:
+        bar = self._bar_area(cursor_x.value, cursor_y.value)
         if not bar:
             self._side = None
             return
