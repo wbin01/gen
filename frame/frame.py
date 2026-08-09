@@ -367,7 +367,6 @@ class Frame(UIObject):
 
             if self._render_update or self._container._dirty:
                 self._render()
-                self._render_count += 1
     
     def _handle_events(self, event, resize_area, cursor_x, cursor_y) -> None:
         if resize_area.value != self._last_resize_cursor_on_hover:

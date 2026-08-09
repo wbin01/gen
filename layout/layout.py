@@ -22,8 +22,10 @@ class Scroll(UIObject):
         self._fill = 'X' if parent._orientation == 'VERTICAL' else 'Y'
         self._control_x = self._parent._x
         self._control_y = self._parent._y
-        self._width = 200
-        self._height = 200
+        self._width = None
+        self._height = None
+        self._first_roll_up = False
+        self._first_roll_down = False
 
         self._side = None
         self._hbar_rect = None
@@ -47,8 +49,8 @@ class Scroll(UIObject):
     @property
     def height(self) -> int:
         """..."""
-        if 'Y' in self._fill:
-            return self._parent._height
+        if not self._height:
+            return self._parent._height if 'Y' in self._fill else 200
         return self._height
     
     @height.setter
@@ -58,8 +60,8 @@ class Scroll(UIObject):
     @property
     def width(self) -> int:
         """..."""
-        if 'X' in self._fill:
-            return self._parent._width
+        if not self._width:
+            return self._parent._width if 'X' in self._fill else 200
         return self._width
     
     @width.setter
@@ -77,6 +79,7 @@ class Scroll(UIObject):
         return self._parent._y
     
     def _roll_down(self, cursor_y: float, step: float = 0) -> None:
+        self._first_roll_down = True
         if not self._parent: return
         if not self._parent._scrollable: return
 
@@ -93,6 +96,7 @@ class Scroll(UIObject):
             self._parent._app._render_update = True
 
     def _roll_up(self, cursor_y: float, step: float = 0) -> None:
+        self._first_roll_up = True
         if not self._parent: return
         if not self._parent._scrollable: return
         last_obj = self._parent._objects[-1]
@@ -110,7 +114,7 @@ class Scroll(UIObject):
             self._parent._app._render_update = True
     
     def _bar_area(self, cursor_x: float, cursor_y: float) -> tuple | None:
-        w = self._parent._x + self.width
+        w = self._parent._x + self.width # + self._parent._padding_x
         h = self._parent._y + self.height + self._parent._padding_y
 
         height_delta = h - self._parent._y
@@ -141,8 +145,7 @@ class Scroll(UIObject):
 
         if (h - self._bar_thickness < cursor_y < h and
                 self._parent._x < cursor_x < w):
-            # return ('H', self._hbar_rect)
-            return None
+            return ('H', self._hbar_rect)
         
         elif (w - self._bar_thickness < cursor_x < w and
                 self._parent._y < cursor_y < h):
@@ -310,7 +313,6 @@ class Layout(UIObject):
             return
         
         for obj in self._objects:
-
             if isinstance(obj, Layout):
                 if obj._scrollable:
                     obj._draw(mode)

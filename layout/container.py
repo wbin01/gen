@@ -10,10 +10,14 @@ class Container(Margin, Padding, Size, Add, Layout):
     """Organizes the positioning of the elements."""
     def __init__(
             self,
-            spacing: int = 0, fill: Fill = Fill.XY,
-            margin: tuple | int = 0, padding: tuple | int = 0,
-            align: Align = Align.START, base_align: Align = Align.CENTER,
-            width: int = None, height: int = None,
+            spacing: int = 0,
+            fill: Fill = Fill.XY,
+            margin: tuple | int = 0,
+            padding: tuple | int = 0,
+            align: Align = Align.START,
+            base_align: Align = Align.CENTER,
+            width: int = None,
+            height: int = None,
             *args, **kwargs) -> None:
         """Layout Initializer.
 
@@ -156,14 +160,24 @@ class Container(Margin, Padding, Size, Add, Layout):
             if not self._scrollable:
                 bd_color = Theme.Frame['BASE']['accent-color']
             
+            # VERTICAL
+            width = self.width
+            if self._scrollable:
+                if not self.scroll._width:
+                    if (self._app._render_count == 1 or
+                            not self.scroll._first_roll_up):
+                        width -= (self._padding_x * 2)
+                else:
+                    width -= self._padding_x
+
             self._drawer.rect(
-                self._x, self._y, self.width, self.height,
+                self._x, self._y, width, self.height,
                 bd_color, self.style['BASE']['radius'])
             
             bd = self.style['BASE']['border']
             self._drawer.rect(
                 self._x + bd, self._y + bd,
-                self.width - (bd * 2), self.height - (bd * 2),
+                width - (bd * 2), self.height - (bd * 2),
                 self.style['BASE']['background-color'],
                 self.style['BASE']['radius'])
     
@@ -179,7 +193,9 @@ class Container(Margin, Padding, Size, Add, Layout):
             self._update_fill(self)
         
         x, y = self._x + self.padding[3], self._y + self.padding[0] # Reset
-        if self._scrollable: y += self._scroll._control_y
+        if self._scrollable:
+            y += self._scroll._control_y
+            x += self._scroll._control_x
 
         for obj in self._objects:
             if not obj.visible: continue
@@ -319,6 +335,7 @@ class Container(Margin, Padding, Size, Add, Layout):
             
             if layout._scrollable:
                 layout._height = layout._base_height
+                layout._width = layout._base_width
         
         elif layout._orientation == 'HORIZONTAL':
             # Height
@@ -428,7 +445,8 @@ class Container(Margin, Padding, Size, Add, Layout):
                 layout._objects_width = layout._width
                 layout._objects_height = layout._height
                 if layout._scrollable:
-                    layout._base_height = layout._scroll._height
+                    layout._base_height = layout._scroll.height # + layout._padding_y
+                    layout._base_width = layout._scroll.width + layout._padding_x
 
             elif layout._orientation == 'HORIZONTAL':
                 if layout.fill in (Fill.X, Fill.XY):
