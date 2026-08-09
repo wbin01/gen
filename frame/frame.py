@@ -613,10 +613,14 @@ class Frame(UIObject):
             
             if event.wheel.y > 0:
                 obj.wheel_up.emit()
-                if scroll: scroll.scroll._roll_down(cursor_y.value)
+                if scroll:
+                    scroll.scroll._roll_down(cursor_y.value)
+                    scroll.scroll._hovering(cursor_x, cursor_y)
             elif event.wheel.y < 0:
                 obj.wheel_down.emit()
-                if scroll: scroll.scroll._roll_up(cursor_y.value)
+                if scroll:
+                    scroll.scroll._roll_up(cursor_y.value)
+                    scroll.scroll._hovering(cursor_x, cursor_y)
     
     def _render(self) -> None:
         self._render_update = False
