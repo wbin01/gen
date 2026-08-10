@@ -78,6 +78,10 @@ class ViewPort(UIObject):
         """..."""
         return self._parent._y
     
+    def _roll_fix(self) -> None:
+        self._roll_up(self._parent._y + 10, 1)
+        self._roll_down(self._parent._y + 10, 1)
+    
     def _roll_down(self, cursor_y: float, step: float = 0) -> None:
         self._first_roll_down = True
         if not self._parent: return
