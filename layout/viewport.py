@@ -26,6 +26,7 @@ class ViewPort(UIObject):
         self._height = None
         self._first_roll_up = False
         self._first_roll_down = False
+        self._dragging = False
 
         self._cursor_side = None
         self._scroll_side = None
@@ -162,7 +163,6 @@ class ViewPort(UIObject):
     
     def _hovering(self, cursor_x: c_float, cursor_y: c_float) -> None:
         self._bar_area(cursor_x.value, cursor_y.value)
-        # if not self._scroll_side: return
         bar = self._vbar_rect if self._scroll_side == 'V' else self._hbar_rect
         
         self._tt_bar = self._parent._drawer.texture(
@@ -178,7 +178,6 @@ class ViewPort(UIObject):
         if not self._offset:
             self._offset = cursor_x, cursor_y
         
-        # self._bar_area(cursor_x, cursor_y)
         bar = self._vbar_rect if self._cursor_side == 'V' else self._hbar_rect
 
         if self._scroll_side == 'V':
@@ -190,18 +189,16 @@ class ViewPort(UIObject):
                 self._roll_down(cursor_y, self._vbar_rect[1] - point)
             elif cursor_y > self._offset[1]:
                 self._roll_up(cursor_y, point - self._vbar_rect[1])
-        # else:
-        #     self._roll_down()
 
         self._offset = cursor_x, cursor_y
 
     def _draw(self):
         bar = self._vbar_rect if self._scroll_side == 'V' else self._hbar_rect
 
-        if not self._cursor_side:
-            self._parent._drawer.apply_texture(
-                self._tt_base_bar, bar[0], bar[1], bar[2], bar[3])
-            return
+        if not self._cursor_side and not self._dragging:
+                self._parent._drawer.apply_texture(
+                    self._tt_base_bar, bar[0], bar[1], bar[2], bar[3])
+                return
         
         self._parent._drawer.apply_texture(
             self._tt_bar, bar[0], bar[1], bar[2], bar[3])

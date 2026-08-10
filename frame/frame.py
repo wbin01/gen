@@ -506,13 +506,17 @@ class Frame(UIObject):
                         self._hovered.viewport._hovering(cursor_x, cursor_y)
                         
                         if self._hovered._state.value == 'PRESSED':
-                            self._hovered.viewport._bar_drag(cursor_x, cursor_y)
-                            if not self._scroll:
-                                self._scroll = self._hovered
-                                self._scroll.viewport.drag_start.emit()
-                                self._scroll.viewport._dragging = True
-                            else:
-                                self._scroll.viewport._dragging = True
+                            if not self._scroll: self._scroll = self._hovered
+                            self._scroll.viewport._bar_drag(cursor_x, cursor_y)
+                            self._scroll.viewport.drag_start.emit()
+                            self._scroll.viewport._dragging = True
+                            # self._hovered.viewport._bar_drag(cursor_x, cursor_y)
+                            # if not self._scroll:
+                            #     self._scroll = self._hovered
+                            #     self._scroll.viewport.drag_start.emit()
+                            #     self._scroll.viewport._dragging = True
+                            # else:
+                            #     self._scroll.viewport._dragging = True
         
         elif event.type == sdl3.SDL_EVENT_TEXT_INPUT:
             if self._input:
