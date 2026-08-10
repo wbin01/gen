@@ -160,12 +160,11 @@ class Container(Margin, Padding, Size, Add, Layout):
             if not self._scroll:
                 bd_color = Theme.Frame['BASE']['accent-color']
             
-            # VERTICAL: Fix viewport init width
-            width, count = self.width, self._app._render_count
+            # VERTICAL: Init viewport width
+            width = self.width
             if self._scroll:
                 if not self.viewport._width:
-                    if count == 1 or not self.viewport._first_roll_up:
-                        self._viewport._roll_fix()  # width-=self._padding_x*2
+                    self._viewport._roll_fix()
                 else:
                     width -= self._padding_x
 

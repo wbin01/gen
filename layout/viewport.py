@@ -79,8 +79,10 @@ class ViewPort(UIObject):
         return self._parent._y
     
     def _roll_fix(self) -> None:
-        self._roll_up(self._parent._y + 10, 1)
-        self._roll_down(self._parent._y + 10, 1)
+        if self._parent._app._render_count == 1 or not self._first_roll_up:
+            # Eq: width -= self._parent._padding_x * 2
+            self._roll_up(self._parent._y + 10, 1)
+            self._roll_down(self._parent._y + 10, 1)
     
     def _roll_down(self, cursor_y: float, step: float = 0) -> None:
         self._first_roll_down = True
