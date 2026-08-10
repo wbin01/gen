@@ -27,7 +27,8 @@ class ViewPort(UIObject):
         self._first_roll_up = False
         self._first_roll_down = False
 
-        self._side = None
+        self._cursor_side = None
+        self._scroll_side = None
         self._hbar_rect = None
         self._vbar_rect = None
 
@@ -120,64 +121,67 @@ class ViewPort(UIObject):
             self._parent._app._render_update = True
     
     def _bar_area(self, cursor_x: float, cursor_y: float) -> tuple | None:
-        self._side, parent, thickness = None, self._parent, self._bar_thickness
-        w = parent._x + self.width # + parent._padding_x
-        h = parent._y + self.height + parent._padding_y
+        self._cursor_side, thickness = None, self._bar_thickness
+        w = self._parent._x + self.width # + parent._padding_x
+        h = self._parent._y + self.height + self._parent._padding_y
 
-        height_delta = h - parent._y
+        height_delta = h - self._parent._y
         y_delta = self.y
-        if parent._objects_height > self.height:
-            x = parent._objects_height // self.height
+        if self._parent._objects_height > self.height:
+            x = self._parent._objects_height // self.height
             height_delta = self.height // x
 
             y_delta = self.y - (self.y + self._control_y)
             y_delta = y_delta // x
         
-        bar_y = parent._y + y_delta
+        bar_y = self._parent._y + y_delta
         if bar_y + height_delta > h: bar_y = h - height_delta
-        if bar_y < parent._y: bar_y = parent._y
+        if bar_y < self._parent._y: bar_y = self._parent._y
 
         self._vbar_rect = (
             w - thickness, bar_y, w - (w - thickness), height_delta)
         
-        width_delta = w - parent._x
-        if parent._objects_width > self.width:
-            width_delta = parent._objects_width // self.width
+        width_delta = w - self._parent._x
+        if self._parent._objects_width > self.width:
+            width_delta = self._parent._objects_width // self.width
             width_delta = self.width // width_delta
 
         self._hbar_rect = (
-            parent._x, h - thickness, width_delta, h - (h - thickness))
+            self._parent._x, h - thickness, width_delta, h - (h - thickness))
 
-        if h - thickness < cursor_y < h and parent._x < cursor_x < w:
-            self._side = 'H'
-        elif w - thickness < cursor_x < w and parent._y < cursor_y < h:
-            self._side = 'V'
+        if h - thickness < cursor_y < h and self._parent._x < cursor_x < w:
+            self._cursor_side, self._scroll_side = 'H', 'H'
+        elif w - thickness < cursor_x < w and self._parent._y < cursor_y < h:
+            self._cursor_side, self._scroll_side = 'V', 'V'
         
-        if (self._side == 'H' and parent._fill_width <= parent.width or
-                self._side == 'V' and parent._fill_height <= parent.height):
-            self._side = None
-
+        if (self._cursor_side == 'H' and
+                self._parent._fill_width <= self._parent.width or
+                self._cursor_side == 'V' and
+                self._parent._fill_height <= self._parent.height):
+            self._cursor_side = None
+    
     def _hovering(self, cursor_x: c_float, cursor_y: c_float) -> None:
         self._bar_area(cursor_x.value, cursor_y.value)
-        if not self._side: return
-        bar = self._vbar_rect if self._side == 'V' else self._hbar_rect
+        # if not self._scroll_side: return
+        bar = self._vbar_rect if self._scroll_side == 'V' else self._hbar_rect
         
         self._tt_bar = self._parent._drawer.texture(
-            self._tt_bar, bar[2], bar[3], self._draw_bar, self._side)
+            self._tt_bar, bar[2], bar[3], self._draw_bar, 'HOVER')
 
         self._tt_base_bar = self._parent._drawer.texture(
             self._tt_base_bar, bar[2], bar[3], self._draw_bar, 'BASE')
 
     def _bar_drag(self, cursor_x: c_float, cursor_y: c_float) -> None:
+        self._bar_area(cursor_x.value, cursor_y.value)
         cursor_x, cursor_y = cursor_x.value, cursor_y.value
 
         if not self._offset:
             self._offset = cursor_x, cursor_y
         
-        bar = self._bar_area(cursor_x, cursor_y)
-        if not self._side and bar: self._side = bar[0]
+        # self._bar_area(cursor_x, cursor_y)
+        bar = self._vbar_rect if self._cursor_side == 'V' else self._hbar_rect
 
-        if self._side == 'V':
+        if self._scroll_side == 'V':
             if not self._cursor_point:
                 self._cursor_point = cursor_y - self._vbar_rect[1]
             point = (cursor_y - self._cursor_point)
@@ -192,9 +196,9 @@ class ViewPort(UIObject):
         self._offset = cursor_x, cursor_y
 
     def _draw(self):
-        bar = self._vbar_rect if self._side == 'V' else self._hbar_rect
+        bar = self._vbar_rect if self._scroll_side == 'V' else self._hbar_rect
 
-        if not self._side:
+        if not self._cursor_side:
             self._parent._drawer.apply_texture(
                 self._tt_base_bar, bar[0], bar[1], bar[2], bar[3])
             return
@@ -203,7 +207,7 @@ class ViewPort(UIObject):
             self._tt_bar, bar[0], bar[1], bar[2], bar[3])
     
     def _draw_bar(self, mode: str) -> None:
-        bar = self._vbar_rect if self._side == 'V' else self._hbar_rect
+        bar = self._vbar_rect if self._scroll_side == 'V' else self._hbar_rect
 
         if mode == 'BASE':
             self._parent._drawer.rect(0, 0, bar[2], bar[3], (0, 0, 0, 0), 0)
