@@ -154,18 +154,18 @@ class Container(Margin, Padding, Size, Add, Layout):
             (color[0], color[1], color[2], 255), Theme.Frame['BASE']['radius'])
         
     def _draw(self, mode: str = None) -> None:
-        # if self._scrollable or not self._first and mode == 'REBUILD':
+        # if self._scroll or not self._first and mode == 'REBUILD':
         if True:
             bd_color = self.style['BASE']['border-color']
-            if not self._scrollable:
+            if not self._scroll:
                 bd_color = Theme.Frame['BASE']['accent-color']
             
             # VERTICAL
             width = self.width
-            if self._scrollable:
-                if not self.scroll._width:
+            if self._scroll:
+                if not self.viewport._width:
                     if (self._app._render_count == 1 or
-                            not self.scroll._first_roll_up):
+                            not self.viewport._first_roll_up):
                         width -= (self._padding_x * 2)
                 else:
                     width -= self._padding_x
@@ -193,9 +193,9 @@ class Container(Margin, Padding, Size, Add, Layout):
             self._update_fill(self)
         
         x, y = self._x + self.padding[3], self._y + self.padding[0] # Reset
-        if self._scrollable:
-            y += self._scroll._control_y
-            x += self._scroll._control_x
+        if self._scroll:
+            y += self._viewport._control_y
+            x += self._viewport._control_x
 
         for obj in self._objects:
             if not obj.visible: continue
@@ -333,7 +333,7 @@ class Container(Margin, Padding, Size, Add, Layout):
             if layout._height < min_height:
                 layout._height = min_height
             
-            if layout._scrollable:
+            if layout._scroll:
                 layout._height = layout._base_height
                 layout._width = layout._base_width
         
@@ -444,9 +444,9 @@ class Container(Margin, Padding, Size, Add, Layout):
 
                 layout._objects_width = layout._width
                 layout._objects_height = layout._height
-                if layout._scrollable:
-                    layout._base_height = layout._scroll.height # + layout._padding_y
-                    layout._base_width = layout._scroll.width + layout._padding_x
+                if layout._scroll:
+                    layout._base_height = layout._viewport.height # + layout._padding_y
+                    layout._base_width = layout._viewport.width + layout._padding_x
 
             elif layout._orientation == 'HORIZONTAL':
                 if layout.fill in (Fill.X, Fill.XY):

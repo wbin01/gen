@@ -17,16 +17,16 @@ class Theme(object):
             },
         }
     
-    Layout = {
+    ViewPort = {
         'BASE': {
             'background-color': (10, 10, 10, 240),
             'border': 1,
             'border-color': (10, 10, 10, 240),
-            'radius': 8,
+            'radius': 4,
             },
         }
     
-    Scroll = {
+    ScrollBar = {
         'BASE': {
             'background-color': (127, 127, 127, 80),
             'radius': 1,
