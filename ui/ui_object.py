@@ -4,7 +4,7 @@ from ..flag import State
 from ..mixin import Core
 
 
-class Scroll:
+class ViewPort:
     pass
 
 
@@ -64,19 +64,20 @@ class UIObject(Core):
         """..."""
         return self._dragging
     
-    def _rect_contains(
-            self, obj: UIObject, x: int, y: int, scroll: Scroll = None
-            ) -> bool:
+    def _rect_contains(self,
+            obj: UIObject, x: int, y: int, viewport: ViewPort = None) -> bool:
         obj_x, obj_y = int(obj._x), int(obj._y)
         obj_w, obj_h = int(obj.width), int(obj.height)
         
-        if scroll:
-            vp_x, vp_y = int(scroll._parent._x), int(scroll._parent._y)
-            vp_w, vp_h = int(scroll.width), int(scroll.height)
-            vp_y += + int(scroll._parent.padding[0])
+        if viewport:
+            viewport_x = int(viewport._parent._x)
+            viewport_y = int(viewport._parent._y)
+            viewport_w = int(viewport.width) - viewport.parent.padding[1]
+            viewport_h = int(viewport.height)
+            viewport_y += + int(viewport._parent.padding[0])
         
-            if not (vp_x <= x.value <= vp_x + vp_w and
-                vp_y <= y.value <= vp_y + vp_h):
+            if not (viewport_x <= x.value <= viewport_x + viewport_w and
+                    viewport_y <= y.value <= viewport_y + viewport_h):
                 return False
         
         if (obj_x <= x.value <= obj_x + obj_w and
