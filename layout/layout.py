@@ -21,6 +21,8 @@ class Layout(UIObject):
 
         self._x = 0
         self._y = 0
+        self._fill_height = None
+        self._fill_width = None
         self._scroll = scroll
         self._viewport = ViewPort(self)
         self.style = copy.deepcopy(Theme.ViewPort)

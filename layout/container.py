@@ -270,6 +270,8 @@ class Container(Margin, Padding, Size, Add, Layout):
         
         total_width = layout.width - layout._padding_x
         total_height = layout.height
+        layout._fill_width = total_width
+        layout._fill_height = total_height
 
         if layout._orientation == 'VERTICAL':
             # Width
@@ -319,6 +321,7 @@ class Container(Margin, Padding, Size, Add, Layout):
                     height += layout.spacing
                     min_height += layout.spacing
 
+            layout._fill_height = height
             vertical_num = len(vertical)
             free = total_height - height  # Discover available space
 
@@ -385,6 +388,7 @@ class Container(Margin, Padding, Size, Add, Layout):
                     width += layout.spacing
                     min_width += layout.spacing
             
+            layout._fill_width = width
             horizontal_num = len(horizontal)
             free = total_width - width
             
