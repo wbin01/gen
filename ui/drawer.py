@@ -3,9 +3,7 @@ import ctypes
 import io
 import math
 
-# python3 -m pip install --upgrade Pillow
 from PIL import Image, ImageDraw
-import pyscreenshot as ImageGrab
 
 import sdl3
 
