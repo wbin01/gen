@@ -182,6 +182,7 @@ class ViewPort(UIObject):
         
         # H Bar
         width_delta = w - self._parent._x
+        x_delta = self.x
         if self._parent._fill_width > self.width:
             d = self._parent._fill_width / (self.width - px)
             width_delta = int(round(self.width / d))
