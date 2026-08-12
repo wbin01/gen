@@ -28,8 +28,8 @@ class Drawer(object):
     def clip_start(self, obj, scroll) -> None:
         sdl3.SDL_RenderClipEnabled(self._renderer)
         clip = sdl3.SDL_Rect(
-            int(scroll.x), int(scroll.y) + obj.padding[0],
-            scroll.width - obj.padding[1], scroll.height)
+            int(scroll.x) + obj.padding[3], int(scroll.y) + obj.padding[0],
+            scroll.width - obj._padding_x, scroll.height - obj._padding_y)
         sdl3.SDL_SetRenderClipRect(self._renderer, ctypes.byref(clip))
 
     def clip_end(self) -> None:

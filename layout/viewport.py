@@ -160,8 +160,8 @@ class ViewPort(UIObject):
     
     def _bar_area(self, cursor_x: float, cursor_y: float) -> tuple | None:
         self._cursor_side, thickness = None, self._bar_thickness
-        w = self._parent._x + self.width # + parent._padding_x
-        h = self._parent._y + self.height + self._parent._padding_y
+        w = self._parent._x + self.width
+        h = self._parent._y + self.height
         px, py = self._parent._padding_x * 2, self._parent._padding_y * 2
 
         # V Bar
