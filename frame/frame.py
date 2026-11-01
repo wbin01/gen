@@ -29,7 +29,7 @@ class Frame(UIObject):
         self._y = y
         self._width = width
         self._height = height
-        self._view_layout = False
+        self._layout_view = False
 
         sdl3.SDL_SetHint(
             sdl3.SDL_HINT_X11_WINDOW_TYPE, b'_NET_WM_WINDOW_TYPE_NORMAL')
@@ -165,13 +165,13 @@ class Frame(UIObject):
         self._container.spacing = spacing
 
     @property
-    def view_layout(self) -> bool:
+    def layout_view(self) -> bool:
         """..."""
-        return self._view_layout
+        return self._layout_view
     
-    @view_layout.setter
-    def view_layout(self, view_layout: bool) -> None:
-        self._view_layout = view_layout
+    @layout_view.setter
+    def layout_view(self, layout_view: bool) -> None:
+        self._layout_view = layout_view
     
     @property
     def width(self) -> int:
@@ -208,6 +208,13 @@ class Frame(UIObject):
         return self._container.add(obj)
         
     def run(self) -> int:
+        if self._layout_view:
+            for obj in self._container._objects:
+                if obj._base_class == 'Layout':
+                    p, m = obj.padding, obj.margin
+                    obj.padding = p[0] + 2, p[1] + 2, p[2] + 2, p[3] + 2
+                    obj.margin = m[0] + 1, m[1] + 1, m[2] + 1, m[3] + 1
+        
         self._draw()
         self._event_loop()
         self._destroy()

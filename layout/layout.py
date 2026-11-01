@@ -22,7 +22,7 @@ class Layout(UIObject):
         self._y = 0
         self._fill_height = None
         self._fill_width = None
-        self.style = copy.deepcopy(Theme.ViewPort)
+        self.style = copy.deepcopy(Theme.Layout)
     
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}()'
@@ -96,7 +96,7 @@ class Layout(UIObject):
         
         for obj in self._objects:
             if isinstance(obj, Layout):
-                if self._app and self._app._view_layout:
+                if self._app and self._app._layout_view:
                     obj._draw(mode)
                 obj._redraw(mode)
 

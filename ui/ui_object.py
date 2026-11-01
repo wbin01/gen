@@ -4,10 +4,6 @@ from ..flag import State
 from ..mixin import Core
 
 
-class ViewPort:
-    pass
-
-
 class UIObject(Core):
     """..."""
     def __init__(self, *args, **kwargs) -> None:

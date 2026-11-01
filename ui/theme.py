@@ -17,7 +17,7 @@ class Theme(object):
             },
         }
     
-    ViewPort = {
+    Layout = {
         'BASE': {
             'background-color': (10, 10, 10, 240),
             'border': 1,

@@ -10,10 +10,6 @@ from ..ui import UIObject, Theme
 from ..flag import StyleClass
 
 
-class ViewPort:
-    pass
-
-
 class Cell(Margin, Padding, Size, UIObject):
     """..."""
     def __init__(
