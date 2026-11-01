@@ -1,10 +1,35 @@
 #!/usr/bin/env python3
 from .layout import Layout
-from ..cell import Cell, ColExpander, RowExpander
+from ..cell import Cell
 from ..flag import Align, Fill
 from ..mixin import Add, Margin, Padding, Size
 from ..ui import Theme
 
+
+class ColExpander(Cell):
+    """..."""
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.margin = 0, 0, 0, 0
+        self.width = 0
+        self.height = 0
+        self.fill = Fill.Y
+    
+    def __draw(self) -> None:
+        pass
+
+
+class RowExpander(Cell):
+    """..."""
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.margin = 0, 0, 0, 0
+        self.width = 0
+        self.height = 0
+        self.fill = Fill.X
+    
+    def __draw(self) -> None:
+        pass
 
 class Container(Margin, Padding, Size, Add, Layout):
     """Organizes the positioning of the elements."""

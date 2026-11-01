@@ -2,6 +2,7 @@
 import time
 
 from .cell import Cell
+from ..layout.layout import Layout
 
 
 class Empty(Cell):
@@ -23,11 +24,31 @@ class Empty(Cell):
         self._need_rebuild = False
         self._log_rebuild = False
 
+        # Layout
+        self._layout = Layout()
+        self._layout._first = True
+        self._layout._parent = self
+        self._layout._app = self
+        self._layout._drawer = self._drawer
+
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}()'
     
     def __str__(self) -> str:
         return self.__class__.__name__
+    
+    @property
+    def spacing(self) -> int:
+        """..."""
+        return self._layout.spacing
+    
+    @spacing.setter
+    def spacing(self, spacing: int) -> None:
+        self._layout.spacing = spacing
+    
+    def add(self, obj: Cell | Layout, fill=None) -> Cell | Layout:
+        obj._drawer = self._drawer
+        return self._layout.add(obj)
     
     def _apply_textures(self) -> None:
         if self._state.value == 'BASE':

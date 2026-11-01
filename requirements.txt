@@ -13,12 +13,12 @@ jeepney==0.9.0
 mss==10.1.0
 multidict==6.7.1
 packaging==26.0
-pillow==12.1.0
+pillow==13.0.0
 propcache==0.4.1
 pyinstaller==6.19.0
 pyinstaller-hooks-contrib==2026.1
 pyscreenshot==3.1
-PySDL3==0.9.11b0
+PySDL3==0.9.12b1
 requests==2.32.5
 setuptools==82.0.0
 urllib3==2.6.3

@@ -9,8 +9,12 @@ import sdl3
 
 from ..cell import Input
 from ..flag import ResizeArea, Cursor, StyleClass
-from ..layout import Layout, Col
+from ..layout import Col
 from ..ui import UIObject, Drawer, Theme
+
+
+class Layout:
+    pass
 
 
 class Frame(UIObject):
@@ -158,7 +162,7 @@ class Frame(UIObject):
     @property
     def spacing(self) -> int:
         """..."""
-        return self.__spacing
+        return self._container.spacing
     
     @spacing.setter
     def spacing(self, spacing: int) -> None:
@@ -203,7 +207,7 @@ class Frame(UIObject):
         self._y = int(y)
         sdl3.SDL_SetWindowPosition(self._frame, self._x, self._y)
     
-    def add(self, obj: Cell | Box, fill=None) -> Cell | Box:
+    def add(self, obj: Cell | Layout, fill=None) -> Cell | Layout:
         obj._drawer = self._drawer
         return self._container.add(obj)
         
