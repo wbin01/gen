@@ -154,26 +154,10 @@ class Container(Margin, Padding, Size, Add, Layout):
             (color[0], color[1], color[2], 255), Theme.Frame['BASE']['radius'])
         
     def _draw(self, mode: str = None) -> None:
-        # if self._scroll or not self._first and mode == 'REBUILD':
         if True:
-            bd_color = self.style['BASE']['border-color']
-            if not self._scroll:
-                bd_color = Theme.Frame['BASE']['accent-color']
-            
-            # VERTICAL: Init viewport width
+            bd_color = Theme.Frame['BASE']['accent-color']
             width = self.width
             height = self.height
-            if self._scroll:
-                if self._orientation == 'VERTICAL':
-                    if not self.viewport._width:
-                        self._viewport._roll_fix()
-                    else:
-                        width -= self._padding_x
-                else:
-                    if not self.viewport._height:
-                        self._viewport._roll_fix()
-                    else:
-                        height -= self._padding_y
             
             self._drawer.rect(
                 self._x, self._y, width, height,
@@ -198,10 +182,6 @@ class Container(Margin, Padding, Size, Add, Layout):
             self._update_fill(self)
         
         x, y = self._x + self.padding[3], self._y + self.padding[0] # Reset
-        if self._scroll:
-            y += self._viewport._control_y
-            x += self._viewport._control_x
-
         for obj in self._objects:
             if not obj.visible: continue
             if not obj._dirty: continue
@@ -340,10 +320,6 @@ class Container(Margin, Padding, Size, Add, Layout):
             
             if layout._height < min_height:
                 layout._height = min_height
-            
-            if layout._scroll:
-                layout._height = layout.viewport.height
-                layout._width = layout._base_width
         
         elif layout._orientation == 'HORIZONTAL':
             # Height
@@ -412,8 +388,7 @@ class Container(Margin, Padding, Size, Add, Layout):
             if isinstance(obj, Layout):
                 self._update_fill(obj)
         
-        if not layout._scroll:
-            layout._height += layout._padding_y
+        layout._height += layout._padding_y
 
     def _update_size(self, layout) -> None:
         # Make sure the layout size are compatible with the number 
@@ -454,10 +429,6 @@ class Container(Margin, Padding, Size, Add, Layout):
 
                 layout._objects_width = layout._width
                 layout._objects_height = layout._height
-                if layout._scroll:
-                    # layout._base_height = layout._viewport.height  # + layout._padding_y
-                    layout._base_height = layout._viewport.height + layout._padding_y
-                    layout._base_width = layout._viewport.width + layout._padding_x
 
             elif layout._orientation == 'HORIZONTAL':
                 if layout.fill in (Fill.X, Fill.XY):

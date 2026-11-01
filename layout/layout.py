@@ -4,12 +4,11 @@ import time
 
 from ..cell import Cell
 from ..ui import UIObject, Theme
-from .viewport import ViewPort
 
 
 class Layout(UIObject):
     """Organizes the positioning of the elements."""
-    def __init__(self, scroll: bool = False, *args, **kwargs) -> None:
+    def __init__(self, *args, **kwargs) -> None:
         """..."""
         super().__init__(*args, **kwargs)
         self._base_class = 'Layout'
@@ -23,8 +22,6 @@ class Layout(UIObject):
         self._y = 0
         self._fill_height = None
         self._fill_width = None
-        self._scroll = scroll
-        self._viewport = ViewPort(self)
         self.style = copy.deepcopy(Theme.ViewPort)
     
     def __repr__(self) -> str:
@@ -32,11 +29,6 @@ class Layout(UIObject):
 
     def __str__(self) -> str:
         return self.__class__.__name__
-    
-    @property
-    def viewport(self) -> ViewPort:
-        """..."""
-        return self._viewport
 
     def _update(self) -> None:
         pass
@@ -55,8 +47,7 @@ class Layout(UIObject):
                     return hit_obj
 
             elif isinstance(obj, Cell):
-                view = obj._parent._viewport if obj._parent._scroll else None
-                hit_obj = obj._hit_test(x, y, view)
+                hit_obj = obj._hit_test(x, y)
                 if hit_obj:
                     return hit_obj
         
@@ -105,19 +96,10 @@ class Layout(UIObject):
         
         for obj in self._objects:
             if isinstance(obj, Layout):
-                if obj._scroll:
+                if self._app and self._app._view_layout:
                     obj._draw(mode)
-                    self._drawer.clip_start(obj, obj._viewport)
-                    obj._redraw(mode)
-                    self._drawer.clip_end()
+                obj._redraw(mode)
 
-                    if obj.viewport._vbar_rect:
-                        obj.viewport._draw()
-                else:
-                    if self._app and self._app._view_layout:
-                        obj._draw(mode)
-                    obj._redraw(mode)
-                    
                 continue
             obj._draw(mode)
 

@@ -65,19 +65,9 @@ class UIObject(Core):
         return self._dragging
     
     def _rect_contains(self,
-            obj: UIObject, x: int, y: int, viewport: ViewPort = None) -> bool:
+            obj: UIObject, x: int, y: int) -> bool:
         obj_x, obj_y = int(obj._x), int(obj._y)
         obj_w, obj_h = int(obj.width), int(obj.height)
-        
-        if viewport:
-            viewport_x = int(viewport._parent._x) + viewport._parent.padding[3]
-            viewport_y = int(viewport._parent._y) + viewport._parent.padding[0]
-            viewport_w = int(viewport.width) - viewport.parent._padding_x
-            viewport_h = int(viewport.height) - viewport.parent._padding_y
-        
-            if not (viewport_x <= x.value <= viewport_x + viewport_w and
-                    viewport_y <= y.value <= viewport_y + viewport_h):
-                return False
         
         if (obj_x <= x.value <= obj_x + obj_w and
                 obj_y <= y.value <= obj_y + obj_h):

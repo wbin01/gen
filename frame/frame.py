@@ -128,7 +128,6 @@ class Frame(UIObject):
         self._input = None
         self._focus = None
         self._default = None
-        self._scroll = None
     
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}()'
@@ -427,11 +426,6 @@ class Frame(UIObject):
 
         elif event.type == sdl3.SDL_EVENT_MOUSE_BUTTON_UP:
             if event.button.button == sdl3.SDL_BUTTON_LEFT:
-                if self._scroll:
-                    self._scroll.viewport.drag_end.emit()
-                    self._scroll.viewport._cursor_point = None
-                    self._scroll.viewport._dragging = False
-                    self._scroll = None
 
                 if self._resizing:
                     self._resize_stop()
@@ -446,9 +440,6 @@ class Frame(UIObject):
                     
                     if self._input:
                         self._input._selecting = False
-                    
-                    # if self._scroll:
-                    #     self._scroll.viewport._offset = None
             
             elif event.button.button == sdl3.SDL_BUTTON_RIGHT:
                 item = self._container._hit_test(cursor_x, cursor_y)
@@ -458,10 +449,6 @@ class Frame(UIObject):
                     self._render_update = True
 
         elif event.type == sdl3.SDL_EVENT_MOUSE_MOTION:
-            if self._scroll:
-                self._scroll.viewport._bar_drag(cursor_x, cursor_y)
-                return
-            
             if not self._resize_wm:
                 if self._resize_area != ResizeArea.NONE:
                     self._render_mode = 'RESIZE'
@@ -478,45 +465,23 @@ class Frame(UIObject):
                     self._render_update = True
             
             if resize_area == ResizeArea.NONE:
-                if not self._scroll:
-                    obj = None
-                    if not self._resizing:
-                        obj = self._container._hit_test(cursor_x, cursor_y)
-                    
-                    if obj and obj != self._hovered:
-                        self._hovered._set_state('LEAVE')
-                        if isinstance(self._hovered, Input):
-                            self._cursor_update_shape('NONE')
-                        
-                        elif isinstance(self._hovered, Layout):
-                            if self._hovered._scroll:
-                                self._hovered.viewport._side = None
+                obj = None
+                if not self._resizing:
+                    obj = self._container._hit_test(cursor_x, cursor_y)
+                
+                if obj and obj != self._hovered:
+                    self._hovered._set_state('LEAVE')
+                    if isinstance(self._hovered, Input):
+                        self._cursor_update_shape('NONE')
 
-                        self._hovered = obj
-                        self._hovered._set_state('ENTER')
+                    self._hovered = obj
+                    self._hovered._set_state('ENTER')
 
-                        self._render_mode = 'UNIT'
-                        self._render_update = True
+                    self._render_mode = 'UNIT'
+                    self._render_update = True
                 
                 if isinstance(self._hovered, Input):
                     self._cursor_update_shape('BEAM')
-
-                elif isinstance(self._hovered, Layout):
-                    if self._hovered._scroll:
-                        self._hovered.viewport._hovering(cursor_x, cursor_y)
-                        
-                        if self._hovered._state.value == 'PRESSED':
-                            if not self._scroll: self._scroll = self._hovered
-                            self._scroll.viewport._bar_drag(cursor_x, cursor_y)
-                            self._scroll.viewport.drag_start.emit()
-                            self._scroll.viewport._dragging = True
-                            # self._hovered.viewport._bar_drag(cursor_x, cursor_y)
-                            # if not self._scroll:
-                            #     self._scroll = self._hovered
-                            #     self._scroll.viewport.drag_start.emit()
-                            #     self._scroll.viewport._dragging = True
-                            # else:
-                            #     self._scroll.viewport._dragging = True
         
         elif event.type == sdl3.SDL_EVENT_TEXT_INPUT:
             if self._input:
@@ -607,23 +572,12 @@ class Frame(UIObject):
         
         elif event.type == sdl3.SDL_EVENT_MOUSE_WHEEL:
             obj = self._container._hit_test(cursor_x, cursor_y)
-            
-            scroll = None
-            if hasattr(obj, '_scroll'):
-                scroll = obj
-            elif hasattr(obj._parent, '_scroll'):
-                scroll = obj._parent
-            
+
             if event.wheel.y > 0:
                 obj.wheel_up.emit()
-                if scroll:
-                    scroll.viewport._roll_down(cursor_y.value)
-                    scroll.viewport._hovering(cursor_x, cursor_y)
+            
             elif event.wheel.y < 0:
                 obj.wheel_down.emit()
-                if scroll:
-                    scroll.viewport._roll_up(cursor_y.value)
-                    scroll.viewport._hovering(cursor_x, cursor_y)
     
     def _render(self) -> None:
         self._render_update = False

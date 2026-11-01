@@ -104,12 +104,11 @@ class Cell(Margin, Padding, Size, UIObject):
         self._style_class = style_class
         self._style = theme
     
-    def _hit_test(self,
-            x: int, y: int, viewport: ViewPort = None) -> UIObject | None:
+    def _hit_test(self, x: int, y: int) -> UIObject | None:
         if not self.visible:
             return None
 
-        if self._rect_contains(self, x, y, viewport):
+        if self._rect_contains(self, x, y):
             return self
         
         return None
