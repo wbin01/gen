@@ -17,7 +17,12 @@ class Core(object):
     
     @property
     def app(self) -> UIObject:
+        """..."""
         return self._app
+    
+    @app.setter
+    def app(self, app: UIObject) -> None:
+        self._app = app
     
     @property
     def base_class(self) -> bool:
