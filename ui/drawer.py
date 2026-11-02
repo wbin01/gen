@@ -4,7 +4,7 @@ import io
 import math
 
 from PIL import Image, ImageDraw
-
+import cairosvg
 import sdl3
 
 
@@ -79,6 +79,63 @@ class Drawer(object):
         cursor_x = x + cursor_x
         sdl3.SDL_RenderLine(
             self._renderer, cursor_x, y, cursor_x, y + size)
+
+    def icon(self, path, w=None, h=None):
+        png_data = cairosvg.svg2png(
+            url=path,
+            output_width=w,
+            output_height=h,
+        )
+
+        img = Image.open(io.BytesIO(png_data)).convert("RGBA")
+
+        w, h = img.size
+        raw_bytes = img.tobytes()
+
+        surface = sdl3.SDL_CreateSurfaceFrom(
+            w,
+            h,
+            sdl3.SDL_PIXELFORMAT_RGBA32,
+            raw_bytes,
+            w * 4,
+        )
+
+        texture = sdl3.SDL_CreateTextureFromSurface(
+            self._renderer,
+            surface,
+        )
+
+        sdl3.SDL_DestroySurface(surface)
+
+        return texture  # , w, h
+
+    def icon_bkp(self, path, size):
+        png_data = cairosvg.svg2png(
+            url=path,
+            output_width=size,
+            output_height=size,
+        )
+
+        img = Image.open(io.BytesIO(png_data)).convert('RGBA')
+
+        raw_bytes = img.tobytes()
+
+        surface = sdl3.SDL_CreateSurfaceFrom(
+            size,
+            size,
+            sdl3.SDL_PIXELFORMAT_RGBA32,
+            raw_bytes,
+            size * 4,
+        )
+
+        texture = sdl3.SDL_CreateTextureFromSurface(
+            self._renderer,
+            surface,
+        )
+
+        sdl3.SDL_DestroySurface(surface)
+
+        return texture
 
     def image(self) -> None:
         """..."""

@@ -97,6 +97,29 @@ class Theme(object):
             },
         }
     
+    ToolButton = {
+        'BASE': {
+            'font-color': (200, 200, 200, 255),
+            'background-color': (35, 35, 35, 255),
+            'border-color': (55, 55, 55, 200),
+            'border': 1,
+            'font': 'DejaVuSans.ttf',
+            'font-size': 12,
+            'padding': 10,
+            'radius': 6,
+            },
+        'HOVER': {
+            'font-color': (200, 200, 200, 255),
+            'background-color': (40, 45, 55, 255),
+            'border-color': (45, 70, 100, 255),
+            },
+        'CLICKED': {
+            'font-color': (200, 200, 200, 255),
+            'background-color': (50, 63, 88, 255),
+            'border-color': (60, 100, 150, 255),
+            },
+        }
+    
     classes = {
         'CHECKED': {
             'BASE': {
