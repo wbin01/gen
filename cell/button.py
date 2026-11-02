@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 import time
+
 from PIL import ImageFont
+from xdg import IconTheme
 
 from .cell import Cell
 from ..flag import Fill
@@ -9,15 +11,16 @@ from ..flag import Fill
 class Button(Cell):
     """..."""
     def __init__(
-            self, text: str = '', width: int = 100, height: int = 32,
-            elided: bool = True, fill: Fill = Fill.X,
-            *args, **kwargs) -> None:
+            self, text: str = '', icon_name: str = 'document-edit',
+            width: int = 100, height: int = 32, elided: bool = True,
+            fill: Fill = Fill.X, *args, **kwargs) -> None:
         """..."""
         super().__init__(fill=fill, *args, **kwargs)
         self.fill = fill
         self._invalidate_item = None
 
         self._text = text
+        self._icon_name = icon_name
         self.width = width
         self.height = height
         self._elided = elided
@@ -40,6 +43,19 @@ class Button(Cell):
         self._tt_hover_txt = None
         self._tt_pressed = None
         self._tt_pressed_txt = None
+
+        self._icon_path = IconTheme.getIconPath(
+            iconname=self._icon_name,
+            size=22,
+            theme='breeze-dark',
+            extensions=['png', 'svg', 'xpm'])
+        
+        self._icon_x = 0
+        self._icon_y = 0
+        self._icon_w = 22
+        self._icon_h = 22
+        self._tt_icon = None
+        self._icon_space = 13
         
         self._tt_width = 0
         self._tt_height = 0
@@ -73,6 +89,10 @@ class Button(Cell):
             self._drawer.apply_texture(
                 self._tt_base_txt,
                 self._txt_x, self._txt_y, self._txt_w, self._txt_h)
+            
+            self._drawer.apply_texture(
+                self._tt_icon,
+                self._icon_x, self._icon_y, self._icon_w, self._icon_h)
 
         elif self._state.value == 'HOVER':
             if not self._tt_hover:
@@ -86,6 +106,10 @@ class Button(Cell):
             self._drawer.apply_texture(
                 self._tt_hover_txt,
                 self._txt_x, self._txt_y, self._txt_w, self._txt_h)
+            
+            self._drawer.apply_texture(
+                self._tt_icon,
+                self._icon_x, self._icon_y, self._icon_w, self._icon_h)
         
         elif self._state.value == 'PRESSED':
             if not self._tt_pressed:
@@ -99,6 +123,10 @@ class Button(Cell):
             self._drawer.apply_texture(
                 self._tt_pressed_txt,
                 self._txt_x, self._txt_y, self._txt_w, self._txt_h)
+            
+            self._drawer.apply_texture(
+                self._tt_icon,
+                self._icon_x, self._icon_y, self._icon_w, self._icon_h)
 
     def _draw(self, mode: str = None) -> None:
         if not self._dirty: return
@@ -146,13 +174,20 @@ class Button(Cell):
             self._drawer.apply_texture(
                 self._tt_base, int(self._x), int(self._y),
                 self._resize_width, self._resize_height)
-            
-            self._txt_x = self._x + (self._resize_width//2)-(self._txt_w//2)
+
+            self._txt_x = self._x + (self._resize_width//2)-(self._txt_w//2) + self._icon_space
             self._txt_y = self._y + (self._resize_height//2)-(self._txt_h//2)
 
             self._drawer.apply_texture(
                 self._tt_base_txt,
                 self._txt_x, self._txt_y, self._txt_w, self._txt_h)
+            
+            # self._icon_x = self._x + (self.width//2)-(self._icon_w//2)
+            # self._icon_y = self._y + (self.height//2)-(self._icon_h//2)
+
+            self._drawer.apply_texture(
+                self._tt_icon,
+                self._icon_x, self._icon_y, self._icon_w, self._icon_h)
             return
         
         self._apply_textures()
@@ -179,6 +214,10 @@ class Button(Cell):
     def _draw_text_textures(self, state: str) -> None:
         padding = self.style['BASE']['padding'] * 2
         width = int(self.width - padding)
+
+        self._tt_icon = self._drawer.icon(
+            self._icon_path, self._icon_w, self._icon_h)
+        
         if state == 'BASE':
             self._tt_base_txt, self._txt_w, self._txt_h = self._drawer.font(
                 self._text, self._tt_base_txt, self._font,
@@ -202,6 +241,11 @@ class Button(Cell):
         
         self._txt_x = self._x + (self.width // 2) - (self._txt_w // 2)
         self._txt_y = self._y + (self.height // 2) - (self._txt_h // 2)
+
+        self._icon_x = self._txt_x - self._icon_space
+        self._icon_y = self._y + (self.height//2)-(self._icon_h//2)
+
+        self._txt_x += self._icon_space
     
     def _draw_rects(self, state: str = 'BASE'):
         radius = self.style['BASE']['radius']

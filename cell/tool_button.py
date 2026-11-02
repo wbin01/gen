@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import time
 
-from PIL import ImageFont
 from xdg import IconTheme
 
 from .cell import Cell
@@ -25,9 +24,9 @@ class ToolButton(Cell):
         self._resize_width = 0
         self._resize_height = 0
 
-        self._font_name = self.style['BASE']['font']
-        self._font = ImageFont.truetype(
-            self._font_name, self.style['BASE']['font-size'])
+        # self._font_name = self.style['BASE']['font']
+        # self._font = ImageFont.truetype(
+        #     self._font_name, self.style['BASE']['font-size'])
         
         self._icon_path = IconTheme.getIconPath(
             iconname=self._icon_name,
@@ -108,10 +107,10 @@ class ToolButton(Cell):
     def _draw(self, mode: str = None) -> None:
         if not self._dirty: return
 
-        if self.style['BASE']['font'] != self._font_name:
-            self._font_name = self.style['BASE']['font']
-            self._font = ImageFont.truetype(
-                self._font_name, self.style['BASE']['font-size'])
+        # if self.style['BASE']['font'] != self._font_name:
+        #     self._font_name = self.style['BASE']['font']
+        #     self._font = ImageFont.truetype(
+        #         self._font_name, self.style['BASE']['font-size'])
 
         if mode == 'UNIT' and self._invalidate_item:
             self._draw_text_textures(state='BASE')
@@ -178,19 +177,16 @@ class ToolButton(Cell):
         padding = self.style['BASE']['padding'] * 2
         width = int(self.width - padding)
 
+        self._tt_icon = self._drawer.icon(
+            self._icon_path, self._icon_w, self._icon_h)
+        
         if state == 'BASE':
-            self._tt_icon = self._drawer.icon(
-                self._icon_path, self._icon_w, self._icon_h)
             if self._log_rebuild: print('BASE text', self, time.time())
 
         elif state == 'HOVER':
-            self._tt_icon = self._drawer.icon(
-                self._icon_path, self._icon_w, self._icon_h)
             if self._log_rebuild: print('HOVER text', self, time.time())
 
         elif state == 'PRESSED':
-            self._tt_icon = self._drawer.icon(
-                self._icon_path, self._icon_w, self._icon_h)
             if self._log_rebuild: print('PRESSED text', self, time.time())
 
         self._icon_x = self._x + (self.width//2)-(self._icon_w//2)
