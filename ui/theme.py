@@ -26,10 +26,12 @@ class Theme(object):
             },
         }
     
-    ScrollBar = {
+    DragArea = {
         'BASE': {
-            'background-color': (127, 127, 127, 80),
-            'radius': 1,
+            'background-color': (35, 35, 35, 100),
+            'font-color': (200, 200, 200, 255),
+            'font': 'DejaVuSans.ttf',
+            'font-size': 12,
             },
         }
     
@@ -56,6 +58,24 @@ class Theme(object):
             },
         }
     
+    ToolButton = {
+        'BASE': {
+            'background-color': (35, 35, 35, 255),
+            'border-color': (55, 55, 55, 200),
+            'border': 1,
+            'padding': 10,
+            'radius': 6,
+            },
+        'HOVER': {
+            'background-color': (40, 45, 55, 255),
+            'border-color': (45, 70, 100, 255),
+            },
+        'CLICKED': {
+            'background-color': (50, 63, 88, 255),
+            'border-color': (60, 100, 150, 255),
+            },
+        }
+    
     ControlButton = {
         'BASE': {
             'background-color': (0, 0, 0, 0),
@@ -71,23 +91,6 @@ class Theme(object):
         'CLICKED': {
             'background-color': (0, 0, 0, 0),
             'border-color': (0, 0, 0, 0),
-            },
-        }
-    
-    Empty = {
-        'BASE': {
-            'background-color': (35, 35, 35, 255),
-            'border-color': (55, 55, 55, 200),
-            'border': 1,
-            'radius': 6,
-            },
-        'HOVER': {
-            'background-color': (40, 45, 55, 255),
-            'border-color': (45, 70, 100, 255),
-            },
-        'CLICKED': {
-            'background-color': (50, 63, 88, 255),
-            'border-color': (60, 100, 150, 255),
             },
         }
     
@@ -112,24 +115,6 @@ class Theme(object):
             'font-color': (200, 200, 200, 255),
             'background-color': (10, 10, 10, 240),
             'border-color': (80, 120, 170, 255),
-            },
-        }
-    
-    ToolButton = {
-        'BASE': {
-            'background-color': (35, 35, 35, 255),
-            'border-color': (55, 55, 55, 200),
-            'border': 1,
-            'padding': 10,
-            'radius': 6,
-            },
-        'HOVER': {
-            'background-color': (40, 45, 55, 255),
-            'border-color': (45, 70, 100, 255),
-            },
-        'CLICKED': {
-            'background-color': (50, 63, 88, 255),
-            'border-color': (60, 100, 150, 255),
             },
         }
     

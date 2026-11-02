@@ -5,6 +5,7 @@ from ..control import Signal, Timer
 
 class Add(object):
     """..."""
+    _global_objects = []
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self._objects = []
@@ -27,6 +28,9 @@ class Add(object):
     def _add(self, obj: UIObject) -> UIObject:
         if isinstance(obj, type):
             obj = obj()
+        
+        if hasattr(obj, '_type_class') and obj._type_class == 'DragArea':
+            self._global_objects.append(obj)
         
         if obj._base_class not in ('Layout', 'Cell', 'Control'):
             raise TypeError(

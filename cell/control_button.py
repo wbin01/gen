@@ -1,17 +1,22 @@
 #!/usr/bin/env python3
 import time
+from pathlib import Path
 
 from xdg import IconTheme
 
 from .cell import Cell
 from ..flag import Fill
 
+# PATH = Path(__file__).resolve().parent.parent
+# static_path = PATH/'static'/'control_button'
+# icon = static_path/'glitch'/'go-down.svg'
+# print(icon, icon.is_file())
 
 class ControlButton(Cell):
     """..."""
     def __init__(self,
             icon_base: str = '', icon_hover: str = '', icon_pressed: str = '',
-            width: int = 32, height: int = 32, *args, **kwargs) -> None:
+            width: int = 22, height: int = 22, *args, **kwargs) -> None:
         """..."""
         super().__init__(fill=Fill.NONE, *args, **kwargs)
         self._invalidate_item = None
@@ -29,8 +34,8 @@ class ControlButton(Cell):
 
         self._icon_x = 0
         self._icon_y = 0
-        self._icon_w = 22
-        self._icon_h = 22
+        self._icon_w = 18
+        self._icon_h = 18
 
         self._tt_icon_base = None
         self._tt_icon_hover = None

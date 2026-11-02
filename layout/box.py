@@ -13,6 +13,7 @@ class Box(Container):
             *args, **kwargs) -> None:
         """..."""
         super().__init__(*args, **kwargs)
+        self._type_class = 'Box'
         self.app = frame
         if horizontal: self._orientation = 'HORIZONTAL'
     

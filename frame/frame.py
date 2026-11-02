@@ -126,6 +126,7 @@ class Frame(UIObject):
         self._last_resize_cursor_on_hover = 'NONE'
         self._cursor_hit = sdl3.SDL_HitTest(self._cursor_hit_test)
         sdl3.SDL_SetWindowHitTest(self._frame, self._cursor_hit, None)
+        self._drag_areas = []
 
         # Objects
         self._hovered = self._container
@@ -209,6 +210,18 @@ class Frame(UIObject):
     
     def add(self, obj: Cell | Layout, fill=None) -> Cell | Layout:
         obj._drawer = self._drawer
+
+        if obj._base_class == 'Cell':
+            if hasattr(obj, '_type_class') and obj._type_class == 'DragArea':
+                self._drag_areas.append(obj)
+        
+        elif obj._base_class == 'Layout':
+            for glo in obj._global_objects:
+                if glo._base_class == 'Cell':
+                    if (hasattr(glo, '_type_class') and
+                            glo._type_class == 'DragArea'):
+                        self._drag_areas.append(glo)
+        
         return self._container.add(obj)
         
     def run(self) -> int:
@@ -256,8 +269,12 @@ class Frame(UIObject):
                 return sdl3.SDL_HITTEST_RESIZE_RIGHT
 
         # DRAG
-        if border < x < w.value - border and border < y < 30:
-            return sdl3.SDL_HITTEST_DRAGGABLE
+        # if border < x < w.value - border and border < y < 30:
+        #     return sdl3.SDL_HITTEST_DRAGGABLE
+        for drag in self._drag_areas:
+            if (drag._x < x < drag._x + drag.width and
+                    drag._y < y < drag._y + drag.height):
+                return sdl3.SDL_HITTEST_DRAGGABLE
 
         return sdl3.SDL_HITTEST_NORMAL
     
