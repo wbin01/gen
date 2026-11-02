@@ -1,0 +1,5 @@
+document-page-setup
+help-faq
+insert-object
+mail-send-receive
+system-shutdown

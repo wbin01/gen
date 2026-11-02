@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from .app import Application
-from .cell import Button, Input, ToolButton
+from .cell import Button, Input, ToolButton, ControlButton
 from .control import Signal, Timer
 from .flag import Align, Fill, State, StyleClass
 from .frame import Frame
@@ -13,5 +13,5 @@ __all__ = [
     'Signal', 'Timer',
     'Frame',
     'Col', 'Row', 'Box',
-    'Button', 'Input', 'ToolButton',
+    'Button', 'Input', 'ToolButton', 'ControlButton',
     ]

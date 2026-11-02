@@ -23,10 +23,6 @@ class ToolButton(Cell):
 
         self._resize_width = 0
         self._resize_height = 0
-
-        # self._font_name = self.style['BASE']['font']
-        # self._font = ImageFont.truetype(
-        #     self._font_name, self.style['BASE']['font-size'])
         
         self._icon_path = IconTheme.getIconPath(
             iconname=self._icon_name,
@@ -81,7 +77,7 @@ class ToolButton(Cell):
         elif self._state.value == 'HOVER':
             if not self._tt_hover:
                 self._draw_background_textures(state='HOVER')
-                self._draw_text_textures(state='HOVER')
+                self._draw_icon_textures(state='HOVER')
             
             self._drawer.apply_texture(
                 self._tt_hover,
@@ -94,7 +90,7 @@ class ToolButton(Cell):
         elif self._state.value == 'PRESSED':
             if not self._tt_pressed:
                 self._draw_background_textures(state='PRESSED')
-                self._draw_text_textures(state='PRESSED')
+                self._draw_icon_textures(state='PRESSED')
             
             self._drawer.apply_texture(
                 self._tt_pressed,
@@ -107,15 +103,10 @@ class ToolButton(Cell):
     def _draw(self, mode: str = None) -> None:
         if not self._dirty: return
 
-        # if self.style['BASE']['font'] != self._font_name:
-        #     self._font_name = self.style['BASE']['font']
-        #     self._font = ImageFont.truetype(
-        #         self._font_name, self.style['BASE']['font-size'])
-
         if mode == 'UNIT' and self._invalidate_item:
-            self._draw_text_textures(state='BASE')
-            self._draw_text_textures(state='HOVER')
-            self._draw_text_textures(state='PRESSED')
+            self._draw_icon_textures(state='BASE')
+            self._draw_icon_textures(state='HOVER')
+            self._draw_icon_textures(state='PRESSED')
             self._invalidate_item = None
             self._need_rebuild = True
             
@@ -128,7 +119,7 @@ class ToolButton(Cell):
             self._tt_pressed = self._drawer.reset_texture(self._tt_pressed)
 
             self._draw_background_textures(state='BASE')
-            self._draw_text_textures(state='BASE')
+            self._draw_icon_textures(state='BASE')
 
             self._resize_width = 0
             self._resize_height = 0
@@ -173,7 +164,7 @@ class ToolButton(Cell):
                 self._tt_width, self._tt_height, self._draw_rects, 'CLICKED')
             if self._log_rebuild: print('PRESSED bg', self, time.time())
     
-    def _draw_text_textures(self, state: str) -> None:
+    def _draw_icon_textures(self, state: str) -> None:
         padding = self.style['BASE']['padding'] * 2
         width = int(self.width - padding)
 
