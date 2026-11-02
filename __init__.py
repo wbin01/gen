@@ -4,7 +4,7 @@ from .cell import Button, Input
 from .control import Signal, Timer
 from .flag import Align, Fill, State, StyleClass
 from .frame import Frame
-from .layout import Col, Row
+from .layout import Col, Row, Box
 
 
 __all__ = [
@@ -12,6 +12,6 @@ __all__ = [
     'Align', 'Fill', 'State', 'StyleClass',
     'Signal', 'Timer',
     'Frame',
-    'Col', 'Row',
+    'Col', 'Row', 'Box',
     'Button', 'Input',
     ]
