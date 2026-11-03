@@ -37,11 +37,15 @@ class Frame(UIObject):
         self._layout_view = False
 
         # Signal
-        self.destroy = Signal(self)
+        self.closed = Signal(self)
+        self.maximized = Signal(self)
+        self.minimized = Signal(self)
+        self.unmaximized = Signal(self)
 
+        # Init
         sdl3.SDL_SetHint(
             sdl3.SDL_HINT_X11_WINDOW_TYPE, b'_NET_WM_WINDOW_TYPE_NORMAL')
-        # Init
+        
         if sdl3.SDL_Init(sdl3.SDL_INIT_VIDEO) < 0: # X SDL_INIT_EVERYTHING
             logging.error('SDL3 init error:', sdl3.SDL_GetError())
             sys.exit(1) # X SDL_SetHint(sdl3.SDL_HINT_RENDER_DRIVER, b'vulkan')
@@ -228,11 +232,32 @@ class Frame(UIObject):
         
         return self._container.add(obj)
     
-    def close(self, arg = None) -> None:
+    def close(self) -> None:
         """..."""
-        self.destroy.emit()
-        if arg: print(arg)
+        self.closed.emit()
         self._running = False
+    
+    def maximize(self):
+        self.maximized.emit()
+        sdl3.SDL_MaximizeWindow(self._frame)
+    
+    def minimize(self):
+        self.minimized.emit()
+        sdl3.SDL_MinimizeWindow(self._frame)
+
+    def unmaximize(self):
+        self.unmaximized.emit()
+        sdl3.SDL_RestoreWindow(self._frame)
+
+    def toggle_maximize(self):
+        flags = sdl3.SDL_GetWindowFlags(self._frame)
+
+        if flags & sdl3.SDL_WINDOW_MAXIMIZED:
+            sdl3.SDL_RestoreWindow(self._frame)
+            self.unmaximized.emit()
+        else:
+            sdl3.SDL_MaximizeWindow(self._frame)
+            self.maximized.emit()
     
     def run(self) -> int:
         if self._layout_view:
