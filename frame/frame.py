@@ -9,7 +9,7 @@ import sdl3
 
 from ..cell import Input
 from ..control import Signal
-from ..flag import ResizeArea, Cursor, StyleClass
+from ..flag import ResizeArea, Cursor, StyleClass, FrameState
 from ..layout import Col
 from ..ui import UIObject, Drawer, Theme
 
@@ -38,6 +38,8 @@ class Frame(UIObject):
 
         # Signal
         self.closed = Signal(self)
+        self.entered_fullscreen = Signal(self)
+        self.exited_fullscreen = Signal(self)
         self.maximized = Signal(self)
         self.minimized = Signal(self)
         self.unmaximized = Signal(self)
@@ -65,6 +67,14 @@ class Frame(UIObject):
 
         sdl3.SDL_SetWindowOpacity(self._frame, 1.0)
 
+        self._start_cursor_x = c_float()
+        self._start_cursor_y = c_float()
+        self._start_x = c_int()
+        self._start_y = c_int()
+        self._start_w = c_int()
+        self._start_h = c_int()
+        self._state = FrameState.FRAME
+
         # Style
         self._renderer  = sdl3.SDL_CreateRenderer(self._frame, None)
         if not self._renderer :
@@ -77,6 +87,7 @@ class Frame(UIObject):
 
         self._drawer = Drawer(self._renderer )
         self._style = self._theme
+        self._tt_frame = None
 
         # Loop
         self._running = True
@@ -95,15 +106,6 @@ class Frame(UIObject):
         self._render_update = True
         self._render_count = 0
         self._first_render = True
-
-        # Frame
-        self._start_cursor_x = c_float()
-        self._start_cursor_y = c_float()
-        self._start_x = c_int()
-        self._start_y = c_int()
-        self._start_w = c_int()
-        self._start_h = c_int()
-        self._tt_frame = None
 
         # Resize
         self._resizing = False
@@ -237,15 +239,28 @@ class Frame(UIObject):
         self.closed.emit()
         self._running = False
     
+    def exit_fullscreen(self):
+        self._state = FrameState.FRAME
+        self.exited_fullscreen.emit()
+        sdl3.SDL_SetWindowFullscreen(self._frame, False)
+    
+    def fullscreen(self):
+        self._state = FrameState.FULL
+        self.entered_fullscreen.emit()
+        sdl3.SDL_SetWindowFullscreen(self._frame, True)
+    
     def maximize(self):
+        self._state = FrameState.MAX
         self.maximized.emit()
         sdl3.SDL_MaximizeWindow(self._frame)
     
     def minimize(self):
+        self._state = FrameState.MIN
         self.minimized.emit()
         sdl3.SDL_MinimizeWindow(self._frame)
 
     def unmaximize(self):
+        self._state = FrameState.FRAME
         self.unmaximized.emit()
         sdl3.SDL_RestoreWindow(self._frame)
 
@@ -254,10 +269,24 @@ class Frame(UIObject):
 
         if flags & sdl3.SDL_WINDOW_MAXIMIZED:
             sdl3.SDL_RestoreWindow(self._frame)
+            self._state = FrameState.FRAME
             self.unmaximized.emit()
         else:
             sdl3.SDL_MaximizeWindow(self._frame)
+            self._state = FrameState.MAX
             self.maximized.emit()
+    
+    def toggle_fullscreen(self):
+        flags = sdl3.SDL_GetWindowFlags(self._frame)
+
+        if flags & sdl3.SDL_WINDOW_FULLSCREEN:
+            sdl3.SDL_SetWindowFullscreen(self._frame, False)
+            self._state = FrameState.FRAME
+            self.exited_fullscreen.emit()
+        else:
+            sdl3.SDL_SetWindowFullscreen(self._frame, True)
+            self._state = FrameState.FULL
+            self.entered_fullscreen.emit()
     
     def run(self) -> int:
         if self._layout_view:
