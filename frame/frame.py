@@ -8,6 +8,7 @@ import sdl3
 # import sdl3.sdlttf as ttf
 
 from ..cell import Input
+from ..control import Signal
 from ..flag import ResizeArea, Cursor, StyleClass
 from ..layout import Col
 from ..ui import UIObject, Drawer, Theme
@@ -34,6 +35,9 @@ class Frame(UIObject):
         self._width = width
         self._height = height
         self._layout_view = False
+
+        # Signal
+        self.destroy = Signal(self)
 
         sdl3.SDL_SetHint(
             sdl3.SDL_HINT_X11_WINDOW_TYPE, b'_NET_WM_WINDOW_TYPE_NORMAL')
@@ -223,7 +227,13 @@ class Frame(UIObject):
                         self._drag_areas.append(glo)
         
         return self._container.add(obj)
-        
+    
+    def close(self, arg = None) -> None:
+        """..."""
+        self.destroy.emit()
+        if arg: print(arg)
+        self._running = False
+    
     def run(self) -> int:
         if self._layout_view:
             for obj in self._container._objects:
@@ -267,16 +277,16 @@ class Frame(UIObject):
                 return sdl3.SDL_HITTEST_RESIZE_LEFT
             if x > w.value - border:
                 return sdl3.SDL_HITTEST_RESIZE_RIGHT
+        else:
+            # DRAG
+            for drag in self._drag_areas:
+                delta_top = 5 if drag._y < 3 else 0
 
-        # DRAG
-        # if border < x < w.value - border and border < y < 30:
-        #     return sdl3.SDL_HITTEST_DRAGGABLE
-        for drag in self._drag_areas:
-            if (drag._x < x < drag._x + drag.width and
-                    drag._y < y < drag._y + drag.height):
-                return sdl3.SDL_HITTEST_DRAGGABLE
+                if (drag._x + 4 < x < drag._x + drag.width - 4 and
+                        drag._y + delta_top < y < drag._y + drag.height):
+                    return sdl3.SDL_HITTEST_DRAGGABLE
 
-        return sdl3.SDL_HITTEST_NORMAL
+            return sdl3.SDL_HITTEST_NORMAL
     
     def _cursor_resize_area(self, cursor_x, cursor_y) -> ResizeArea:
         # cursor_x = c_float()
