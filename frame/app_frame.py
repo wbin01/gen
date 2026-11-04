@@ -5,6 +5,7 @@ from .sys_frame import SysFrame
 from ..flag.fill import Fill
 from ..flag.frame_state import FrameState
 from ..layout.box import Box
+from ..layout.col import Col
 from ..cell.control_button import ControlButton
 from ..cell.drag_area import DragArea
 from ..cell.tool_button import ToolButton
@@ -17,6 +18,8 @@ class Header(Box):
     def __init__(self, frame, *args, **kwargs):
         super().__init__(frame=frame, horizontal=True, *args, **kwargs)
         self.fill = Fill.X
+        self.padding = 2
+        self.margin = 0, 0, 1, 0
 
         desk_env = 'plasma'
         buttons_path = PATH/'static'/'control_button'
@@ -45,7 +48,7 @@ class Header(Box):
             lambda _: setattr(frame, 'frame_state', FrameState.MIN))
         
         self.add(DragArea('Title'))
-        self.add(ToolButton('document-edit'))
+        tb = self.add(ToolButton('document-edit'))
 
 
 class AppFrame(SysFrame):
