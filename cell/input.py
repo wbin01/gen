@@ -74,6 +74,7 @@ class Input(Cell):
         self._tt_cursor_off = None
         
         self._timer = Timer(call=self._cursor_tick)
+        self._timer.active = True
 
         self._log_rebuild = False
     

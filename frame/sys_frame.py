@@ -73,6 +73,8 @@ class SysFrame(Frame):
         flags = sdl3.SDL_GetWindowFlags(self._frame)
         self.frame_state = (FrameState.FRAME
             if flags & sdl3.SDL_WINDOW_MAXIMIZED else FrameState.MAX)
+        
+        self._render_mode = 'REBUILD'
     
     def toggle_fullscreen(self):
         """..."""

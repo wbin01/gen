@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import logging
-import time
 import sys
 from ctypes import c_float, c_int
 
@@ -215,18 +214,6 @@ class Frame(UIObject):
     
     def add(self, obj: Cell | Layout, fill=None) -> Cell | Layout:
         obj._drawer = self._drawer
-
-        if obj._base_class == 'Cell':
-            if hasattr(obj, '_type_class') and obj._type_class == 'DragArea':
-                self._drag_areas.append(obj)
-        
-        elif obj._base_class == 'Layout':
-            for glo in obj._global_objects:
-                if glo._base_class == 'Cell':
-                    if (hasattr(glo, '_type_class') and
-                            glo._type_class == 'DragArea'):
-                        self._drag_areas.append(glo)
-        
         return self._container.add(obj)
     
     def close(self) -> None:
@@ -314,14 +301,10 @@ class Frame(UIObject):
                         self._handle_events(
                             event, resize_area, cursor_x, cursor_y)
 
-            current_time = time.monotonic()
             for timer in self._timers:
-                if current_time >= timer._next_tick:
-                    timer._next_tick = time.monotonic() + timer.interval
-
-                    if timer._exec() and self._render_mode == 'UNIT':
-                        if self._resize_area == ResizeArea.NONE:
-                            self._render_update = True
+                if timer._exec() and self._render_mode == 'UNIT':
+                    if self._resize_area == ResizeArea.NONE:
+                        self._render_update = True
 
             if self._queue_list:
                 self._container._redraw_queue(self._queue_list)

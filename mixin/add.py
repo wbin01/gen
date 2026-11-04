@@ -49,6 +49,9 @@ class Add(object):
         if obj._base_class == 'Cell':
             obj._drawer = self._app._drawer
 
+            if hasattr(obj, '_type_class') and obj._type_class == 'DragArea':
+                self._app._drag_areas.append(obj)
+
             if hasattr(obj, '_timer') and isinstance(obj._timer, Timer):
                 self._app._timers.append(obj._timer)
                 obj._timer._parent = self
