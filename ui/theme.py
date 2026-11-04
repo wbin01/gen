@@ -17,6 +17,34 @@ class Theme(object):
             },
         }
     
+    SysFrame = {
+        'BASE': {
+            'background-color': (20, 20, 20, 240),
+            'border': 1,
+            'border-color': (55, 55, 55, 200),
+            'radius': 8,
+            'accent-color': (60, 100, 150, 255),
+            },
+        'INACTIVE': {
+            'background-color': (20, 20, 20, 240),
+            'border-color': (55, 55, 55, 200),
+            },
+        }
+    
+    AppFrame = {
+        'BASE': {
+            'background-color': (20, 20, 20, 240),
+            'border': 1,
+            'border-color': (55, 55, 55, 200),
+            'radius': 8,
+            'accent-color': (60, 100, 150, 255),
+            },
+        'INACTIVE': {
+            'background-color': (20, 20, 20, 240),
+            'border-color': (55, 55, 55, 200),
+            },
+        }
+    
     Layout = {
         'BASE': {
             'background-color': (10, 10, 10, 240),
