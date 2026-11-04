@@ -1,16 +1,11 @@
 #!/usr/bin/env python3
 import time
-from pathlib import Path
 
 from xdg import IconTheme
 
 from .cell import Cell
 from ..flag import Fill
 
-# PATH = Path(__file__).resolve().parent.parent
-# static_path = PATH/'static'/'control_button'
-# icon = static_path/'glitch'/'go-down.svg'
-# print(icon, icon.is_file())
 
 class ControlButton(Cell):
     """..."""
