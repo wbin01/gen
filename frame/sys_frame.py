@@ -5,7 +5,7 @@ import sdl3
 # import sdl3.sdlttf as ttf
 
 from ..control import Signal
-from ..flag import ResizeArea,FrameState
+from ..flag import ResizeArea, FrameState
 from .frame import Frame
 
 
@@ -25,54 +25,60 @@ class SysFrame(Frame):
     def __str__(self) -> str:
         return self.__class__.__name__
     
-    def exit_fullscreen(self):
-        self._state = FrameState.FRAME
-        self.exited_fullscreen.emit()
-        sdl3.SDL_SetWindowFullscreen(self._frame, False)
+    @property
+    def frame_state(self) -> FrameState:
+        """..."""
+        flags = sdl3.SDL_GetWindowFlags(self._frame)
+        if flags & sdl3.SDL_WINDOW_FULLSCREEN:
+            return FrameState.FULL
+        if flags & sdl3.SDL_WINDOW_MAXIMIZED:
+            return FrameState.MAX
+        if flags & sdl3.SDL_WINDOW_MINIMIZED:
+            return FrameState.MIN
+        if flags & sdl3.SDL_WINDOW_HIDDEN:
+            return FrameState.HIDDEN
+        return FrameState.FRAME
     
-    def fullscreen(self):
-        self._state = FrameState.FULL
-        self.entered_fullscreen.emit()
-        sdl3.SDL_SetWindowFullscreen(self._frame, True)
-    
-    def maximize(self):
-        self._state = FrameState.MAX
-        self.maximized.emit()
-        sdl3.SDL_MaximizeWindow(self._frame)
-    
-    def minimize(self):
-        self._state = FrameState.MIN
-        self.minimized.emit()
-        sdl3.SDL_MinimizeWindow(self._frame)
-
-    def unmaximize(self):
-        self._state = FrameState.FRAME
-        self.unmaximized.emit()
-        sdl3.SDL_RestoreWindow(self._frame)
-
-    def toggle_maximize(self):
+    @frame_state.setter
+    def frame_state(self, frame_state: FrameState) -> None:
         flags = sdl3.SDL_GetWindowFlags(self._frame)
 
-        if flags & sdl3.SDL_WINDOW_MAXIMIZED:
+        if frame_state != FrameState.FULL and frame_state != FrameState.MIN:
+            if flags & sdl3.SDL_WINDOW_FULLSCREEN:
+                sdl3.SDL_SetWindowFullscreen(self._frame, False)
+                self.exited_fullscreen.emit()
+
+        if frame_state == FrameState.FRAME:    
             sdl3.SDL_RestoreWindow(self._frame)
             self._state = FrameState.FRAME
             self.unmaximized.emit()
-        else:
-            sdl3.SDL_MaximizeWindow(self._frame)
-            self._state = FrameState.MAX
-            self.maximized.emit()
-    
-    def toggle_fullscreen(self):
-        flags = sdl3.SDL_GetWindowFlags(self._frame)
-
-        if flags & sdl3.SDL_WINDOW_FULLSCREEN:
-            sdl3.SDL_SetWindowFullscreen(self._frame, False)
-            self._state = FrameState.FRAME
-            self.exited_fullscreen.emit()
-        else:
+        
+        elif frame_state == FrameState.FULL:
             sdl3.SDL_SetWindowFullscreen(self._frame, True)
             self._state = FrameState.FULL
             self.entered_fullscreen.emit()
+            
+        elif frame_state == FrameState.MAX:
+            sdl3.SDL_MaximizeWindow(self._frame)
+            self._state = FrameState.MAX
+            self.maximized.emit()
+            
+        elif frame_state == FrameState.MIN:
+            sdl3.SDL_MinimizeWindow(self._frame)
+            self._state = FrameState.MIN
+            self.minimized.emit()
+
+    def toggle_maximize(self):
+        """..."""
+        flags = sdl3.SDL_GetWindowFlags(self._frame)
+        self.frame_state = (FrameState.FRAME
+            if flags & sdl3.SDL_WINDOW_MAXIMIZED else FrameState.MAX)
+    
+    def toggle_fullscreen(self):
+        """..."""
+        flags = sdl3.SDL_GetWindowFlags(self._frame)
+        self.frame_state = (FrameState.FRAME
+            if flags & sdl3.SDL_WINDOW_FULLSCREEN else FrameState.FULL)
     
     def _cursor_hit_test(self, window, area, data):
         x = area.contents.x
