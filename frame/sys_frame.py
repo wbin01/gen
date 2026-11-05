@@ -45,6 +45,9 @@ class SysFrame(Frame):
     
     @frame_state.setter
     def frame_state(self, frame_state: FrameState) -> None:
+        if frame_state == self.frame_state:
+            return
+
         flags = sdl3.SDL_GetWindowFlags(self._frame)
 
         if frame_state != FrameState.FULL and frame_state != FrameState.MIN:
