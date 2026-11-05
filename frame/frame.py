@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import logging
 import sys
-from ctypes import c_float, c_int
+import ctypes
 
 import sdl3
 # import sdl3.sdlttf as ttf
@@ -61,12 +61,12 @@ class Frame(UIObject):
 
         sdl3.SDL_SetWindowOpacity(self._frame, 1.0)
 
-        self._start_cursor_x = c_float()
-        self._start_cursor_y = c_float()
-        self._start_x = c_int()
-        self._start_y = c_int()
-        self._start_w = c_int()
-        self._start_h = c_int()
+        self._start_cursor_x = ctypes.c_float()
+        self._start_cursor_y = ctypes.c_float()
+        self._start_x = ctypes.c_int()
+        self._start_y = ctypes.c_int()
+        self._start_w = ctypes.c_int()
+        self._start_h = ctypes.c_int()
         self._state = FrameState.FRAME
 
         # Style
@@ -258,8 +258,9 @@ class Frame(UIObject):
         sdl3.SDL_Quit()
     
     def _draw(self) -> None:
-        w = h = c_int()
-        sdl3.SDL_GetWindowSize(self._frame, w, h)
+        w = ctypes.c_int()
+        h = ctypes.c_int()
+        sdl3.SDL_GetWindowSize(self._frame, ctypes.byref(w), ctypes.byref(h))
 
         self._tt_frame = self._drawer.texture(
             self._tt_frame, self.width, self.height, self._draw_obj, 'FRAME')
@@ -284,13 +285,13 @@ class Frame(UIObject):
         while self._running:
             event = sdl3.SDL_Event()
             
-            cursor_x = c_float()
-            cursor_y = c_float()
+            cursor_x = ctypes.c_float()
+            cursor_y = ctypes.c_float()
             sdl3.SDL_GetGlobalMouseState(cursor_x, cursor_y)
             resize_area = self._cursor_resize_area(cursor_x, cursor_y)
 
-            cursor_x = c_float()
-            cursor_y = c_float()
+            cursor_x = ctypes.c_float()
+            cursor_y = ctypes.c_float()
             sdl3.SDL_GetMouseState(cursor_x, cursor_y)
 
             if sdl3.SDL_WaitEventTimeout(event, 16):
@@ -530,7 +531,7 @@ class Frame(UIObject):
         self._render_update = False
         self._render_count += 1
         
-        sdl3.SDL_SetRenderDrawColor(self._renderer , 0,0,0,0)
+        sdl3.SDL_SetRenderDrawColor(self._renderer, 0, 0, 0, 0)
         sdl3.SDL_RenderClear(self._renderer )
 
         if self._render_mode == 'RESIZE':
@@ -582,8 +583,8 @@ class Frame(UIObject):
         if not self._resizing:
             return
 
-        cursor_x = c_float()
-        cursor_y = c_float()
+        cursor_x = ctypes.c_float()
+        cursor_y = ctypes.c_float()
         sdl3.SDL_GetGlobalMouseState(cursor_x, cursor_y)
 
         dx = cursor_x.value - self._start_cursor_x.value

@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
-from ctypes import c_int
+import ctypes
 
 import sdl3
 # import sdl3.sdlttf as ttf
 
-from ..control import Signal
+from ..control import Signal, Timer
 from ..flag import ResizeArea, FrameState
 from .frame import Frame
 
 
 class SysFrame(Frame):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         # Signal
         self.entered_fullscreen = Signal(self)
@@ -18,7 +18,11 @@ class SysFrame(Frame):
         self.maximized = Signal(self)
         self.minimized = Signal(self)
         self.unmaximized = Signal(self)
-    
+
+        self._canvas_update_timer = Timer(
+            call=self._canvas_update_render, single_shot=True, init_delay=0.1)
+        self._timers.append(self._canvas_update_timer)
+        
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}()'
 
@@ -67,28 +71,41 @@ class SysFrame(Frame):
             sdl3.SDL_MinimizeWindow(self._frame)
             self._state = FrameState.MIN
             self.minimized.emit()
+        
+        sdl3.SDL_SyncWindow(self._frame)
+        w = ctypes.c_int()
+        h = ctypes.c_int()
+        sdl3.SDL_GetWindowSize(self._frame, ctypes.byref(w), ctypes.byref(h))
+        self._width, self._height = w.value, h.value
 
-    def toggle_maximize(self):
+        if frame_state != FrameState.MIN:
+            self._canvas_update_timer.active = True
+
+    def toggle_maximize(self) -> None:
         """..."""
         flags = sdl3.SDL_GetWindowFlags(self._frame)
         self.frame_state = (FrameState.FRAME
             if flags & sdl3.SDL_WINDOW_MAXIMIZED else FrameState.MAX)
-        
-        self._render_mode = 'REBUILD'
     
-    def toggle_fullscreen(self):
+    def toggle_fullscreen(self) -> None:
         """..."""
         flags = sdl3.SDL_GetWindowFlags(self._frame)
         self.frame_state = (FrameState.FRAME
             if flags & sdl3.SDL_WINDOW_FULLSCREEN else FrameState.FULL)
     
+    def _canvas_update_render(self) -> None:
+        """..."""
+        self._render_mode = 'RESIZE'
+        self._render_update = True
+        # sdl3.SDL_GetCurrentDisplayMode(display)
+    
     def _cursor_hit_test(self, window, area, data):
         x = area.contents.x
         y = area.contents.y
 
-        w = c_int()
-        h = c_int()
-        sdl3.SDL_GetWindowSize(self._frame, w, h)
+        w = ctypes.c_int()
+        h = ctypes.c_int()
+        sdl3.SDL_GetWindowSize(self._frame, ctypes.byref(w), ctypes.byref(h))
 
         border = self._resize_border
         
@@ -123,16 +140,17 @@ class SysFrame(Frame):
             return sdl3.SDL_HITTEST_NORMAL
     
     def _cursor_resize_area(self, cursor_x, cursor_y) -> ResizeArea:
-        # cursor_x = c_float()
-        # cursor_y = c_float()
+        # cursor_x = ctypes.c_float()
+        # cursor_y = ctypes.c_float()
         # sdl3.SDL_GetGlobalMouseState(cursor_x, cursor_y)
-        frame_x = c_int()
-        frame_y = c_int()
+        frame_x = ctypes.c_int()
+        frame_y = ctypes.c_int()
         sdl3.SDL_GetWindowPosition(self._frame, frame_x, frame_y)
 
-        frame_w = c_int()
-        frame_h = c_int()
-        sdl3.SDL_GetWindowSize(self._frame, frame_w, frame_h)
+        frame_w = ctypes.c_int()
+        frame_h = ctypes.c_int()
+        sdl3.SDL_GetWindowSize(
+            self._frame, ctypes.byref(frame_w), ctypes.byref(frame_h))
 
         x = cursor_x.value - frame_x.value
         y = cursor_y.value - frame_y.value

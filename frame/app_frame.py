@@ -15,7 +15,7 @@ PATH = Path(__file__).resolve().parent.parent
 
 
 class Header(Box):
-    def __init__(self, frame, *args, **kwargs):
+    def __init__(self, frame, *args, **kwargs) -> None:
         super().__init__(frame=frame, horizontal=True, *args, **kwargs)
         self.fill = Fill.X
         self.padding = 2
@@ -52,7 +52,7 @@ class Header(Box):
 
 
 class AppFrame(SysFrame):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.header = self.add(Header(self))
     
