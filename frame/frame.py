@@ -94,6 +94,7 @@ class Frame(UIObject):
         self._container._parent = self
         self._container._app = self
         self._container._drawer = self._drawer
+        self._container._global_objects.append(self)
 
         # Render
         self._render_mode = 'UNIT'

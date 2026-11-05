@@ -8,16 +8,22 @@ from .cell import Cell
 from ..flag import Fill
 
 
+class UIObject:
+    pass
+
+
 class DragArea(Cell):
     """..."""
     def __init__(
             self, text: str = '', width: int = 100, height: int = 32,
-            elided: bool = True, fill: Fill = Fill.X, *args, **kwargs) -> None:
+            elided: bool = True, fill: Fill = Fill.X, center: UIObject = None,
+            *args, **kwargs) -> None:
         """..."""
         super().__init__(fill=fill, *args, **kwargs)
         self._type_class = 'DragArea'
         self.fill = fill
         self._invalidate_item = None
+        self._center_ref = center
 
         self._text = text
         self.width = width
@@ -111,8 +117,8 @@ class DragArea(Cell):
                 self._tt_base, int(self._x), int(self._y),
                 self._resize_width, self._resize_height)
 
-            self._txt_x = self._x + (self._resize_width//2)-(self._txt_w//2)
-            self._txt_y = self._y + (self._resize_height//2)-(self._txt_h//2)
+            # self._txt_x = self._x + (self._resize_width//2)-(self._txt_w//2)
+            # self._txt_y = self._y + (self._resize_height//2)-(self._txt_h//2)
 
             self._drawer.apply_texture(
                 self._tt_base_txt,
@@ -141,6 +147,9 @@ class DragArea(Cell):
         
         self._txt_x = self._x + (self.width // 2) - (self._txt_w // 2)
         self._txt_y = self._y + (self.height // 2) - (self._txt_h // 2)
+
+        if self._center_ref:
+            self._txt_x = self._center_ref.width // 2 - (self._txt_w // 2)
     
     def _draw_rects(self, state: str = 'BASE'):
         radius = 0

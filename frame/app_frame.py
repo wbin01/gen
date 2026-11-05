@@ -47,7 +47,7 @@ class Header(Box):
         self._min_control.pressed.connect(
             lambda _: setattr(frame, 'frame_state', FrameState.MIN))
         
-        self.add(DragArea('Title'))
+        self.add(DragArea('Title', center=frame))
         tb = self.add(ToolButton('document-edit'))
 
 
