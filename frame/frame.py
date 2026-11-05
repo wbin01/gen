@@ -271,15 +271,22 @@ class Frame(UIObject):
             self._container._redraw('REBUILD')
 
     def _draw_obj(self, mode) -> None:
+        bg_color = self._style.Frame['BASE']['background-color']
+        bd_color = self._style.Frame['BASE']['border-color']
+        bd_radius = self._style.Frame['BASE']['radius']
+
+        flags = sdl3.SDL_GetWindowFlags(self._frame)
+        if (flags & sdl3.SDL_WINDOW_FULLSCREEN or
+                flags & sdl3.SDL_WINDOW_MAXIMIZED):
+            bd_color = bg_color
+            bd_radius = 0
+        
         self._drawer.rect(
-            x=0, y=0, w=self.width, h=self.height,
-            color=self._style.Frame['BASE']['border-color'],
-            r=self._style.Frame['BASE']['radius'])
+            x=0, y=0, w=self.width, h=self.height, color=bd_color, r=bd_radius)
 
         self._drawer.rect(
             x=1, y=1, w=self.width - 2, h=self.height - 2,
-            color=self._style.Frame['BASE']['background-color'],
-            r=self._style.Frame['BASE']['radius'])
+            color=bg_color, r=bd_radius)
 
     def _event_loop(self) -> None:
         while self._running:
