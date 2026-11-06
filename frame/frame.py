@@ -236,11 +236,11 @@ class Frame(UIObject):
         return 0
     
     def _cursor_hit_test(self, window, area, data):
-        # In SysFrame
+        # SysFrame
         return sdl3.SDL_HITTEST_NORMAL
     
     def _cursor_resize_area(self, cursor_x, cursor_y) -> ResizeArea:
-        # In SysFrame
+        # SysFrame
         return ResizeArea.NONE
     
     def _cursor_update_shape(self, cursor_name: str) -> None:
@@ -323,7 +323,16 @@ class Frame(UIObject):
             if self._render_update or self._container._dirty:
                 self._render()
     
+    def _event_name(self, event_type):
+        for name in dir(sdl3):
+            if name.startswith("SDL_EVENT_"):
+                if getattr(sdl3, name) == event_type:
+                    return name
+        return str(event_type)
+    
     def _handle_events(self, event, resize_area, cursor_x, cursor_y) -> None:
+        # print(self._event_name(event.type))
+        
         if resize_area.value != self._last_resize_cursor_on_hover:
             self._cursor_update_shape(resize_area.value)
             self._last_resize_cursor_on_hover = resize_area.value
@@ -334,6 +343,12 @@ class Frame(UIObject):
         if event.type == sdl3.SDL_EVENT_KEY_DOWN:
             if event.key.key == sdl3.SDLK_ESCAPE:
                 self._running = False
+        
+        if event.type == sdl3.SDL_EVENT_WINDOW_EXPOSED:
+            # or SDL_EVENT_WINDOW_SAFE_AREA_CHANGED
+            if not self._resizing:
+                self._render_mode = 'SYS_RESIZE'
+                self._render_update = True
         
         if event.type == sdl3.SDL_EVENT_MOUSE_BUTTON_DOWN:
             if event.button.button == sdl3.SDL_BUTTON_LEFT:
@@ -542,6 +557,9 @@ class Frame(UIObject):
         sdl3.SDL_SetRenderDrawColor(self._renderer, 0, 0, 0, 0)
         sdl3.SDL_RenderClear(self._renderer )
 
+        if self._render_mode == 'SYS_RESIZE':
+            self._sync_frame_size()
+        
         if self._render_mode == 'RESIZE':
             if self._resizing:
                 self._resizing_count += 1
@@ -580,6 +598,10 @@ class Frame(UIObject):
 
         sdl3.SDL_RenderPresent(self._renderer )
         sdl3.SDL_Delay(16)
+    
+    def _sync_frame_size(self, frame_state = None) -> None:
+        # SysFrame
+        pass
     
     def _resize_settings(self) -> None:
         self._resizing = True

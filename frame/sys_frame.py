@@ -20,9 +20,9 @@ class SysFrame(Frame):
         self.unmaximized = Signal(self)
 
         self._canvas_update_timer = Timer(
-            call=self._canvas_update_render, single_shot=True, init_delay=0.1)
+            call=self._canvas_update_render, single_shot=True, init_delay=0.01)
         self._timers.append(self._canvas_update_timer)
-        
+
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}()'
 
@@ -74,13 +74,14 @@ class SysFrame(Frame):
             sdl3.SDL_MinimizeWindow(self._frame)
             self._state = FrameState.MIN
             self.minimized.emit()
-        
+    
+    def _sync_frame_size(self, frame_state: FrameState = None) -> None:
         sdl3.SDL_SyncWindow(self._frame)
         w = ctypes.c_int()
         h = ctypes.c_int()
         sdl3.SDL_GetWindowSize(self._frame, ctypes.byref(w), ctypes.byref(h))
         self._width, self._height = w.value, h.value
-
+        
         if frame_state != FrameState.MIN:
             self._canvas_update_timer.active = True
 
@@ -143,9 +144,6 @@ class SysFrame(Frame):
             return sdl3.SDL_HITTEST_NORMAL
     
     def _cursor_resize_area(self, cursor_x, cursor_y) -> ResizeArea:
-        # cursor_x = ctypes.c_float()
-        # cursor_y = ctypes.c_float()
-        # sdl3.SDL_GetGlobalMouseState(cursor_x, cursor_y)
         frame_x = ctypes.c_int()
         frame_y = ctypes.c_int()
         sdl3.SDL_GetWindowPosition(self._frame, frame_x, frame_y)
