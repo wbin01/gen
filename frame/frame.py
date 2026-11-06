@@ -23,7 +23,7 @@ class Frame(UIObject):
 
     def __init__(
             self, title: str,
-            x: int = 0, y: int = 0, width: int = 500, height: int = 300,
+            x: int = 0, y: int = 0, width: int = 100, height: int = 100,
             *args, **kwargs) -> None:
         """..."""
         super().__init__(*args, **kwargs)
@@ -255,7 +255,6 @@ class Frame(UIObject):
 
         sdl3.SDL_DestroyRenderer(self._renderer )
         sdl3.SDL_DestroyWindow(self._frame)
-        # sdl3.SDL_DestroySurface(self.__font_surface)
         sdl3.SDL_Quit()
     
     def _draw(self) -> None:
@@ -332,7 +331,7 @@ class Frame(UIObject):
     
     def _handle_events(self, event, resize_area, cursor_x, cursor_y) -> None:
         # print(self._event_name(event.type))
-        
+
         if resize_area.value != self._last_resize_cursor_on_hover:
             self._cursor_update_shape(resize_area.value)
             self._last_resize_cursor_on_hover = resize_area.value
@@ -601,7 +600,7 @@ class Frame(UIObject):
     
     def _sync_frame_size(self, frame_state = None) -> None:
         # SysFrame
-        pass
+        self._render_mode = 'RESIZE'
     
     def _resize_settings(self) -> None:
         self._resizing = True

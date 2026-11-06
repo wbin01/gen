@@ -11,7 +11,7 @@ class Application(Size):
         self._app = None
         self._name = 'Genesis'
         self._title = None
-        self._size = 500, 400
+        self._size = None
     
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}()'
@@ -57,7 +57,12 @@ class Application(Size):
     
     def run(self) -> int:
         """..."""
-        self._app = self._frame(
-            title=self._title if self._title else self._name,
-            width=self._size[0], height=self._size[1])
+        if self._size:
+            self._app = self._frame(
+                title=self._title if self._title else self._name,
+                width=self._size[0], height=self._size[1])
+        else:
+            self._app = self._frame(
+                title=self._title if self._title else self._name)
+        
         self._app.run()

@@ -53,7 +53,7 @@ class Header(Box):
 
 class AppFrame(SysFrame):
     def __init__(self, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
+        super().__init__(width=400, height=400, *args, **kwargs)
         self.header = self.add(Header(self))
     
     def __repr__(self) -> str:

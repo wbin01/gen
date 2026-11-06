@@ -10,8 +10,9 @@ from .frame import Frame
 
 
 class SysFrame(Frame):
-    def __init__(self, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
+    def __init__(self, width: int = 300, height: int = 300,
+            *args, **kwargs) -> None:
+        super().__init__(width=width, height=height, *args, **kwargs)
         # Signal
         self.entered_fullscreen = Signal(self)
         self.exited_fullscreen = Signal(self)
