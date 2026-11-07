@@ -21,7 +21,7 @@ class SysFrame(Frame):
         self.unmaximized = Signal(self)
 
         self._canvas_update_timer = Timer(
-            call=self._canvas_update_render, single_shot=True, init_delay=0.1)
+            call=self._canvas_update_render, single_shot=True, init_delay=0.05)
         self._timers.append(self._canvas_update_timer)
 
     def __repr__(self) -> str:

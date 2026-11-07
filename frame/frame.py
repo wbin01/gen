@@ -11,6 +11,7 @@ from ..control import Signal
 from ..flag import ResizeArea, Cursor, StyleClass, FrameState
 from ..layout import Col
 from ..ui import UIObject, Drawer, Theme
+from ..platform_ import Platform
 
 
 class Layout:
@@ -34,6 +35,7 @@ class Frame(UIObject):
         self._width = width
         self._height = height
         self._layout_view = False
+        self._platform = Platform()
 
         # Signal
         self.closed = Signal(self)
