@@ -15,7 +15,7 @@ class ColExpander(Cell):
         self.height = 0
         self.fill = Fill.Y
     
-    def __draw(self) -> None:
+    def _draw(self, mode: str = None) -> None:
         pass
 
 
@@ -28,7 +28,7 @@ class RowExpander(Cell):
         self.height = 0
         self.fill = Fill.X
     
-    def __draw(self) -> None:
+    def _draw(self, mode: str = None) -> None:
         pass
 
 class Container(Margin, Padding, Size, Add, Layout):
@@ -86,7 +86,7 @@ class Container(Margin, Padding, Size, Add, Layout):
         self._fill = fill
         self._first = False
         self._orientation = 'VERTICAL'
-        self._tx_background = None
+        self._tt_background = None
         self._x = 0
         self._y = 0
     
@@ -151,14 +151,14 @@ class Container(Margin, Padding, Size, Add, Layout):
         self._spacing = spacing
     
     def _draw_tx(self) -> None:
-        if not self._tx_background:
-            self._tx_background = self._drawer.build_texture(
+        if not self._tt_background:
+            self._tt_background = self._drawer.build_texture(
                 self.width + self.margin[1] + self.margin[3] - 2,
                 self.height + self.margin[0] + self.margin[2] - 2,
                 self._draw_obj, 'BASE')
 
         self._drawer.set_texture(
-            self._tx_background,
+            self._tt_background,
             self._x - self.margin[3], self._y - self.margin[0],
             self.width + self.margin[1] + self.margin[3] - 2,
             self.height + self.margin[0] + self.margin[2] - 2)

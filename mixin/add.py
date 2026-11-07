@@ -24,6 +24,10 @@ class Add(object):
     def add(self, obj: UIObject) -> UIObject:
         """..."""
         return self._add(obj)
+    
+    def insert(self, obj: UIObject) -> UIObject:
+        """..."""
+        return self._add(obj)
 
     def _add(self, obj: UIObject) -> UIObject:
         if isinstance(obj, type):

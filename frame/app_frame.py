@@ -3,9 +3,11 @@ from pathlib import Path
 
 from .sys_frame import SysFrame
 from ..flag.fill import Fill
+from ..flag.align import Align
 from ..flag.frame_state import FrameState
 from ..layout.box import Box
 from ..layout.col import Col
+from ..layout.row import Row
 from ..cell.control_button import ControlButton
 from ..cell.drag_area import DragArea
 from ..cell.tool_button import ToolButton
@@ -18,8 +20,9 @@ class Header(Box):
     def __init__(self, frame, *args, **kwargs) -> None:
         super().__init__(frame=frame, horizontal=True, *args, **kwargs)
         self.fill = Fill.X
-        self.padding = 2
-        self.margin = 0, 0, 1, 0
+        self.padding = 0
+        self.height = 32
+        self.margin = 0, 0, 3, 0
 
         desk_env = 'plasma'
         buttons_path = PATH/'static'/'control_button'
@@ -47,14 +50,35 @@ class Header(Box):
         self._min_control.pressed.connect(
             lambda _: setattr(frame, 'frame_state', FrameState.MIN))
         
+        self._left = self.add(Row(fill=Fill.X, align=Align.START))
         self.add(DragArea('Title', center=frame))
-        tb = self.add(ToolButton('document-edit'))
+        self._right = self.add(Row(fill=Fill.X, align=Align.END))
+
+        self._r = self.add(Row(fill=Fill.NONE, align=Align.END))
+        ff = self._r.add(ToolButton('document-edit'))
+    
+    @property
+    def left(self) -> Row:
+        """..."""
+        return self._left
+    
+    @property
+    def right(self) -> Row:
+        """..."""
+        return self._right
 
 
 class AppFrame(SysFrame):
-    def __init__(self, *args, **kwargs) -> None:
-        super().__init__(width=400, height=400, *args, **kwargs)
-        self.header = self.add(Header(self))
+    def __init__(
+            self, width: int = 400, height: int = 400,
+            *args, **kwargs) -> None:
+        super().__init__(width=width, height=height, *args, **kwargs)
+        self._header = self.add(Header(self))
+    
+    @property
+    def header(self) -> Header:
+        """..."""
+        return self._header
     
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}()'

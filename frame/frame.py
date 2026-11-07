@@ -87,6 +87,7 @@ class Frame(UIObject):
         self._running = True
         self._queue_list = []
         self._timers = []
+        self._recalculate = False
 
         # Container
         self._container = Col()
@@ -559,6 +560,11 @@ class Frame(UIObject):
         if self._render_mode == 'SYS_RESIZE':
             self._sync_frame_size()
         
+        if self._recalculate:
+            for _ in range(5):
+                self._container._invalidate()
+                self._container._update(self._render_mode)
+        
         if self._render_mode == 'RESIZE':
             if self._resizing:
                 self._resizing_count += 1
@@ -589,7 +595,9 @@ class Frame(UIObject):
             sdl3.SDL_RenderTexture(self._renderer, self._tt_frame, None, None)
 
             if self._first_render:
-                self._container._invalidate()
+                for _ in range(5):
+                    self._container._invalidate()
+                    self._container._update('RESIZE')
                 self._first_render = False
             
             self._container._update(self._render_mode)

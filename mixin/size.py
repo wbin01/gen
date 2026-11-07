@@ -5,10 +5,10 @@ class Size(object):
     """..."""
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
-        self._width = 100
-        self._height = 30
-        self._base_width = 60
-        self._base_height = 30
+        self._width = 0
+        self._height = 0
+        self._base_width = 32
+        self._base_height = 32
 
         self._min_width = 0
         self._min_height = 0
