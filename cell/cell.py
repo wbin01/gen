@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import copy
 import ctypes
+from pathlib import Path
 
 import sdl3
 
@@ -8,10 +9,19 @@ from ..flag import Fill
 from ..mixin import Margin, Padding, Size
 from ..ui import UIObject, Theme
 from ..flag import StyleClass
+from ..platform_.icon import Icon
+from ..platform_.os_desk import OSDesk
+
+
+PATH = Path(__file__).resolve().parent.parent
 
 
 class Cell(Margin, Padding, Size, UIObject):
     """..."""
+    _os_desk = OSDesk()
+    _icon = Icon(_os_desk.desktop_environment)
+    _icon_theme = _icon.icon_theme()
+    _empty_icon_path = PATH/'static/icons/empty.svg'
     def __init__(
             self, style_class: str = None, fill: Fill = Fill.XY,
             *args, **kwargs) -> None:

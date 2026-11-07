@@ -27,8 +27,9 @@ class ToolButton(Cell):
         self._icon_path = IconTheme.getIconPath(
             iconname=self._icon_name,
             size=22,
-            theme='breeze-dark',
+            theme=self._icon_theme,
             extensions=['png', 'svg', 'xpm'])
+        if not self._icon_path: self._icon_path = self._empty_icon_path
 
         self._icon_x = 0
         self._icon_y = 0

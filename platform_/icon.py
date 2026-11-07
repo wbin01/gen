@@ -193,38 +193,6 @@ class Icon(object):
             theme=self._icon_theme,
             extensions=['png', 'svg', 'xpm'])
 
-        """
-        from PySide6.QtGui import QIcon
-        icon = QIcon.fromTheme("document-save")
-
-        Self impl:
-        
-        ICON PATH
-            User:
-                Gtk
-                /home/user/.icons/icon-theme/22x22/actions/icon-name.svg
-                Qt
-                /home/user/.icons/icon-theme/actions/22/icon-name.svg
-            
-            Gtk
-            /usr/share/icons/icon-theme/22x22/actions/icon-name.svg
-            Qt
-            /usr/share/icons/icon-theme/actions/22/icon-name.svg
-            
-            Default sys
-            /usr/share/icons/hicolor/22x22/actions/icon-name.png
-            Default lib
-            self._icon_path / document-save.svg
-
-        ROADMAP
-            loop paths:
-                check for: Gtk Qt icon-name icon-theme.png .svg
-            else:
-                or: Default sys
-                or: Default lib
-                or: callback-icon-path
-        """
-
         if icon_path:
             return icon_path
         

@@ -36,7 +36,7 @@ class Platform(object):
     def accent_color(self) -> str:
         """..."""
         if not self._accent_color:
-            self._accent_color = self._style.accent_color()
+            self._accent_color = self._style.accent_color
         return self._accent_color
 
     @accent_color.setter
