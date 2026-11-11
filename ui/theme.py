@@ -3,6 +3,10 @@
 
 class Theme(object):
     """..."""
+    Name = 'Glitch'
+    ModeColor = 'dark'
+    AccentColor = '#FF3C8CBD'
+
     Frame = {
         'BASE': {
             'background-color': (20, 20, 20, 240),
@@ -65,6 +69,8 @@ class Theme(object):
     
     Button = {
         'BASE': {
+            # 'font-color': (18, 18, 18, 255),
+            # 'background-color': (229, 229, 229, 255),
             'font-color': (200, 200, 200, 255),
             'background-color': (35, 35, 35, 255),
             'border-color': (55, 55, 55, 200),
@@ -143,6 +149,12 @@ class Theme(object):
             'font-color': (200, 200, 200, 255),
             'background-color': (10, 10, 10, 240),
             'border-color': (80, 120, 170, 255),
+            },
+        }
+    
+    Icon = {
+        'BASE': {
+            'padding': 10,
             },
         }
     

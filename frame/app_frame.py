@@ -11,6 +11,7 @@ from ..layout.row import Row
 from ..cell.control_button import ControlButton
 from ..cell.drag_area import DragArea
 from ..cell.tool_button import ToolButton
+from ..cell.icon import Icon
 
 
 PATH = Path(__file__).resolve().parent.parent
@@ -27,27 +28,28 @@ class Header(Box):
         desk_env = 'plasma'
         buttons_path = PATH/'static'/'control_button'
         base = buttons_path/desk_env
+        default_app_icon = PATH/'static'/'icons'/'app.svg'
 
         icon_close = base/'window-close-b-symbolic.svg'
         icon_close_hover = base/'window-close-b-hover-symbolic.svg'
         icon_close_clicked = base/'window-close-clicked-symbolic.svg'
         self._close_control = self.add(
             ControlButton(icon_close, icon_close_hover, icon_close_clicked))
-        self._close_control.pressed.connect(lambda _: frame.close())
+        self._close_control.released.connect(lambda _: frame.close())
 
         icon_max = base/'go-up-symbolic.svg'
         icon_max_hover = base/'go-up-hover-symbolic.svg'
         icon_max_clicked = base/'go-up-clicked-symbolic.svg'
         self._max_control = self.add(
             ControlButton(icon_max, icon_max_hover, icon_max_clicked))
-        self._max_control.pressed.connect(lambda _: frame.toggle_maximize())
+        self._max_control.released.connect(lambda _: frame.toggle_maximize())
         
         icon_min = base/'go-down-symbolic.svg'
         icon_min_hover = base/'go-down-hover-symbolic.svg'
         icon_min_clicked = base/'go-down-clicked-symbolic.svg'
         self._min_control = self.add(
             ControlButton(icon_min, icon_min_hover, icon_min_clicked))
-        self._min_control.pressed.connect(
+        self._min_control.released.connect(
             lambda _: setattr(frame, 'frame_state', FrameState.MIN))
         
         self._left = self.add(Row(fill=Fill.X, align=Align.START))
@@ -55,7 +57,7 @@ class Header(Box):
         self._right = self.add(Row(fill=Fill.X, align=Align.END))
 
         self._r = self.add(Row(fill=Fill.NONE, align=Align.END))
-        ff = self._r.add(ToolButton('document-edit'))
+        self._app_icon = self._r.add(Icon(default_app_icon))
     
     @property
     def left(self) -> Row:

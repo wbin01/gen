@@ -29,7 +29,9 @@ class ToolButton(Cell):
             size=22,
             theme=self._icon_theme,
             extensions=['png', 'svg', 'xpm'])
-        if not self._icon_path: self._icon_path = self._empty_icon_path
+        if not self._icon_path:
+            self._icon_path = (self._empty_icon_dark
+                if self._mode_color == 'dark' else self._empty_icon)
 
         self._icon_x = 0
         self._icon_y = 0

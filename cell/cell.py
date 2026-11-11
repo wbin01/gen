@@ -21,7 +21,11 @@ class Cell(Margin, Padding, Size, UIObject):
     _os_desk = OSDesk()
     _icon = Icon(_os_desk.desktop_environment)
     _icon_theme = _icon.icon_theme()
-    _empty_icon_path = PATH/'static/icons/empty.svg'
+    _empty_icon = PATH/'static/icons/empty.svg'
+    _empty_icon_dark = PATH/'static/icons/empty-dark.svg'
+    _mode_color = Theme.ModeColor
+    _accent_color = Theme.AccentColor
+    _theme_name = Theme.Name
     def __init__(
             self, style_class: str = None, fill: Fill = Fill.XY,
             *args, **kwargs) -> None:
